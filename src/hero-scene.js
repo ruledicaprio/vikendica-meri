@@ -218,6 +218,9 @@ export class CabinHeroScene {
     cabin.add(this._createBalcony(3.7, 0.9, 0.8, 0, 5.4, 4.8));
     cabin.add(this._createBalcony(2.0, 0.7, 0.6, 0, 7.0, 4.5));
 
+    // Exposed timber frame on the front gable — the "A" shape (two legs + tie beam).
+    this._createAframeTimber();
+
     const windowMat = new THREE.MeshStandardMaterial({
       color: 0x1a1a2e, emissive: 0xffaa44, emissiveIntensity: 0.3, roughness: 0.1, metalness: 0.3,
     });
@@ -289,6 +292,34 @@ export class CabinHeroScene {
 
     group.position.set(x, y, z);
     return group;
+  }
+
+  // ----------------------------------------------------------
+  //  A-FRAME TIMBER (the visible "A": two slanted legs + tie beam)
+  // ----------------------------------------------------------
+  _createAframeTimber() {
+    const cabin = this.cabinGroup;
+    const z = 5.12; // just proud of the front gable face (front is at z = 5)
+    const mat = new THREE.MeshStandardMaterial({ color: 0x6e4326, roughness: 0.7, metalness: 0.04 });
+
+    // Box beam connecting two gable points (a,b) on the front face.
+    const beam = (ax, ay, bx, by, thick) => {
+      const dx = bx - ax, dy = by - ay;
+      const len = Math.hypot(dx, dy);
+      const m = new THREE.Mesh(new THREE.BoxGeometry(len, thick, thick * 0.8), mat);
+      m.position.set((ax + bx) / 2, (ay + by) / 2, z);
+      m.rotation.z = Math.atan2(dy, dx);
+      cabin.add(m);
+      return m;
+    };
+
+    // The two slanted legs of the "A" (run along the gable edges to the apex).
+    beam(-4.7, 0.2, -0.16, 8.6, 0.36);
+    beam(4.7, 0.2, 0.16, 8.6, 0.36);
+    // The tie beam — the crossbar of the letter "A" (between the two balconies).
+    beam(-2.35, 4.75, 2.35, 4.75, 0.46);
+    // Short king-post detail from the tie beam up toward the apex.
+    beam(0, 4.95, 0, 8.4, 0.26);
   }
 
   // ----------------------------------------------------------
