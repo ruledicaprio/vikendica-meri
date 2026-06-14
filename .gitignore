@@ -1,0 +1,12 @@
+node_modules
+dist
+.DS_Store
+*.local
+.vite
+
+# Tooling / local-only
+.claude
+*.plugin
+
+# Orphaned duplicate of the photos (everything used by the site lives in public/)
+data

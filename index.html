@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="bs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Vikendica Meri — klasična A-frame planinska vikendica u Dolini Panjeva, Babanovac, Vlašić. Smještaj za ~10 osoba, blizu ski-centra i grada Travnika."
+    />
+    <meta name="theme-color" content="#0a0e1a" />
+    <title>Vikendica Meri · Planina Vlašić</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <span id="top"></span>
+
+    <!-- Fixed 3D hero scene mount -->
+    <div id="hero-canvas"></div>
+
+    <!-- NAVBAR -->
+    <header class="navbar" id="navbar">
+      <div class="navbar__inner">
+        <a class="navbar__logo" href="#top">Vikendica&nbsp;Meri</a>
+        <nav class="navbar__links" id="nav-links">
+          <a href="#smjestaj">Smještaj</a>
+          <a href="#destinacije">Planina Vlašić i Travnik</a>
+          <a href="#galerija">Galerija</a>
+          <a class="navbar__cta" href="#kontakt">Rezerviši&nbsp;→</a>
+        </nav>
+        <button class="navbar__burger" id="burger" aria-label="Otvori meni" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- HERO overlay -->
+    <div class="hero-overlay">
+      <div class="hero-overlay__inner">
+        <p class="hero-overlay__subtitle">Planina Vlašić · Babanovac</p>
+        <h1 class="hero-overlay__title">Vikendica Meri</h1>
+        <p class="hero-overlay__location">Dolina Panjeva · Babanovac · Vlašić</p>
+        <div class="hero-overlay__cta">
+          <a class="btn btn--primary" href="#smjestaj">Pogledaj smještaj</a>
+          <a class="btn btn--secondary" href="#kontakt">Rezerviši</a>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint">Istraži ↓</div>
+
+    <!-- CONTENT (scrolls over the fixed hero) -->
+    <main class="content">
+      <!-- SMJEŠTAJ -->
+      <section class="section section--smjestaj" id="smjestaj">
+        <div class="wrap">
+          <div class="about">
+            <div class="about__text">
+              <p class="kicker">O vikendici</p>
+              <h2>Topli planinski dom sa dušom</h2>
+              <p>
+                Klasična A-frame vikendica sa strmim drvenim krovom, prostranim balkonima
+                i pogledom na borovu šumu. Generacijama je ovo mjesto okupljanja porodice
+                i prijatelja, gdje miris drveta i toplina peći stvaraju nezaboravan ugođaj.
+              </p>
+              <p>
+                Smještena u mirnoj Dolini Panjeva na Babanovcu, nudi udoban prostor za
+                <strong>do 10 osoba</strong> — idealno za zimske dane na snijegu i ljetne
+                večeri uz roštilj. Centralno grijanje na pelet i drva čuva toplinu doma u
+                svako doba godine.
+              </p>
+              <ul class="facts">
+                <li>🛏️ Kapacitet ~10 osoba</li>
+                <li>🔥 Centralno grijanje</li>
+                <li>📍 Babanovac, Vlašić</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3 class="subhead">Raspored po etažama</h3>
+          <div class="floors">
+            <article class="floor">
+              <h4>Prizemlje</h4>
+              <ul>
+                <li>Predsoblje</li><li>Kupatilo</li><li>Dnevni boravak</li><li>Kuhinja</li>
+              </ul>
+            </article>
+            <article class="floor">
+              <h4>1. sprat</h4>
+              <ul>
+                <li>Soba: bračni + 1 single + balkon</li>
+                <li>Dječija soba: 2× single</li><li>Kupatilo</li>
+              </ul>
+            </article>
+            <article class="floor">
+              <h4>2. sprat</h4>
+              <ul>
+                <li>Soba: 2× single</li><li>Soba: 3× single + balkon</li>
+              </ul>
+            </article>
+          </div>
+
+          <h3 class="subhead">Sadržaji</h3>
+          <ul class="amenities">
+            <li>Besplatan parking</li><li>Roštilj</li><li>Kuhalo</li><li>Rerna</li>
+            <li>Šporet</li><li>Mikrovalna</li><li>Frižider</li><li>LED TV</li>
+            <li>Centralno grijanje (pelet/drva)</li><li>Fen</li><li>Usisavač</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- DESTINACIJE: Planina Vlašić & Grad Travnik -->
+      <section class="section section--destinacije" id="destinacije">
+        <div class="wrap">
+          <div class="section__head">
+            <p class="kicker">Istraži okolinu</p>
+            <h2>Planina Vlašić &amp; Grad Travnik</h2>
+          </div>
+          <div class="dest-grid">
+            <article class="dest-card" data-cat="vlasic">
+              <div class="dest-card__media" data-cat="vlasic"></div>
+              <div class="dest-card__body">
+                <h3>Planina Vlašić</h3>
+                <p>
+                  Vlašić je planina u centralnoj Bosni, poznat po ski-stazama Babanovca,
+                  borovim šumama i kristalnom zraku. Dolina Panjeva, gdje se nalazi
+                  Vikendica Meri, pruža mir i prirodu u svako godišnje doba.
+                </p>
+                <div class="dest-links">
+                  <a class="dest-link" href="https://vlasic-online.com/" target="_blank" rel="noopener">Vlašić online ↗</a>
+                  <a class="dest-link" href="https://ski.srednjabosna.ba/" target="_blank" rel="noopener">Ski-centar ↗</a>
+                  <a class="dest-link dest-link--live" href="https://ski.srednjabosna.ba/live-kamere/" target="_blank" rel="noopener">● Live kamere ↗</a>
+                  <a class="dest-link dest-link--live" href="https://www.ozon.ba/en/live/" target="_blank" rel="noopener">● Live: Lift Babanovac ↗</a>
+                </div>
+              </div>
+            </article>
+            <article class="dest-card" data-cat="travnik">
+              <div class="dest-card__media" data-cat="travnik"></div>
+              <div class="dest-card__body">
+                <h3>Grad Travnik</h3>
+                <p>
+                  Travnik — bivša prijestolnica Bosanskog ejaleta — krasi se historijskim
+                  utvrđenjem, šarenom čaršijom i legendom o Ivi Andriću. Udaljen je 30
+                  minuta od Vlašića i savršen za kulturni izlet.
+                </p>
+                <div class="dest-links">
+                  <a class="dest-link" href="https://muzejtravnik.ba/" target="_blank" rel="noopener">Muzej Travnik ↗</a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- GALERIJA -->
+      <section class="section section--galerija" id="galerija">
+        <div class="wrap">
+          <div class="section__head">
+            <p class="kicker">Galerija</p>
+            <h2>Pogledajte u detalje</h2>
+          </div>
+          <div class="segments" id="gallery-segments"></div>
+        </div>
+      </section>
+
+      <!-- KONTAKT -->
+      <section class="section section--kontakt" id="kontakt">
+        <div class="wrap">
+          <div class="contact-grid">
+            <div class="contact-info">
+              <p class="kicker">Kontakt</p>
+              <h2>Rezervišite svoj boravak</h2>
+              <p class="lead">
+                Za upite i rezervacije kontaktirajte nas telefonom, mailom ili putem poruke.
+                Radujemo se vašoj posjeti.
+              </p>
+              <ul class="contact-list">
+                <li>📞 <a href="tel:+38762555888">+387 62 555 888</a></li>
+                <li>📞 <a href="tel:+38761477345">+387 61 477 345</a></li>
+                <li>✉️ <a href="mailto:villa-meri@gmail.com">villa-meri@gmail.com</a></li>
+                <li>📍 <span>Dolina Panjeva, Babanovac, Vlašić, BiH</span></li>
+              </ul>
+              <p class="contact-note">🕑 Minimalni boravak: 2 noći</p>
+              <div class="map">
+                <iframe
+                  title="Lokacija — Vikendica Meri"
+                  src="https://www.google.com/maps?q=44.309258,17.574111&z=15&output=embed"
+                  width="100%" height="100%" style="border:0" allowfullscreen=""
+                  loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              </div>
+              <a class="btn btn--secondary" target="_blank" rel="noopener"
+                href="https://maps.app.goo.gl/46PD85bbz4XNFv8J9">Otvori u Google Maps</a>
+            </div>
+
+            <form class="contact-form" id="reserve-form" novalidate>
+              <h3>Pošaljite upit</h3>
+              <div class="field">
+                <label for="f-name">Ime i prezime</label>
+                <input id="f-name" name="name" type="text" required placeholder="Vaše ime" />
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="f-email">Email</label>
+                  <input id="f-email" name="email" type="email" required placeholder="vas@email.com" />
+                </div>
+                <div class="field">
+                  <label for="f-phone">Telefon</label>
+                  <input id="f-phone" name="phone" type="tel" placeholder="+387…" />
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="f-from">Dolazak</label>
+                  <input id="f-from" name="checkin" type="date" />
+                </div>
+                <div class="field">
+                  <label for="f-to">Odlazak</label>
+                  <input id="f-to" name="checkout" type="date" />
+                </div>
+              </div>
+              <div class="field">
+                <label for="f-guests">Broj gostiju</label>
+                <input id="f-guests" name="guests" type="number" min="1" max="10" value="2" />
+              </div>
+              <div class="field">
+                <label for="f-msg">Poruka</label>
+                <textarea id="f-msg" name="message" rows="4" placeholder="Termin, broj noćenja, pitanja…"></textarea>
+              </div>
+              <button class="btn btn--primary" type="submit">Pošalji upit</button>
+              <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>Vikendica Meri © 2026 · Vlašić, BiH</p>
+      </footer>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+# ============================================================
+#  Vikendica Meri — production static hosting (Caddy v2)
+#  Serves the built ./dist folder with automatic HTTPS + caching.
+# ============================================================
+#
+#  IMPORTANT — domain:
+#  Replace `vikendica-meri.example` below with a REAL, publicly
+#  resolvable domain that you control.
+#  `.meri` is NOT a real top-level domain — Let's Encrypt cannot
+#  issue a certificate for `babanovac.villa.meri` and public DNS
+#  cannot resolve it. See DEPLOY.md for how to get a (free) domain.
+#
+#  Run from this folder:
+#     caddy run               (foreground, for testing)
+#     caddy start             (background)
+#     caddy install           (install as a Windows service)
+# ============================================================
+
+vikendica-meri.example {
+	# Absolute path to the build output (forward slashes work on Windows).
+	root * E:/vikendica-meri/dist
+
+	encode zstd gzip
+	file_server
+
+	# Fingerprinted build assets never change → cache forever.
+	@hashed path /assets/*
+	header @hashed Cache-Control "public, max-age=31536000, immutable"
+
+	# Photos have stable names but may be updated → cache a week.
+	@photos path /smjestaj/* /vlasic/* /travnik/*
+	header @photos Cache-Control "public, max-age=604800"
+
+	# HTML must always re-validate so updates appear immediately.
+	@html path / /index.html
+	header @html Cache-Control "no-cache"
+
+	header -Server
+}
+
+# ------------------------------------------------------------
+#  Local-network / offline testing (no public domain required).
+#  Uses Caddy's internal self-signed CA — browsers will warn unless
+#  you trust the Caddy root CA. Uncomment to use:
+# ------------------------------------------------------------
+# babanovac.villa.meri {
+# 	tls internal
+# 	root * E:/vikendica-meri/dist
+# 	encode zstd gzip
+# 	file_server
+# }

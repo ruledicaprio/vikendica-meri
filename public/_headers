@@ -1,0 +1,18 @@
+# Cache-Control rules — honoured by Cloudflare Pages and Netlify.
+# (Copied verbatim into dist/ by Vite because it lives in public/.)
+
+# Fingerprinted build assets never change → cache forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Photos: stable names, occasionally updated → cache a week.
+/smjestaj/*
+  Cache-Control: public, max-age=604800
+/vlasic/*
+  Cache-Control: public, max-age=604800
+/travnik/*
+  Cache-Control: public, max-age=604800
+
+# HTML must always re-validate so updates appear immediately.
+/index.html
+  Cache-Control: no-cache
