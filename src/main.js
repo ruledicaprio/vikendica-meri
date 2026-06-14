@@ -65,7 +65,7 @@ gsap.utils.toArray('.reveal').forEach((el) => {
 
 /* ---------- Reservation form ----------
    Add a free Web3Forms access key to send in-page; otherwise opens the mail client. */
-const WEB3FORMS_KEY = '';
+const WEB3FORMS_KEY = 'bc60fbf4-87e2-4fa8-bde9-b5636e7bca26';
 const CONTACT_EMAIL = 'villa-meri@gmail.com';
 const form = document.getElementById('reserve-form');
 const status = document.getElementById('form-status');
