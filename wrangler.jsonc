@@ -1,0 +1,10 @@
+{
+  // Static-assets-only Worker: serves the built ./dist as the site.
+  // Cloudflare runs `npm run build` (→ dist/) then `npx wrangler deploy`,
+  // which uploads dist/ as static assets. No server code needed.
+  "name": "vikendica-meri",
+  "compatibility_date": "2025-06-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}

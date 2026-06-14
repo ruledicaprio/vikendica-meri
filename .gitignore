@@ -6,6 +6,7 @@ dist
 
 # Tooling / local-only
 .claude
+.wrangler
 *.plugin
 
 # Orphaned duplicate of the photos (everything used by the site lives in public/)
