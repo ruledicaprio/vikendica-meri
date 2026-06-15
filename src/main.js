@@ -100,6 +100,11 @@ if (form) {
       mailtoFallback(data);
       return;
     }
+    if (!data['h-captcha-response']) {
+      status.textContent = 'Molimo potvrdite da niste robot (captcha).';
+      status.className = 'form-status is-err';
+      return;
+    }
     status.textContent = 'Šaljemo…';
     status.className = 'form-status is-info';
     try {
@@ -113,10 +118,12 @@ if (form) {
         status.textContent = 'Hvala! Vaš upit je poslan. Javit ćemo se uskoro.';
         status.className = 'form-status is-ok';
         form.reset();
+        if (window.hcaptcha) window.hcaptcha.reset();
       } else throw new Error();
     } catch {
       status.textContent = 'Slanje nije uspjelo. Kontaktirajte nas direktno.';
       status.className = 'form-status is-err';
+      if (window.hcaptcha) window.hcaptcha.reset();
     }
   });
 }
