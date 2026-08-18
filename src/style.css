@@ -300,9 +300,26 @@ picture {
 /* Every section needs an opaque background: .content scrolls over the fixed
    hero, so a transparent section lets the 3D scene and the hero title show
    through it. */
+/* The hero poster, reused. It is already preloaded and painted in the hero, so
+   by the time anyone scrolls here it is in cache and this costs no extra bytes.
+   background-color stays as the fallback: if the image fails the section must
+   still be opaque, or the fixed hero shows through .content. */
 .section--dostupnost {
-  background: var(--bg);
-  padding-bottom: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(10, 14, 26, 0.9), rgba(10, 14, 26, 0.94)),
+    url('/hero-poster.jpg');
+  background-size: cover;
+  /* Biased up towards the A-frame apex; centred would land on empty sky. */
+  background-position: center 30%;
+  padding-block: clamp(4rem, 9vw, 7rem);
+}
+/* Parallax only where it behaves: iOS Safari sizes a fixed background to the
+   viewport and judders, and a parallax is motion, so reduced-motion opts out. */
+@media (min-width: 901px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .section--dostupnost {
+    background-attachment: fixed;
+  }
 }
 .section--kontakt {
   background: var(--bg);
@@ -500,7 +517,9 @@ picture {
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(245, 240, 232, 0.5);
+  /* 0.5 measured 4.36:1 against the photo background behind this section —
+     just under the 4.5 threshold. */
+  color: rgba(245, 240, 232, 0.68);
   padding-bottom: 0.4rem;
 }
 .cal__day {
