@@ -6,6 +6,29 @@ import * as THREE from 'three';
 //  Mouse hover → glowing string lights · gentle float/breathe
 // ============================================================
 
+// Season endpoints, allocated once. These used to be constructed inside the
+// render loop, which meant ~65 THREE.Color allocations every single frame.
+const C_GROUND_WINTER = new THREE.Color(0xe8eef5);
+const C_GROUND_SUMMER = new THREE.Color(0x4a8a3a);
+const C_FOLIAGE_WINTER = new THREE.Color(0x1a4a1a);
+const C_FOLIAGE_SUMMER = new THREE.Color(0x2d7a2d);
+const C_AMBIENT_WINTER = new THREE.Color(0x404060);
+const C_AMBIENT_SUMMER = new THREE.Color(0x88aacc);
+const C_DIR_WINTER = new THREE.Color(0x8888cc);
+const C_DIR_SUMMER = new THREE.Color(0xffffee);
+
+const SNOW_MAX = 1400;
+const STAR_MAX = 500;
+
+// Quality tiers. The sky is a full-screen backside sphere running domain-warped
+// fbm noise per pixel — comfortably the most expensive thing here — so the octave
+// count, the pixel ratio and the shadow pass are what actually move the needle
+// on a phone.
+const TIERS = {
+  high: { dpr: 2, shadows: true, snow: SNOW_MAX, stars: STAR_MAX, octaves: 4, lightEvery: 3 },
+  low: { dpr: 1.5, shadows: false, snow: 400, stars: 150, octaves: 2, lightEvery: 5 },
+};
+
 export class CabinHeroScene {
   constructor(container) {
     this.container = container;
@@ -20,10 +43,22 @@ export class CabinHeroScene {
     this.snowParticles = null;
     this.starParticles = null;
     this.cabinGroup = new THREE.Group();
-    this.trees = [];
     this.groundMesh = null;
     this.roofSnowMesh = null;
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Pick a starting tier from device hints; _animate() steps it down if the
+    // measured frame time says the guess was optimistic.
+    this.tierName = this._detectTier();
+    this.tier = TIERS[this.tierName];
+
+    // Reduced motion still needs to answer scroll — the winter/summer transition
+    // is the content, not decoration — but it renders on demand instead of
+    // continuously, and every ambient animation below is switched off.
+    this._dirty = true;
+    this._paused = false;
+    this._frames = 0;
+    this._sampleStart = 0;
 
     this._init();
     this._createScene();
@@ -45,6 +80,14 @@ export class CabinHeroScene {
     };
   }
 
+  _detectTier() {
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    const memory = navigator.deviceMemory || 4;
+    const cores = navigator.hardwareConcurrency || 4;
+    if (coarse || window.innerWidth < 900 || memory <= 4 || cores <= 4) return 'low';
+    return 'high';
+  }
+
   // ----------------------------------------------------------
   //  INIT
   // ----------------------------------------------------------
@@ -56,10 +99,17 @@ export class CabinHeroScene {
     this.camera.position.set(0, 4, 18);
     this.camera.lookAt(0, 3, 0);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    // alpha:false — the sky sphere (r=80, camera always inside) covers every
+    // pixel, so there is nothing to blend against and an opaque buffer is cheaper.
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: this.tierName === 'high',
+      alpha: false,
+      powerPreference: 'high-performance',
+    });
+    this.renderer.setClearColor(0x0a0e1a, 1);
     this.renderer.setSize(w, h);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.shadowMap.enabled = true;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.tier.dpr));
+    this.renderer.shadowMap.enabled = this.tier.shadows;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.0;
@@ -84,6 +134,7 @@ export class CabinHeroScene {
         }
       `,
       fragmentShader: `
+        #define FBM_OCTAVES ${this.tier.octaves}
         uniform float uProgress;
         uniform float uTime;
         varying vec3 vWorldPos;
@@ -98,7 +149,7 @@ export class CabinHeroScene {
         }
         float fbm(vec2 p) {
           float v = 0.0, a = 0.5;
-          for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.0; a *= 0.5; }
+          for (int i = 0; i < FBM_OCTAVES; i++) { v += a * noise(p); p *= 2.0; a *= 0.5; }
           return v;
         }
 
@@ -331,50 +382,44 @@ export class CabinHeroScene {
       [8, 0, 2], [10, 0, -3], [7, 0, -6],
       [-12, 0, 0], [12, 0, 1],
     ];
-    treePositions.forEach((pos) => {
-      const tree = this._createPineTree();
-      tree.position.set(...pos);
-      this.scene.add(tree);
-      this.trees.push(tree);
-    });
-  }
-
-  _createPineTree() {
-    const group = new THREE.Group();
-    const trunk = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.15, 0.25, 1.5, 8),
-      new THREE.MeshStandardMaterial({ color: 0x3d2817, roughness: 0.9 })
-    );
-    trunk.position.y = 0.75;
-    trunk.castShadow = true;
-    group.add(trunk);
-
-    const foliageMat = new THREE.MeshStandardMaterial({ color: 0x1a4a1a, roughness: 0.8 });
-    const snowMat = new THREE.MeshStandardMaterial({ color: 0xe8eef5, roughness: 0.9 });
+    const n = treePositions.length;
     const layers = [
       { y: 1.5, r: 1.2, h: 1.5 },
       { y: 2.5, r: 0.9, h: 1.3 },
       { y: 3.3, r: 0.6, h: 1.1 },
       { y: 4.0, r: 0.3, h: 0.8 },
     ];
-    const foliage = [];
-    layers.forEach((l) => {
-      const cone = new THREE.Mesh(new THREE.ConeGeometry(l.r, l.h, 8), foliageMat.clone());
-      cone.position.y = l.y;
-      cone.castShadow = true;
-      group.add(cone);
-      foliage.push(cone);
+
+    // One shared material per role. Every tree lerped to the *same* colour and
+    // opacity, so the previous per-cone material.clone() (64 of them) bought
+    // nothing and cost 64 updates a frame — now it is two.
+    this.foliageMat = new THREE.MeshStandardMaterial({ color: C_FOLIAGE_WINTER.clone(), roughness: 0.8 });
+    this.treeSnowMat = new THREE.MeshStandardMaterial({
+      color: 0xe8eef5, roughness: 0.9, transparent: true,
     });
-    const snowParts = [];
-    layers.forEach((l) => {
-      const snow = new THREE.Mesh(new THREE.ConeGeometry(l.r * 0.7, l.h * 0.3, 8), snowMat.clone());
-      snow.position.y = l.y + l.h * 0.35;
-      group.add(snow);
-      snowParts.push(snow);
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2817, roughness: 0.9 });
+
+    const m = new THREE.Matrix4();
+    const place = (mesh, offsetY) => {
+      treePositions.forEach((p, i) => {
+        m.makeTranslation(p[0], p[1] + offsetY, p[2]);
+        mesh.setMatrixAt(i, m);
+      });
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = true;
+      this.scene.add(mesh);
+      return mesh;
+    };
+
+    // 8 trees x 9 meshes = 72 draw calls, collapsed to 9 instanced ones.
+    place(new THREE.InstancedMesh(new THREE.CylinderGeometry(0.15, 0.25, 1.5, 8), trunkMat, n), 0.75);
+    this.treeSnowMeshes = layers.map((l) => {
+      place(new THREE.InstancedMesh(new THREE.ConeGeometry(l.r, l.h, 8), this.foliageMat, n), l.y);
+      return place(
+        new THREE.InstancedMesh(new THREE.ConeGeometry(l.r * 0.7, l.h * 0.3, 8), this.treeSnowMat, n),
+        l.y + l.h * 0.35
+      );
     });
-    group.userData.snowParts = snowParts;
-    group.userData.foliage = foliage;
-    return group;
   }
 
   // ----------------------------------------------------------
@@ -411,7 +456,7 @@ export class CabinHeroScene {
   //  SNOW PARTICLES
   // ----------------------------------------------------------
   _createSnowParticles() {
-    const count = 1400;
+    const count = SNOW_MAX;
     const geo = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count);
@@ -423,6 +468,11 @@ export class CabinHeroScene {
     }
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geo.userData = { velocities };
+    // Allocated at full size once; the tier (and any runtime downgrade) just
+    // narrows the draw range, so changing quality never reallocates a buffer.
+    // Falling snow is pure decoration, so reduced motion gets none of it.
+    this.snowCount = this.reducedMotion ? 0 : this.tier.snow;
+    geo.setDrawRange(0, this.snowCount);
     this.snowParticles = new THREE.Points(
       geo,
       new THREE.PointsMaterial({ color: 0xffffff, size: 0.08, transparent: true, opacity: 0.8, depthWrite: false })
@@ -434,7 +484,7 @@ export class CabinHeroScene {
   //  STAR PARTICLES
   // ----------------------------------------------------------
   _createStarParticles() {
-    const count = 500;
+    const count = STAR_MAX;
     const geo = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
@@ -446,6 +496,7 @@ export class CabinHeroScene {
       positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
     }
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setDrawRange(0, this.tier.stars);
     this.starParticles = new THREE.Points(
       geo,
       new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.6, depthWrite: false })
@@ -517,8 +568,9 @@ export class CabinHeroScene {
         bulb.userData.phase = Math.random() * Math.PI * 2;
         bulb.userData.baseColor = bulbColor;
 
-        // A few real point lights spill warm light onto the wood.
-        if (i % 3 === 0) {
+        // A few real point lights spill warm light onto the wood. Each one is a
+        // dynamic light every lit material must evaluate, so the low tier thins them.
+        if (i % this.tier.lightEvery === 0) {
           const pl = new THREE.PointLight(0xffb060, 0.35, 3.5);
           pl.position.copy(bulb.position);
           this.cabinGroup.add(pl);
@@ -548,25 +600,79 @@ export class CabinHeroScene {
   // ----------------------------------------------------------
   //  EVENTS
   // ----------------------------------------------------------
+  /**
+   * Recompute whether the pointer is over the cabin. Called once at startup and
+   * then only on pointer movement.
+   *
+   * The startup call matters: `this.mouse` defaults to (0,0), which in NDC is the
+   * centre of the screen — and that ray hits the cabin. The old every-frame
+   * raycast therefore had the lights at full glow from load, and on touch devices
+   * (no mousemove ever) permanently so. Seeding it here keeps that look.
+   */
+  _updateHover() {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    this.targetHoverIntensity =
+      this.raycaster.intersectObject(this.cabinGroup, true).length > 0 ? 1 : 0;
+    this._dirty = true;
+  }
+
   _bindEvents() {
+    this._updateHover();
+
     this._onScroll = () => {
       const heroHeight = this._size().h;
       this.targetScrollProgress = Math.min(window.scrollY / heroHeight, 1);
+      this._dirty = true;
     };
     this._onMove = (e) => {
       this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
       this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
       this.mouse.set(this.mouseX, this.mouseY);
+      // Hover testing belongs here, not in the render loop: it only changes when
+      // the pointer moves. Running a full scene raycast every frame was wasted
+      // work, and on a touch device (no mousemove at all) it now never runs.
+      this._updateHover();
     };
     this._onResize = () => {
       const { w, h } = this._size();
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(w, h);
+      this._dirty = true;
+    };
+    // A hidden tab kept rendering the full scene, burning battery for nothing.
+    this._onVisibility = () => {
+      this._paused = document.hidden;
+      if (!this._paused) {
+        this.clock.getDelta(); // drop the elapsed background time so snow doesn't jump
+        this._dirty = true;
+      }
     };
     window.addEventListener('scroll', this._onScroll, { passive: true });
     window.addEventListener('mousemove', this._onMove, { passive: true });
     window.addEventListener('resize', this._onResize);
+    document.addEventListener('visibilitychange', this._onVisibility);
+  }
+
+  /** Switch quality at runtime. Buffers are never reallocated — only narrowed. */
+  _applyTier(name) {
+    if (this.tierName === name || !TIERS[name]) return;
+    this.tierName = name;
+    this.tier = TIERS[name];
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.tier.dpr));
+    this.renderer.shadowMap.enabled = this.tier.shadows;
+    this.scene.traverse((o) => {
+      if (o.material) o.material.needsUpdate = true;
+    });
+    if (!this.reducedMotion) {
+      this.snowCount = this.tier.snow;
+      this.snowParticles.geometry.setDrawRange(0, this.snowCount);
+    }
+    this.starParticles.geometry.setDrawRange(0, this.tier.stars);
+    this._dirty = true;
+    // The sky's octave count is compiled into the shader and is deliberately not
+    // changed here — recompiling mid-scroll stutters, and phones already start
+    // on the low tier where it matters.
   }
 
   // ----------------------------------------------------------
@@ -575,60 +681,66 @@ export class CabinHeroScene {
   _animate() {
     this._raf = requestAnimationFrame(() => this._animate());
 
-    // Pause the (expensive) render once the hero is scrolled out of view —
-    // content sections cover it, so there's nothing to see. Saves GPU/CPU.
-    if (window.scrollY > this._size().h * 1.15) {
-      this.clock.getDelta(); // keep delta from accumulating
+    // Nothing worth drawing: tab in the background, or the hero scrolled behind
+    // the content sections. Drain the clock either way so time doesn't pile up.
+    if (this._paused || window.scrollY > this._size().h * 1.15) {
+      this.clock.getDelta();
       return;
     }
 
     const delta = this.clock.getDelta();
     const elapsed = this.clock.getElapsedTime();
+    // `still` = honour prefers-reduced-motion. The winter/summer scroll
+    // transition is the content itself so it stays, but every ambient
+    // animation (falling snow, flicker, float, parallax, drifting sky) stops,
+    // and the scene renders on demand rather than continuously.
+    const still = this.reducedMotion;
 
-    // Smooth scroll + hover interpolation.
-    this.scrollProgress += (this.targetScrollProgress - this.scrollProgress) * 0.05;
-
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObject(this.cabinGroup, true);
-    this.targetHoverIntensity = intersects.length > 0 ? 1 : 0;
-    this.hoverIntensity += (this.targetHoverIntensity - this.hoverIntensity) * 0.08;
+    if (still) {
+      const settled =
+        Math.abs(this.targetScrollProgress - this.scrollProgress) < 0.0005 &&
+        Math.abs(this.targetHoverIntensity - this.hoverIntensity) < 0.0005;
+      if (settled && !this._dirty) return;
+      this.scrollProgress = this.targetScrollProgress;
+      this.hoverIntensity = this.targetHoverIntensity;
+      this._dirty = false;
+    } else {
+      this.scrollProgress += (this.targetScrollProgress - this.scrollProgress) * 0.05;
+      this.hoverIntensity += (this.targetHoverIntensity - this.hoverIntensity) * 0.08;
+    }
 
     // Sky.
     this.skyMesh.material.uniforms.uProgress.value = this.scrollProgress;
-    this.skyMesh.material.uniforms.uTime.value = elapsed;
+    if (!still) this.skyMesh.material.uniforms.uTime.value = elapsed;
 
     // Ground color.
-    this.groundMesh.material.color.lerpColors(
-      new THREE.Color(0xe8eef5), new THREE.Color(0x4a8a3a), this.scrollProgress
-    );
+    this.groundMesh.material.color.lerpColors(C_GROUND_WINTER, C_GROUND_SUMMER, this.scrollProgress);
 
     // Roof snow.
     this.roofSnowMesh.material.opacity = 1 - this.scrollProgress;
     this.roofSnowMesh.material.transparent = true;
     this.roofSnowMesh.visible = this.scrollProgress < 0.95;
 
-    // Trees: melt snow + green up.
-    this.trees.forEach((tree) => {
-      tree.userData.snowParts.forEach((part) => {
-        part.material.opacity = 1 - this.scrollProgress;
-        part.material.transparent = true;
-        part.visible = this.scrollProgress < 0.95;
-      });
-      tree.userData.foliage.forEach((cone) => {
-        cone.material.color.lerpColors(
-          new THREE.Color(0x1a4a1a), new THREE.Color(0x2d7a2d), this.scrollProgress
-        );
-      });
-    });
+    // Trees: melt snow + green up. Shared materials, so this is two updates
+    // rather than the 64 the per-cone clones used to need.
+    this.foliageMat.color.lerpColors(C_FOLIAGE_WINTER, C_FOLIAGE_SUMMER, this.scrollProgress);
+    this.treeSnowMat.opacity = 1 - this.scrollProgress;
+    const snowVisible = this.scrollProgress < 0.95;
+    for (const mesh of this.treeSnowMeshes) mesh.visible = snowVisible;
 
     // String lights — realistic per-bulb flicker + dramatic hover burst (→ 3.0).
     const baseIntensity = 0.5 + this.hoverIntensity * 2.5;
     const dim = 1 - this.scrollProgress * 0.8;
-    this.lights.forEach((bulb) => {
+    for (const bulb of this.lights) {
       const ph = bulb.userData.phase;
       // Two incommensurate sines + an occasional candle-like dip = organic flicker.
-      let flicker = 0.82 + 0.1 * Math.sin(elapsed * 3.0 + ph) + 0.08 * Math.sin(elapsed * 7.3 + ph * 1.7);
-      flicker *= 0.94 + 0.06 * Math.sin(elapsed * 0.7 + ph * 3.1);
+      // Held at the flicker function's mean (0.82 * 0.94) when motion is reduced,
+      // so a steady bulb matches the average animated frame rather than its peak.
+      let flicker = 0.771;
+      if (!still) {
+        flicker = 0.82 + 0.1 * Math.sin(elapsed * 3.0 + ph) + 0.08 * Math.sin(elapsed * 7.3 + ph * 1.7);
+        flicker *= 0.94 + 0.06 * Math.sin(elapsed * 0.7 + ph * 3.1);
+      }
       bulb.material.emissiveIntensity = baseIntensity * flicker * dim;
       if (bulb.userData.halo) {
         const m = bulb.userData.halo.material;
@@ -638,29 +750,25 @@ export class CabinHeroScene {
       if (bulb.userData.pointLight) {
         bulb.userData.pointLight.intensity = (0.3 + this.hoverIntensity * 1.0) * flicker * dim;
       }
-    });
+    }
     // Windows pick up the hover glow too.
     if (this.windowMat) {
       this.windowMat.emissiveIntensity = 0.3 + this.hoverIntensity * 0.9;
     }
 
     // Ambient / directional / interior lighting.
-    this.ambientLight.color.lerpColors(
-      new THREE.Color(0x404060), new THREE.Color(0x88aacc), this.scrollProgress
-    );
+    this.ambientLight.color.lerpColors(C_AMBIENT_WINTER, C_AMBIENT_SUMMER, this.scrollProgress);
     this.ambientLight.intensity = 0.4 + this.scrollProgress * 0.6;
-    this.dirLight.color.lerpColors(
-      new THREE.Color(0x8888cc), new THREE.Color(0xffffee), this.scrollProgress
-    );
+    this.dirLight.color.lerpColors(C_DIR_WINTER, C_DIR_SUMMER, this.scrollProgress);
     this.dirLight.intensity = 0.6 + this.scrollProgress * 1.2;
     this.interiorLight.intensity = 1.5 * (1 - this.scrollProgress * 0.5);
 
-    // Snow particles.
-    if (this.snowParticles) {
+    // Snow particles — only the active draw range is simulated.
+    if (this.snowParticles && this.snowCount > 0) {
       this.snowParticles.material.opacity = 0.8 * (1 - this.scrollProgress);
       const positions = this.snowParticles.geometry.attributes.position.array;
       const velocities = this.snowParticles.geometry.userData.velocities;
-      for (let i = 0; i < positions.length / 3; i++) {
+      for (let i = 0; i < this.snowCount; i++) {
         positions[i * 3 + 1] -= velocities[i] * delta;
         positions[i * 3] += Math.sin(elapsed + i) * 0.01;
         if (positions[i * 3 + 1] < 0) {
@@ -674,16 +782,28 @@ export class CabinHeroScene {
       this.starParticles.material.opacity = 0.6 * (1 - this.scrollProgress);
     }
 
-    // Cabin gentle float / breathe.
-    this.cabinGroup.position.y = Math.sin(elapsed * 0.6) * 0.05;
+    if (!still) {
+      // Cabin gentle float / breathe.
+      this.cabinGroup.position.y = Math.sin(elapsed * 0.6) * 0.05;
 
-    // Camera subtle parallax.
-    this.camera.position.x += (this.mouseX * 1.5 - this.camera.position.x) * 0.02;
-    this.camera.position.y += (4 + this.mouseY * 0.5 - this.camera.position.y) * 0.02;
-    this.camera.lookAt(0, 3, 0);
+      // Camera subtle parallax.
+      this.camera.position.x += (this.mouseX * 1.5 - this.camera.position.x) * 0.02;
+      this.camera.position.y += (4 + this.mouseY * 0.5 - this.camera.position.y) * 0.02;
+      this.camera.lookAt(0, 3, 0);
+    }
 
     this.renderer.toneMappingExposure = 1.0 + this.scrollProgress * 0.5;
     this.renderer.render(this.scene, this.camera);
+
+    // Adaptive downgrade: device hints are a guess, so measure the opening
+    // seconds and drop a tier if this machine can't actually hold ~50fps.
+    if (this.tierName === 'high' && !still) {
+      if (this._frames === 0) this._sampleStart = performance.now();
+      if (++this._frames === 90) {
+        const fps = 90000 / (performance.now() - this._sampleStart);
+        if (fps < 50) this._applyTier('low');
+      }
+    }
   }
 
   dispose() {
@@ -691,6 +811,7 @@ export class CabinHeroScene {
     window.removeEventListener('scroll', this._onScroll);
     window.removeEventListener('mousemove', this._onMove);
     window.removeEventListener('resize', this._onResize);
+    document.removeEventListener('visibilitychange', this._onVisibility);
     this.renderer.dispose();
     if (this.renderer.domElement.parentNode === this.container) {
       this.container.removeChild(this.renderer.domElement);
