@@ -752,6 +752,14 @@ picture {
 .lightbox__img {
   max-width: 90vw;
   max-height: 82vh;
+  /* The width/height attributes are set per photo so the box can be reserved
+     before the bytes arrive, but as presentational hints they also pin the used
+     width. max-height would then clamp only the height and squash the picture,
+     so width/height must stay auto and let max-* scale it proportionally.
+     object-fit is the belt-and-braces: never distort, whatever the box. */
+  width: auto;
+  height: auto;
+  object-fit: contain;
   border-radius: 8px;
   box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9);
 }
