@@ -203,6 +203,89 @@ export function attachHoverSwap(el, key) {
 }
 
 /* ----------------------------------------------------------------------------
+   Hover previews for the floor cards and amenity chips
+   Each [data-photo] element names one photo as "<cat>/<file>". A single shared
+   panel is repointed on hover rather than one panel per element: 17 targets
+   would otherwise put 17 more <picture> trees in the DOM for a decoration.
+---------------------------------------------------------------------------- */
+const PREVIEW_SIZES = '240px';
+
+/** Resolve "kuhinja/05-….jpg" against the manifest. Throws — see initHoverPreviews. */
+export function findPhoto(path) {
+  const [cat, file] = String(path).split('/');
+  return (manifest[cat] || []).find((p) => base(p.src) === file) || null;
+}
+
+export function initHoverPreviews(root = document) {
+  const targets = root.querySelectorAll('[data-photo]');
+  if (!targets.length) return;
+
+  // Hover is a pointing-device affordance. On touch there is no hover to leave,
+  // so the panel would stick after a tap and cover the text it belongs to.
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  const panel = document.createElement('div');
+  panel.className = 'hover-preview';
+  // Decorative: the chip's own text is the accessible name, and the photo adds
+  // nothing a screen reader needs.
+  panel.setAttribute('aria-hidden', 'true');
+
+  // Resolve everything up front so a typo in data-photo fails at load, loudly,
+  // instead of silently doing nothing the first time someone hovers.
+  const photos = new Map();
+  for (const el of targets) {
+    const key = el.dataset.photo;
+    const p = findPhoto(key);
+    if (!p) throw new Error(`[hover-preview] no photo matches data-photo="${key}"`);
+    photos.set(el, p);
+  }
+
+  const first = photos.values().next().value;
+  panel.innerHTML = pictureHtml(first, { cls: 'hover-preview__img', sizes: PREVIEW_SIZES, alt: '' });
+  document.body.appendChild(panel);
+  const pic = panel.querySelector('picture');
+  const img = panel.querySelector('img');
+  // The panel is visibility:hidden until hovered, and Chrome never starts a
+  // lazy fetch for a hidden image — not for this one, and not for the swaps
+  // either, so the panel would stay permanently blank. It is one 320w AVIF
+  // (~8 KB), and loading it up front makes the first hover instant.
+  img.loading = 'eager';
+
+  const place = (el) => {
+    const r = el.getBoundingClientRect();
+    const w = panel.offsetWidth;
+    const h = panel.offsetHeight;
+    const gap = 12;
+    // Prefer the right of the element, flip to the left when it would overflow.
+    let x = r.right + gap;
+    if (x + w > window.innerWidth - gap) x = r.left - w - gap;
+    x = Math.max(gap, Math.min(x, window.innerWidth - w - gap));
+    const y = Math.max(gap, Math.min(r.top, window.innerHeight - h - gap));
+    panel.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+  };
+
+  const show = (el) => {
+    const p = photos.get(el);
+    if (!p) return;
+    setSources(pic, p);
+    // Portrait stays portrait: the panel takes the photo's own ratio rather
+    // than the wide cover geometry the gallery squares use.
+    img.style.aspectRatio = `${p.w} / ${p.h}`;
+    panel.classList.add('is-visible');
+    place(el);
+  };
+  const hide = () => panel.classList.remove('is-visible');
+
+  for (const el of targets) {
+    el.addEventListener('pointerenter', () => show(el));
+    el.addEventListener('pointerleave', hide);
+    el.addEventListener('focus', () => show(el));
+    el.addEventListener('blur', hide);
+  }
+  window.addEventListener('scroll', hide, { passive: true });
+}
+
+/* ----------------------------------------------------------------------------
    Build segments
 ---------------------------------------------------------------------------- */
 const ORDER = ['eksterijer', 'dnevni', 'kuhinja', 'sobe', 'kupatila', 'vlasic', 'travnik'];

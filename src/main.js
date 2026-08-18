@@ -2,7 +2,7 @@ import './style.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CabinHeroScene } from './hero-scene.js';
-import { initGallery, createLightbox, attachHoverSwap } from './gallery.js';
+import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews } from './gallery.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,6 +18,9 @@ initGallery(document.getElementById('gallery-segments'), openLightbox);
 document.querySelectorAll('.dest-card__media[data-cat]').forEach((el) => {
   attachHoverSwap(el, el.dataset.cat);
 });
+
+/* ---------- Etaže + sadržaji: photo preview on hover ---------- */
+initHoverPreviews();
 
 /* ---------- Babanovac video: play once when scrolled into view ---------- */
 const babanovacVideo = document.getElementById('babanovac-video');

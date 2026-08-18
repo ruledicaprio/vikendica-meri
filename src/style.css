@@ -367,6 +367,47 @@ picture {
   transform: translateY(-3px);
 }
 
+/* Shared floating photo preview for [data-photo] floor cards and amenity chips.
+   Fixed + transform-positioned so showing it never reflows the section. */
+.hover-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  width: 240px;
+  padding: 6px;
+  border: 1px solid rgba(212, 148, 58, 0.45);
+  border-radius: 12px;
+  background: rgba(10, 14, 26, 0.92);
+  box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.hover-preview.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+.hover-preview__img {
+  display: block;
+  /* The width/height attributes come from the manifest so the box is reserved
+     before the bytes land, but as presentational hints they also pin the used
+     width — same trap that squashed the lightbox. Let aspect-ratio drive it. */
+  width: 100%;
+  height: auto;
+  border-radius: 7px;
+}
+[data-photo] {
+  cursor: help;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-preview {
+    transition: none;
+  }
+}
+
 /* ---------- Destinacije (dark green) ---------- */
 .section--destinacije {
   background: var(--green);
