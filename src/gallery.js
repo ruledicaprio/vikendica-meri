@@ -24,6 +24,48 @@ const META = {
   travnik: { label: 'Travnik' },
 };
 
+/* ----------------------------------------------------------------------------
+   Alt text
+   Derived from the filename's semantic prefix. Generic alt ("Smještaj 3") is
+   worthless to screen readers and invisible to image search, and these photos
+   are the main thing a guest wants to see.
+---------------------------------------------------------------------------- */
+const ALT_ROOM = [
+  [/^front/, 'Prednja strana A-frame vikendice Meri na Babanovcu'],
+  [/^back/, 'Zadnja strana vikendice Meri sa terasom'],
+  [/^first-floor-bath/, 'Kupatilo na prvom spratu vikendice Meri'],
+  [/^zero-floor-bath/, 'Kupatilo u prizemlju vikendice Meri'],
+  [/^first-floor/, 'Soba na prvom spratu vikendice Meri'],
+];
+
+const ALT_VIEW = [
+  [/galica/, 'Pogled na Galicu, planina Vlašić'],
+  [/ugar/, 'Pogled na Ugar, planina Vlašić'],
+];
+
+function altFor(key, url, i) {
+  const name = base(url).replace(/\.[a-z]+$/i, '');
+  if (key === 'smjestaj') {
+    const hit = ALT_ROOM.find(([re]) => re.test(name));
+    return hit ? hit[1] : `Unutrašnjost vikendice Meri, Babanovac — fotografija ${i + 1}`;
+  }
+  if (key === 'vlasic') {
+    const hit = ALT_VIEW.find(([re]) => re.test(name));
+    return hit ? hit[1] : `Planina Vlašić i Babanovac — fotografija ${i + 1}`;
+  }
+  return `Grad Travnik, centralna Bosna — fotografija ${i + 1}`;
+}
+
+// Bosnian count agreement: 1 fotografija, 2–4 fotografije, 5+ fotografija
+// (and the teens always take the last form).
+function photoCount(n) {
+  const last = n % 10;
+  const teen = n % 100 >= 11 && n % 100 <= 14;
+  if (!teen && last === 1) return `${n} fotografija`;
+  if (!teen && last >= 2 && last <= 4) return `${n} fotografije`;
+  return `${n} fotografija`;
+}
+
 export const categories = Object.fromEntries(
   Object.keys(META).map((key) => {
     const urls = manifest[key] || [];
@@ -103,15 +145,15 @@ export function initGallery(container, openLightbox) {
           <span class="segment__layer is-back"></span>
           <span class="segment__overlay">
             <span class="segment__title">${c.label}</span>
-            <span class="segment__count">${c.urls.length} ${c.urls.length === 1 ? 'fotografija' : 'fotografija'}</span>
+            <span class="segment__count">${photoCount(c.urls.length)}</span>
           </span>
         </button>
         <div class="segment__thumbs">
           ${thumbs
             .map(
               (u, i) => `
-            <button class="thumb" data-cat="${key}" data-index="${i}" aria-label="Fotografija ${i + 1}">
-              <img src="${u}" loading="lazy" alt="${c.label} ${i + 1}" />
+            <button class="thumb" data-cat="${key}" data-index="${i}" aria-label="Otvori fotografiju ${i + 1} od ${c.urls.length}">
+              <img src="${u}" loading="lazy" decoding="async" alt="${altFor(key, u, i)}" />
             </button>`
             )
             .join('')}
@@ -172,16 +214,19 @@ export function createLightbox(root) {
   const label = el.querySelector('.lightbox__label');
   const count = el.querySelector('.lightbox__count');
   let list = [];
+  let currentKey = '';
   let i = 0;
 
   const render = () => {
     img.src = list[i];
+    img.alt = altFor(currentKey, list[i], i);
     count.textContent = `${i + 1} / ${list.length}`;
   };
   const open = (key, index) => {
     const c = categories[key];
     if (!c || !c.urls.length) return;
     list = c.urls;
+    currentKey = key;
     i = Math.max(0, Math.min(index, list.length - 1));
     label.textContent = c.label;
     render();
