@@ -8,14 +8,12 @@
  *           'pending' → on hold / awaiting confirmation (amber)
  */
 
-export const BOOKED = [
-  { from: '2026-06-20', to: '2026-06-27', status: 'booked' },
-  { from: '2026-07-04', to: '2026-07-11', status: 'booked' },
-  { from: '2026-07-18', to: '2026-07-25', status: 'pending' },
-  { from: '2026-08-01', to: '2026-08-10', status: 'booked' },
-  { from: '2026-08-22', to: '2026-08-31', status: 'booked' },
-  { from: '2026-12-20', to: '2027-01-05', status: 'booked' },
-];
+// Empty until the owner supplies real availability. The six ranges that used to
+// sit here were placeholders written while the component was being built; some
+// had already elapsed. Publishing invented bookings would turn guests away from
+// dates that are actually free, so an empty list — everything available — is the
+// only honest default.
+export const BOOKED = [];
 
 const MONTHS = [
   'Januar','Februar','Mart','April','Maj','Juni',
@@ -33,7 +31,9 @@ function fmtDate(s) {
   const d = parseDate(s);
   return `${d.getDate()}. ${MONTHS[d.getMonth()]} ${d.getFullYear()}.`;
 }
-function nightLabel(n) { return n === 1 ? '1 noć' : `${n} noć${n < 5 ? 'i' : 'i'}`; }
+// Bosnian: 1 noć, everything else noći. (The old ternary here returned 'i' on
+// both branches, so it never did anything.)
+function nightLabel(n) { return n === 1 ? '1 noć' : `${n} noći`; }
 
 function dayStatus(ymd) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -94,18 +94,33 @@ export function initCalendar(container) {
     for (let d = 1; d <= daysInMonth; d++) {
       const ymd    = toYMD(year, month, d);
       const status = dayStatus(ymd);
-      const el     = document.createElement('div');
+      // A button, not a div: these were click-only and unreachable by keyboard.
+      const el     = document.createElement('button');
+      el.type = 'button';
 
       el.className = `cal__day cal__day--${status}`;
       el.textContent = d;
       el.dataset.ymd = ymd;
 
+      const selected = (selStart && ymd === selStart) || (selEnd && ymd === selEnd);
       if (ymd === todayStr)                                   el.classList.add('cal__day--today');
       if (selStart && ymd === selStart)                       el.classList.add('cal__day--sel-start');
       if (selEnd   && ymd === selEnd)                         el.classList.add('cal__day--sel-end');
       if (selStart && selEnd && ymd > selStart && ymd < selEnd) el.classList.add('cal__day--in-range');
 
-      if (status === 'available') el.addEventListener('click', () => handleClick(ymd));
+      // The bare number is meaningless out of context, so announce the full date
+      // and why an unavailable day cannot be chosen.
+      const suffix = status === 'booked' ? ' — zauzeto'
+        : status === 'pending' ? ' — na čekanju'
+        : status === 'past' ? ' — prošlo' : '';
+      el.setAttribute('aria-label', fmtDate(ymd) + suffix);
+
+      if (status === 'available') {
+        el.setAttribute('aria-pressed', String(!!selected));
+        el.addEventListener('click', () => handleClick(ymd));
+      } else {
+        el.disabled = true;
+      }
       grid.appendChild(el);
     }
 
@@ -130,6 +145,9 @@ export function initCalendar(container) {
       viewMonth--;
       if (viewMonth < 0) { viewMonth = 11; viewYear--; }
       render();
+      // Same re-render problem as the day cells: keep focus on the arrow so it
+      // can be pressed repeatedly from the keyboard.
+      root.querySelector('.cal__nav-btn')?.focus();
     });
 
     const nextBtn = document.createElement('button');
@@ -141,6 +159,7 @@ export function initCalendar(container) {
       viewMonth++;
       if (viewMonth > 11) { viewMonth = 0; viewYear++; }
       render();
+      root.querySelectorAll('.cal__nav-btn')[1]?.focus();
     });
 
     const nextMIdx = (viewMonth + 1) % 12;
@@ -218,6 +237,15 @@ export function initCalendar(container) {
   }
 
   /* ── click handler ── */
+  // render() replaces the whole subtree, so the button that was just activated
+  // no longer exists afterwards and focus would fall back to <body>. Re-find the
+  // equivalent day by its date and restore focus there.
+  function renderKeepingFocus(ymd) {
+    const hadFocus = document.activeElement?.classList.contains('cal__day');
+    render();
+    if (hadFocus) root.querySelector(`.cal__day[data-ymd="${ymd}"]`)?.focus();
+  }
+
   function handleClick(ymd) {
     if (!selStart || (selStart && selEnd)) {
       // start a fresh selection
@@ -235,7 +263,7 @@ export function initCalendar(container) {
         selEnd = ymd;
       }
     }
-    render();
+    renderKeepingFocus(ymd);
   }
 
   render();

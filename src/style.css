@@ -386,6 +386,183 @@ picture {
 }
 
 /* ============================================================
+   Availability calendar
+   ============================================================ */
+.cal {
+  margin-bottom: 3rem;
+}
+.cal__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+.cal__nav-btn {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--cream);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.cal__nav-btn:hover {
+  border-color: var(--amber);
+  background: rgba(212, 148, 58, 0.14);
+}
+.cal__nav-label {
+  min-width: 22ch;
+  text-align: center;
+  font-weight: 600;
+  color: var(--amber2);
+}
+.cal__months {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+.cal__month {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.2rem;
+}
+.cal__month-title {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+.cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal__dow {
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.5);
+  padding-bottom: 0.4rem;
+}
+.cal__day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--cream);
+  font: inherit;
+  font-size: 0.86rem;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.cal__day--empty {
+  background: none;
+  border: none;
+}
+.cal__day--available:hover {
+  border-color: var(--amber);
+  background: rgba(212, 148, 58, 0.18);
+}
+/* Unavailable days are real <button disabled>, so they are skipped by Tab and
+   announced as unavailable rather than just looking greyed out. */
+.cal__day--past,
+.cal__day--booked,
+.cal__day--pending {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+.cal__day--past {
+  background: none;
+  color: rgba(245, 240, 232, 0.25);
+}
+.cal__day--booked {
+  background: rgba(190, 60, 60, 0.28);
+  color: rgba(255, 220, 220, 0.8);
+}
+.cal__day--pending {
+  background: rgba(212, 148, 58, 0.26);
+  color: rgba(255, 236, 205, 0.85);
+}
+.cal__day--today {
+  border-color: rgba(245, 240, 232, 0.45);
+}
+.cal__day--sel-start,
+.cal__day--sel-end {
+  background: var(--amber);
+  color: #14100a;
+  font-weight: 600;
+}
+.cal__day--in-range {
+  background: rgba(212, 148, 58, 0.3);
+}
+.cal__sel-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.4rem;
+  padding: 1.1rem 1.3rem;
+  border: 1px solid rgba(212, 148, 58, 0.45);
+  border-radius: 12px;
+  background: rgba(212, 148, 58, 0.08);
+}
+.cal__sel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.cal__sel-info span {
+  font-size: 0.88rem;
+  color: rgba(245, 240, 232, 0.72);
+}
+.cal__sel-actions {
+  display: flex;
+  gap: 0.7rem;
+}
+.cal__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+  font-size: 0.82rem;
+  color: rgba(245, 240, 232, 0.7);
+}
+.cal__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.cal__legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.cal__legend-dot--available {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--line);
+}
+.cal__legend-dot--booked {
+  background: rgba(190, 60, 60, 0.6);
+}
+.cal__legend-dot--pending {
+  background: rgba(212, 148, 58, 0.55);
+}
+.cal__legend-dot--sel {
+  background: var(--amber);
+}
+
+/* ============================================================
    Focus visibility
    ============================================================ */
 /* One ring for everything interactive. The stylesheet previously had no
@@ -1006,6 +1183,13 @@ summary:focus-visible {
     /* One column here, so the box is the full viewport width — close to the
        source's own 0.75 keeps almost the whole photo. */
     aspect-ratio: 4 / 5;
+  }
+  .cal__months {
+    grid-template-columns: 1fr;
+  }
+  .cal__nav-label {
+    min-width: 0;
+    font-size: 0.9rem;
   }
   /* Full-bleed cinematic band on phones. A 35vh `cover` box cropped this 16:9
      aerial shot into an unreadable strip, so break out of .wrap's padding and

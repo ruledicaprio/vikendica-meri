@@ -1,5 +1,6 @@
 import './style.css';
 import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews } from './gallery.js';
+import { initCalendar } from './calendar.js';
 
 // Three.js and GSAP are ~600 KB and ~70 KB of the bundle and neither is needed
 // for first paint, so both load after it. Everything below runs immediately.
@@ -40,6 +41,10 @@ document.querySelectorAll('.dest-card__media[data-cat]').forEach((el) => {
 
 /* ---------- Etaže + sadržaji: photo preview on hover ---------- */
 initHoverPreviews();
+
+/* ---------- Availability calendar ---------- */
+const calMount = document.getElementById('cal-mount');
+if (calMount) initCalendar(calMount);
 
 /* ---------- Babanovac video: play once when scrolled into view ---------- */
 const babanovacVideo = document.getElementById('babanovac-video');
