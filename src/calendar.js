@@ -7,6 +7,7 @@
  *   status: 'booked'  → unavailable (red)
  *           'pending' → on hold / awaiting confirmation (amber)
  */
+import { t } from './i18n/ui.js';
 
 // Empty until the owner supplies real availability. The six ranges that used to
 // sit here were placeholders written while the component was being built; some
@@ -15,11 +16,8 @@
 // only honest default.
 export const BOOKED = [];
 
-const MONTHS = [
-  'Januar','Februar','Mart','April','Maj','Juni',
-  'Juli','August','Septembar','Oktobar','Novembar','Decembar',
-];
-const DAYS = ['Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub', 'Ned'];
+const MONTHS = t.months;
+const DAYS = t.days;
 
 /* ── helpers ───────────────────────────────────────────────── */
 function toYMD(y, m, d) {
@@ -28,12 +26,11 @@ function toYMD(y, m, d) {
 function parseDate(s) { return new Date(s + 'T12:00:00'); }
 function diffDays(a, b) { return Math.round((parseDate(b) - parseDate(a)) / 86400000); }
 function fmtDate(s) {
-  const d = parseDate(s);
-  return `${d.getDate()}. ${MONTHS[d.getMonth()]} ${d.getFullYear()}.`;
+  return t.formatDate(parseDate(s), MONTHS);
 }
 // Bosnian: 1 noć, everything else noći. (The old ternary here returned 'i' on
 // both branches, so it never did anything.)
-function nightLabel(n) { return n === 1 ? '1 noć' : `${n} noći`; }
+function nightLabel(n) { return t.nights(n); }
 
 function dayStatus(ymd) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -110,9 +107,9 @@ export function initCalendar(container) {
 
       // The bare number is meaningless out of context, so announce the full date
       // and why an unavailable day cannot be chosen.
-      const suffix = status === 'booked' ? ' — zauzeto'
-        : status === 'pending' ? ' — na čekanju'
-        : status === 'past' ? ' — prošlo' : '';
+      const suffix = status === 'booked' ? ` — ${t.calBooked}`
+        : status === 'pending' ? ` — ${t.calPending}`
+        : status === 'past' ? ` — ${t.calPast}` : '';
       el.setAttribute('aria-label', fmtDate(ymd) + suffix);
 
       if (status === 'available') {
@@ -139,7 +136,7 @@ export function initCalendar(container) {
     const prevBtn = document.createElement('button');
     prevBtn.className = 'cal__nav-btn';
     prevBtn.type = 'button';
-    prevBtn.setAttribute('aria-label', 'Prethodni mjesec');
+    prevBtn.setAttribute('aria-label', t.calPrev);
     prevBtn.innerHTML = '&#8249;';
     prevBtn.addEventListener('click', () => {
       viewMonth--;
@@ -153,7 +150,7 @@ export function initCalendar(container) {
     const nextBtn = document.createElement('button');
     nextBtn.className = 'cal__nav-btn';
     nextBtn.type = 'button';
-    nextBtn.setAttribute('aria-label', 'Sljedeći mjesec');
+    nextBtn.setAttribute('aria-label', t.calNext);
     nextBtn.innerHTML = '&#8250;';
     nextBtn.addEventListener('click', () => {
       viewMonth++;
@@ -188,11 +185,11 @@ export function initCalendar(container) {
       box.innerHTML = `
         <div class="cal__sel-info">
           <strong>${fmtDate(selStart)} → ${fmtDate(selEnd)}</strong>
-          <span>${nightLabel(nights)} · do 10 osoba</span>
+          <span>${nightLabel(nights)} · ${t.calCapacity}</span>
         </div>
         <div class="cal__sel-actions">
-          <button class="btn btn--primary" id="cal-cta" type="button">Pošalji upit ↓</button>
-          <button class="btn btn--ghost"   id="cal-clear" type="button">Poništi</button>
+          <button class="btn btn--primary" id="cal-cta" type="button">${t.calSend}</button>
+          <button class="btn btn--ghost"   id="cal-clear" type="button">${t.calClear}</button>
         </div>`;
       root.appendChild(box);
 
@@ -222,16 +219,16 @@ export function initCalendar(container) {
     legend.className = 'cal__legend';
     legend.innerHTML = `
       <div class="cal__legend-item">
-        <span class="cal__legend-dot cal__legend-dot--available"></span>Slobodno
+        <span class="cal__legend-dot cal__legend-dot--available"></span>${t.calLegendAvailable}
       </div>
       <div class="cal__legend-item">
-        <span class="cal__legend-dot cal__legend-dot--booked"></span>Zauzeto
+        <span class="cal__legend-dot cal__legend-dot--booked"></span>${t.calLegendBooked}
       </div>
       <div class="cal__legend-item">
-        <span class="cal__legend-dot cal__legend-dot--pending"></span>Na čekanju
+        <span class="cal__legend-dot cal__legend-dot--pending"></span>${t.calLegendPending}
       </div>
       <div class="cal__legend-item">
-        <span class="cal__legend-dot cal__legend-dot--sel"></span>Vaš odabir
+        <span class="cal__legend-dot cal__legend-dot--sel"></span>${t.calLegendSelected}
       </div>`;
     root.appendChild(legend);
   }

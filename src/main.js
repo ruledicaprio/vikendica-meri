@@ -1,6 +1,7 @@
 import './style.css';
 import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews } from './gallery.js';
 import { initCalendar } from './calendar.js';
+import { t } from './i18n/ui.js';
 
 // Three.js and GSAP are ~600 KB and ~70 KB of the bundle and neither is needed
 // for first paint, so both load after it. Everything below runs immediately.
@@ -178,18 +179,19 @@ const form = document.getElementById('reserve-form');
 const status = document.getElementById('form-status');
 
 function mailtoFallback(d) {
+  const L = t.mailLabels;
   const body = [
-    `Ime: ${d.name || ''}`,
-    `Email: ${d.email || ''}`,
-    `Telefon: ${d.phone || ''}`,
-    `Dolazak: ${d.checkin || ''}`,
-    `Odlazak: ${d.checkout || ''}`,
-    `Gostiju: ${d.guests || ''}`,
+    `${L.name}: ${d.name || ''}`,
+    `${L.email}: ${d.email || ''}`,
+    `${L.phone}: ${d.phone || ''}`,
+    `${L.checkin}: ${d.checkin || ''}`,
+    `${L.checkout}: ${d.checkout || ''}`,
+    `${L.guests}: ${d.guests || ''}`,
     '',
     d.message || '',
   ].join('\n');
   window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-    'Upit za rezervaciju — Vikendica Meri'
+    t.mailSubject
   )}&body=${encodeURIComponent(body)}`;
 }
 
@@ -204,39 +206,39 @@ if (form) {
     // Nothing stops a guest entering a checkout before their check-in, and the
     // error is easier to fix here than in a reply email two days later.
     if (data.checkin && data.checkout && data.checkout <= data.checkin) {
-      status.textContent = 'Datum odlaska mora biti nakon datuma dolaska.';
+      status.textContent = t.formDates;
       status.className = 'form-status is-err';
       document.getElementById('f-to').focus();
       return;
     }
     if (!WEB3FORMS_KEY) {
-      status.textContent = 'Otvaramo vaš email klijent…';
+      status.textContent = t.formMailto;
       status.className = 'form-status is-info';
       mailtoFallback(data);
       return;
     }
     if (!data['h-captcha-response']) {
-      status.textContent = 'Molimo potvrdite da niste robot (captcha).';
+      status.textContent = t.formCaptcha;
       status.className = 'form-status is-err';
       return;
     }
-    status.textContent = 'Šaljemo…';
+    status.textContent = t.formSending;
     status.className = 'form-status is-info';
     try {
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Upit — Vikendica Meri', ...data }),
+        body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: t.mailSubject, ...data }),
       });
       const json = await res.json();
       if (json.success) {
-        status.textContent = 'Hvala! Vaš upit je poslan. Javit ćemo se uskoro.';
+        status.textContent = t.formOk;
         status.className = 'form-status is-ok';
         form.reset();
         if (window.hcaptcha) window.hcaptcha.reset();
       } else throw new Error();
     } catch {
-      status.textContent = 'Slanje nije uspjelo. Kontaktirajte nas direktno.';
+      status.textContent = t.formErr;
       status.className = 'form-status is-err';
       if (window.hcaptcha) window.hcaptcha.reset();
     }

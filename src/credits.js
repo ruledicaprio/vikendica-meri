@@ -3,6 +3,7 @@
 // Keyed by exact path, deliberately not by category: only the aerial Vlašić work
 // is Adel's. The older scene-*-vlasic.jpg shots in the same folder are not his
 // and must not carry his name.
+import { t } from './i18n/ui.js';
 
 export const ADEL = {
   name: 'Adel Huseinspahić',
@@ -23,8 +24,8 @@ export function creditFor(url) {
   return CREDITED.has(url) ? ADEL : null;
 }
 
-/** Small inline credit line. `label` is the Bosnian noun ("Foto" / "Video"). */
-export function creditHtml(credit, label = 'Foto') {
+/** Small inline credit line. `label` is the localised noun ("Foto" / "Photo"). */
+export function creditHtml(credit, label = t.creditPhoto) {
   if (!credit) return '';
   return (
     `<span class="media-credit">${label}: ` +

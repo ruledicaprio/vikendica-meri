@@ -47,6 +47,8 @@
   Cache-Control: public, max-age=604800
 /og-image.jpg
   Cache-Control: public, max-age=604800
+/hero-poster.jpg
+  Cache-Control: public, max-age=604800
 
 # Crawler files — keep them fresh enough to fix quickly.
 /robots.txt
@@ -60,6 +62,10 @@
 /
   Cache-Control: no-cache
 /index.html
+  Cache-Control: no-cache
+/en/
+  Cache-Control: no-cache
+/en/index.html
   Cache-Control: no-cache
 /404.html
   Cache-Control: no-cache

@@ -171,6 +171,20 @@ picture {
 .navbar__cta:hover {
   background: var(--amber2);
 }
+.navbar__lang {
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.6);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.28rem 0.8rem;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.navbar__lang:hover {
+  color: var(--cream);
+  border-color: var(--amber);
+}
 .navbar__burger {
   display: none;
   flex-direction: column;

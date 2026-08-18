@@ -6,6 +6,7 @@
 // are descriptors: { src, w, h, avif, webp, jpeg } with pre-joined srcsets.
 import { manifest } from 'virtual:gallery';
 import { creditFor, creditHtml } from './credits.js';
+import { t } from './i18n/ui.js';
 
 function base(url) {
   return url.split('/').pop();
@@ -27,84 +28,30 @@ function pickCover(photos) {
   );
 }
 
-const META = {
-  eksterijer: { label: 'Eksterijer' },
-  dnevni: { label: 'Dnevni boravak' },
-  kuhinja: { label: 'Kuhinja' },
-  sobe: { label: 'Sobe' },
-  kupatila: { label: 'Kupatila' },
-  vlasic: { label: 'Planina Vlašić' },
-  travnik: { label: 'Travnik' },
-};
+// Category order is fixed; the labels come from the active locale.
+const CATEGORY_KEYS = ['eksterijer', 'dnevni', 'kuhinja', 'sobe', 'kupatila', 'vlasic', 'travnik'];
 
 /* ----------------------------------------------------------------------------
    Alt text
-   Derived from the curated filename. Generic alt ("Smještaj 3") is worthless to
-   screen readers and invisible to image search, and these photos are the main
-   thing a guest actually wants to see.
+   Derived from the curated filename — the patterns matched are the Bosnian
+   filenames, which are locale-independent, while the text returned is not.
+   Generic alt ("Smještaj 3") is worthless to screen readers and invisible to
+   image search, and these photos are the main thing a guest wants to see.
 ---------------------------------------------------------------------------- */
-const ALT = {
-  eksterijer: (n) => {
-    if (/terasa/.test(n)) return 'Terasa vikendice Meri sa roštiljem, Babanovac';
-    if (/dvoriste/.test(n)) return 'Dvorište vikendice Meri sa roštiljem i sjedenjem';
-    if (/ulaz/.test(n)) return 'Ulaz u vikendicu Meri, Dolina Panjeva';
-    if (/okolina/.test(n)) return 'Okolina vikendice Meri na Babanovcu, planina Vlašić';
-    if (/bocna/.test(n)) return 'Bočna strana A-frame vikendice Meri';
-    if (/snijeg|zimski|zimi/.test(n)) return 'A-frame vikendica Meri pod snijegom, Babanovac';
-    return 'A-frame vikendica Meri, Dolina Panjeva, Babanovac';
-  },
-  dnevni: (n) => {
-    if (/trpezarija/.test(n)) return 'Trpezarija sa velikim stolom u vikendici Meri';
-    if (/hodnik/.test(n)) return 'Hodnik i stepenice u vikendici Meri';
-    return 'Dnevni boravak sa kaminom i TV-om u vikendici Meri';
-  },
-  kuhinja: (n) => {
-    if (/sudoper/.test(n)) return 'Sudoper i radna ploča u kuhinji vikendice Meri';
-    if (/stednjak/.test(n)) return 'Šporet i rerna u kuhinji vikendice Meri';
-    if (/frizider/.test(n)) return 'Frižider i mikrovalna u kuhinji vikendice Meri';
-    if (/radna-ploca|kutak/.test(n)) return 'Radni kutak u kuhinji vikendice Meri';
-    return 'Potpuno opremljena kuhinja u vikendici Meri, Babanovac';
-  },
-  sobe: (n) => {
-    if (/bracna/.test(n)) return 'Bračna soba sa balkonom na 1. spratu vikendice Meri';
-    if (/djecija/.test(n)) return 'Dječija soba na 1. spratu vikendice Meri';
-    if (/druga/.test(n)) return 'Spavaća soba sa dva ležaja na 2. spratu vikendice Meri';
-    return 'Spavaća soba sa balkonom na 2. spratu vikendice Meri';
-  },
-  kupatila: (n) =>
-    /prizemlje/.test(n)
-      ? 'Kupatilo u prizemlju vikendice Meri sa tuš kabinom'
-      : 'Kupatilo na spratu vikendice Meri sa tuš kabinom',
-  vlasic: (n) => {
-    if (/galica/.test(n)) return 'Pogled na Galicu, planina Vlašić';
-    if (/ugar/.test(n)) return 'Pogled na Ugar, planina Vlašić';
-    return 'Planina Vlašić i Babanovac';
-  },
-  travnik: () => 'Grad Travnik, centralna Bosna',
-};
-
 function altFor(key, src, i) {
   const name = base(src).replace(/\.[a-z]+$/i, '');
-  const build = ALT[key];
-  const text = build ? build(name) : META[key]?.label || '';
+  const build = t.alt[key];
+  const text = build ? build(name) : t.categories[key] || '';
   // Keep every alt distinct: repeated alt text is a quality signal against you.
-  return i > 0 ? `${text} — fotografija ${i + 1}` : text;
+  return i > 0 ? `${text}${t.photoSuffix(i + 1)}` : text;
 }
 
-// Bosnian count agreement: 1 fotografija, 2–4 fotografije, 5+ fotografija
-// (and the teens always take the last form).
-function photoCount(n) {
-  const last = n % 10;
-  const teen = n % 100 >= 11 && n % 100 <= 14;
-  if (!teen && last === 1) return `${n} fotografija`;
-  if (!teen && last >= 2 && last <= 4) return `${n} fotografije`;
-  return `${n} fotografija`;
-}
+const photoCount = (n) => t.photoCount(n);
 
 export const categories = Object.fromEntries(
-  Object.keys(META).map((key) => {
+  CATEGORY_KEYS.map((key) => {
     const photos = manifest[key] || [];
-    return [key, { key, label: META[key].label, photos, cover: pickCover(photos) }];
+    return [key, { key, label: t.categories[key], photos, cover: pickCover(photos) }];
   })
 );
 
@@ -288,7 +235,7 @@ export function initHoverPreviews(root = document) {
 /* ----------------------------------------------------------------------------
    Build segments
 ---------------------------------------------------------------------------- */
-const ORDER = ['eksterijer', 'dnevni', 'kuhinja', 'sobe', 'kupatila', 'vlasic', 'travnik'];
+const ORDER = CATEGORY_KEYS;
 const THUMB_COUNT = 6;
 
 export function initGallery(container, openLightbox) {
@@ -298,7 +245,7 @@ export function initGallery(container, openLightbox) {
       const thumbs = c.photos.slice(0, THUMB_COUNT);
       return `
       <article class="segment reveal" data-cat="${key}">
-        <button class="segment__square" data-cat="${key}" aria-label="Otvori galeriju: ${c.label}">
+        <button class="segment__square" data-cat="${key}" aria-label="${esc(t.openGallery(c.label))}">
           ${pictureHtml(c.cover, {
             cls: 'segment__layer is-front',
             sizes: COVER_SIZES,
@@ -314,16 +261,18 @@ export function initGallery(container, openLightbox) {
           ${thumbs
             .map(
               (p, i) => `
-            <button class="thumb" data-cat="${key}" data-index="${i}" aria-label="Otvori fotografiju ${
-              i + 1
-            } od ${c.photos.length}">
+            <button class="thumb" data-cat="${key}" data-index="${i}" aria-label="${esc(
+              t.openPhoto(i + 1, c.photos.length)
+            )}">
               ${pictureHtml(p, { cls: '', sizes: THUMB_SIZES, alt: altFor(key, p.src, i) })}
             </button>`
             )
             .join('')}
           ${
             c.photos.length > THUMB_COUNT
-              ? `<button class="segment__more" data-cat="${key}">Prikaži sve (${c.photos.length})</button>`
+              ? `<button class="segment__more" data-cat="${key}">${esc(
+                  t.showAll(c.photos.length)
+                )}</button>`
               : ''
           }
         </div>
@@ -367,14 +316,14 @@ export function createLightbox(root) {
   el.setAttribute('aria-modal', 'true');
   el.innerHTML = `
     <div class="lightbox__label"></div>
-    <button class="lightbox__close" aria-label="Zatvori">×</button>
-    <button class="lightbox__nav lightbox__prev" aria-label="Prethodna">‹</button>
+    <button class="lightbox__close" aria-label="${esc(t.close)}">×</button>
+    <button class="lightbox__nav lightbox__prev" aria-label="${esc(t.prev)}">‹</button>
     <picture class="lightbox__pic">
       <source type="image/avif" srcset="" sizes="90vw" />
       <source type="image/webp" srcset="" sizes="90vw" />
       <img class="lightbox__img" src="" alt="" sizes="90vw" decoding="async" />
     </picture>
-    <button class="lightbox__nav lightbox__next" aria-label="Sljedeća">›</button>
+    <button class="lightbox__nav lightbox__next" aria-label="${esc(t.next)}">›</button>
     <div class="lightbox__count"></div>
     <div class="lightbox__credit"></div>
   `;
