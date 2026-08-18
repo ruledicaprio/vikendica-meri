@@ -533,6 +533,12 @@ summary:focus-visible {
 .segment__layer.is-back {
   opacity: 0;
 }
+/* Segment covers only — the Vlašić/Travnik dest cards are landscape and frame
+   correctly on centre. In these vertical architecture shots the cabin sits high
+   in the frame, which is also why the OG card crops with gravity.north. */
+.segment__layer {
+  object-position: center 38%;
+}
 
 /* ---------- Gallery segments ---------- */
 .segments {
@@ -585,7 +591,10 @@ summary:focus-visible {
   position: relative;
   display: block;
   width: 100%;
-  height: 50vh;
+  /* Aspect-ratio, not a vh height: at 50vh this box was roughly 3:1 on a laptop
+     while every villa photo is portrait (0.75), so `cover` threw most of each
+     frame away. Same fix, same reason as the .video-feature block below. */
+  aspect-ratio: 16 / 10;
   /* A <button> takes `buttontext` (black) from the UA sheet rather than
      inheriting body colour, so the overlay title was rendering black on the
      photo. Only obvious once the covers got brighter. */
@@ -639,8 +648,10 @@ summary:focus-visible {
   align-items: center;
 }
 .thumb {
-  width: 96px;
-  height: 66px;
+  /* Portrait, because the photos are: a 96x66 landscape thumb of a 0.75 source
+     showed a horizontal sliver with the subject cropped out. */
+  width: 78px;
+  aspect-ratio: 3 / 4;
   border: none;
   border-radius: 8px;
   overflow: hidden;
@@ -974,7 +985,9 @@ summary:focus-visible {
     grid-template-columns: repeat(2, 1fr);
   }
   .segment__square {
-    height: 35vh;
+    /* One column here, so the box is the full viewport width — close to the
+       source's own 0.75 keeps almost the whole photo. */
+    aspect-ratio: 4 / 5;
   }
   /* Full-bleed cinematic band on phones. A 35vh `cover` box cropped this 16:9
      aerial shot into an unreadable strip, so break out of .wrap's padding and
@@ -1001,8 +1014,7 @@ summary:focus-visible {
     grid-template-columns: 1fr;
   }
   .thumb {
-    width: 72px;
-    height: 52px;
+    width: 62px;
   }
   .lightbox__prev {
     left: 0.5rem;

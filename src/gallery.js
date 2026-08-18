@@ -129,7 +129,7 @@ export function randomImage(key, excludeSrc) {
    <picture> rendering
 ---------------------------------------------------------------------------- */
 const COVER_SIZES = '(max-width: 1240px) 100vw, 1180px';
-const THUMB_SIZES = '(max-width: 540px) 72px, 96px';
+const THUMB_SIZES = '(max-width: 540px) 62px, 78px';
 
 function pictureHtml(p, { cls, sizes, alt, eager = false }) {
   if (!p) return '';
