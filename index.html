@@ -211,10 +211,16 @@
               id="babanovac-video"
               src="/video/babanovac.mp4"
               poster="/video/babanovac-poster.jpg"
+              aria-label="Snimak iz zraka: Babanovac na Vlašiću"
               muted
               playsinline
               preload="none"
             ></video>
+            <!-- Shown when autoplay is refused (iOS Low Power Mode) or declined
+                 for reduced-motion / data-saver visitors. -->
+            <button class="video-feature__play" id="babanovac-play" type="button" aria-label="Pusti video" hidden>
+              <span aria-hidden="true">▶</span>
+            </button>
             <div class="segment__overlay">
               <span class="segment__title">Babanovac, Vlašić</span>
             </div>

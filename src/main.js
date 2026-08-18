@@ -21,21 +21,45 @@ document.querySelectorAll('.dest-card__media[data-cat]').forEach((el) => {
 
 /* ---------- Babanovac video: play once when scrolled into view ---------- */
 const babanovacVideo = document.getElementById('babanovac-video');
-if (babanovacVideo) {
-  let played = false;
-  const videoObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !played) {
-          played = true;
-          babanovacVideo.play().catch(() => {});
-          videoObserver.disconnect();
-        }
-      });
-    },
-    { threshold: 0.4 }
-  );
-  videoObserver.observe(babanovacVideo);
+const babanovacPlay = document.getElementById('babanovac-play');
+if (babanovacVideo && babanovacPlay) {
+  const showPlayButton = () => {
+    babanovacPlay.hidden = false;
+  };
+  // A rejected play() must surface a control — iOS refuses autoplay in Low Power
+  // Mode, and swallowing that left the visitor stuck on a static poster.
+  const play = () => {
+    babanovacPlay.hidden = true;
+    babanovacVideo.play().catch(showPlayButton);
+  };
+
+  babanovacPlay.addEventListener('click', () => {
+    babanovacVideo.preload = 'auto';
+    play();
+  });
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const saveData = navigator.connection?.saveData === true;
+
+  if (reduceMotion || saveData) {
+    // Don't spend the visitor's data or override their motion preference — offer it.
+    showPlayButton();
+  } else {
+    let started = false;
+    const videoObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !started) {
+            started = true;
+            play();
+            videoObserver.disconnect();
+          }
+        });
+      },
+      { threshold: 0.4 }
+    );
+    videoObserver.observe(babanovacVideo);
+  }
 }
 
 /* ---------- Navbar: transparent → dark after 100px ---------- */

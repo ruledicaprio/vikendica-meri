@@ -471,6 +471,33 @@ img {
   height: 100%;
   object-fit: cover;
 }
+.video-feature__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  padding: 0 0 0 4px; /* optically centre the triangle */
+  border: none;
+  border-radius: 999px;
+  background: var(--amber);
+  color: #20140a;
+  font-size: 1.7rem;
+  cursor: pointer;
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.7);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.video-feature__play:hover {
+  background: var(--amber2);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+.video-feature__play[hidden] {
+  display: none;
+}
 .segment__square {
   position: relative;
   display: block;
@@ -808,8 +835,20 @@ img {
   .segment__square {
     height: 35vh;
   }
+  /* Full-bleed cinematic band on phones. A 35vh `cover` box cropped this 16:9
+     aerial shot into an unreadable strip, so break out of .wrap's padding and
+     let the frame play at its own ratio instead. */
   .video-feature {
-    height: 35vh;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    width: auto;
+    margin-inline: calc(var(--pad) * -1);
+    border-radius: 0;
+  }
+  .video-feature__play {
+    width: 62px;
+    height: 62px;
+    font-size: 1.4rem;
   }
 }
 
