@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 // Generate the favicon/PWA icon set from public/favicon.svg, and the social-share
-// card from a photo in public/smjestaj/. Both land in public/ so Vite copies them
-// verbatim into dist/. Usage:
-//   node scripts/make-icons.js [--photo=public/smjestaj/front-3-1000020074.jpg] [--force]
+// card from a photo in public/eksterijer/. Both land in public/ so Vite copies
+// them verbatim into dist/. Usage:
+//   node scripts/make-icons.js [--photo=public/eksterijer/00-vikendica-prednja-strana.jpg] [--force]
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
 const PUBLIC = path.resolve(process.cwd(), 'public');
 const SVG = path.join(PUBLIC, 'favicon.svg');
-const DEFAULT_PHOTO = 'public/smjestaj/front-3-1000020074.jpg';
+const DEFAULT_PHOTO = 'public/eksterijer/00-vikendica-prednja-strana.jpg';
 
 // PNG icons rendered from the SVG mark.
 const PNG_ICONS = [
@@ -74,15 +74,18 @@ async function main() {
   const ico32 = await sharp(svg, { density: 384 }).resize(32, 32).png().toBuffer();
   await write(path.join(PUBLIC, 'favicon.ico'), pngToIco(ico32, 32), flags.force);
 
-  // Social card. Every exterior photo is portrait, so crop with sharp's
-  // attention strategy rather than a blind centre crop, which would cut the roof off.
+  // Social card. Every exterior photo is portrait, so the 1.91:1 card is a thin
+  // band and the crop position decides everything. Top gravity, not sharp's
+  // attention strategy: attention chases local contrast and picked the stone
+  // paving at the bottom of the frame, while the cabin — the actual subject —
+  // sits at the top of a vertical architecture shot.
   if (!fs.existsSync(flags.photo)) {
     console.error(`Photo not found: ${flags.photo}`);
     process.exit(1);
   }
   const og = await sharp(flags.photo)
     .rotate()
-    .resize(1200, 630, { fit: 'cover', position: sharp.strategy.attention })
+    .resize(1200, 630, { fit: 'cover', position: sharp.gravity.north })
     .jpeg({ quality: 82, mozjpeg: true })
     .toBuffer();
   await write(path.join(PUBLIC, 'og-image.jpg'), og, flags.force);

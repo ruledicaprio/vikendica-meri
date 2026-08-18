@@ -11,3 +11,6 @@ dist
 
 # Orphaned duplicate of the photos (everything used by the site lives in public/)
 data
+
+# Generated responsive image variants (build artifacts, regenerated on demand)
+.image-cache
