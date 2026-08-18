@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// Resize/compress a photo into public/<category>/ for the gallery manifest
-// (see vite.config.js) to pick up. Usage:
+// Resize/compress a single photo into public/<category>/ for the gallery
+// manifest to pick up. For a bulk rebuild from the curated map, use
+// scripts/ingest-photos.js instead. Usage:
 //   node scripts/process-photo.js <sourceFile> <category> <outputName.jpg> [--max=2200] [--quality=80] [--force]
 import fs from 'node:fs';
 import path from 'node:path';
-import sharp from 'sharp';
-
-const CATEGORIES = ['smjestaj', 'vlasic', 'travnik'];
+import { CATEGORIES } from '../plugins/gallery-manifest.js';
+import { writeMaster } from './lib/images.js';
 
 function parseArgs(argv) {
   const positional = [];
@@ -44,17 +44,11 @@ async function main() {
     process.exit(1);
   }
 
-  const tmpDest = `${dest}.tmp.jpg`;
-  await sharp(source)
-    .rotate()
-    .resize({ width: flags.max, height: flags.max, fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: flags.quality, mozjpeg: true })
-    .toFile(tmpDest);
-  fs.renameSync(tmpDest, dest);
-
-  const { size } = fs.statSync(dest);
-  const meta = await sharp(dest).metadata();
-  console.log(`Wrote ${dest} — ${meta.width}x${meta.height}, ${(size / 1024).toFixed(0)} KB`);
+  const { width, height, size } = await writeMaster(source, dest, {
+    max: flags.max,
+    quality: flags.quality,
+  });
+  console.log(`Wrote ${dest} — ${width}x${height}, ${(size / 1024).toFixed(0)} KB`);
 }
 
 main().catch((err) => {

@@ -11,8 +11,21 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Photos: stable names, occasionally updated → cache a week.
-/smjestaj/*
+# Generated responsive variants — filenames carry a content hash, so a changed
+# photo produces a new URL and these can never go stale.
+/img/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Photo masters: stable names, occasionally updated → cache a week.
+/eksterijer/*
+  Cache-Control: public, max-age=604800
+/dnevni/*
+  Cache-Control: public, max-age=604800
+/kuhinja/*
+  Cache-Control: public, max-age=604800
+/sobe/*
+  Cache-Control: public, max-age=604800
+/kupatila/*
   Cache-Control: public, max-age=604800
 /vlasic/*
   Cache-Control: public, max-age=604800

@@ -51,6 +51,11 @@ img {
   display: block;
   max-width: 100%;
 }
+/* <picture> generates no box, so the layout rules below keep applying to the
+   <img> itself exactly as they did when these were background-image layers. */
+picture {
+  display: contents;
+}
 
 /* ---------- Hero canvas mount (fixed) ---------- */
 #hero-canvas {
@@ -438,8 +443,10 @@ img {
 .segment__layer {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   transition: opacity 0.45s ease;
 }
 .media-layer.is-front,
@@ -503,6 +510,10 @@ img {
   display: block;
   width: 100%;
   height: 50vh;
+  /* A <button> takes `buttontext` (black) from the UA sheet rather than
+     inheriting body colour, so the overlay title was rendering black on the
+     photo. Only obvious once the covers got brighter. */
+  color: var(--cream);
   border: none;
   border-radius: 16px;
   overflow: hidden;
