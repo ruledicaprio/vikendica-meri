@@ -180,8 +180,11 @@
           <a href="#smjestaj">{{navSmjestaj}}</a>
           <a href="#destinacije">{{navDestinacije}}</a>
           <a href="#galerija">{{navGalerija}}</a>
+          <!-- lang= as well as hreflang=: the link text is in the *other*
+               language, so without it a screen reader reads "English" with
+               Bosnian phonemes (and "Bosanski" with English ones). -->
           <a class="navbar__lang" href="{{langSwitchHref}}" hreflang="{{langSwitchLang}}"
-             aria-label="{{langSwitchAria}}">{{langSwitchLabel}}</a>
+             lang="{{langSwitchLang}}" aria-label="{{langSwitchAria}}">{{langSwitchLabel}}</a>
           <a class="navbar__cta" href="#kontakt">{{navCta}}</a>
         </nav>
         <button class="navbar__burger" id="burger" type="button" aria-label="{{navBurger}}"
@@ -226,38 +229,46 @@
 
           <h3 class="subhead">{{floorsSubhead}}</h3>
           <div class="floors">
-            <article class="floor" tabindex="0" data-photo="dnevni/00-dnevni-boravak.jpg">
+            <!-- The card holds a heading and a list, which a <button> may not
+                 contain, so the control is a stretched overlay instead. -->
+            <article class="floor">
               <h4>{{floorGround}}</h4>
               <ul>
                 <li>{{roomHallway}}</li><li>{{roomBathroom}}</li><li>{{roomLiving}}</li><li>{{roomKitchen}}</li>
               </ul>
+              <button class="floor__view" type="button" data-photo="dnevni/00-dnevni-boravak.jpg"
+                      aria-label="{{floorGround}} — {{floorViewPhoto}}"></button>
             </article>
-            <article class="floor" tabindex="0" data-photo="sobe/00-soba-bracna-sprat-1.jpg">
+            <article class="floor">
               <h4>{{floorFirst}}</h4>
               <ul>
                 <li>{{roomMaster}}</li>
                 <li>{{roomKids}}</li><li>{{roomBathroom}}</li>
               </ul>
+              <button class="floor__view" type="button" data-photo="sobe/00-soba-bracna-sprat-1.jpg"
+                      aria-label="{{floorFirst}} — {{floorViewPhoto}}"></button>
             </article>
-            <article class="floor" tabindex="0" data-photo="sobe/04-soba-sprat-2-prva.jpg">
+            <article class="floor">
               <h4>{{floorSecond}}</h4>
               <ul>
                 <li>{{roomTwoSingle}}</li><li>{{roomThreeSingle}}</li>
               </ul>
+              <button class="floor__view" type="button" data-photo="sobe/04-soba-sprat-2-prva.jpg"
+                      aria-label="{{floorSecond}} — {{floorViewPhoto}}"></button>
             </article>
           </div>
 
           <h3 class="subhead">{{amenitiesSubhead}}</h3>
           <ul class="amenities">
             <li>{{amParking}}</li>
-            <li tabindex="0" data-photo="eksterijer/08-terasa-rostilj.jpg">{{amGrill}}</li>
+            <li><button class="amenity__btn" type="button" data-photo="eksterijer/08-terasa-rostilj.jpg">{{amGrill}}</button></li>
             <li>{{amKettle}}</li>
-            <li tabindex="0" data-photo="kuhinja/03-kuhinja-stednjak.jpg">{{amOven}}</li>
-            <li tabindex="0" data-photo="kuhinja/03-kuhinja-stednjak.jpg">{{amStove}}</li>
-            <li tabindex="0" data-photo="kuhinja/05-kuhinja-mikrovalna.jpg">{{amMicrowave}}</li>
-            <li tabindex="0" data-photo="kuhinja/04-kuhinja-frizider.jpg">{{amFridge}}</li>
-            <li tabindex="0" data-photo="dnevni/00-dnevni-boravak.jpg">{{amTv}}</li>
-            <li tabindex="0" data-photo="kupatila/06-kupatilo-sprat-ves-masina.jpg">{{amWasher}}</li>
+            <li><button class="amenity__btn" type="button" data-photo="kuhinja/03-kuhinja-stednjak.jpg">{{amOven}}</button></li>
+            <li><button class="amenity__btn" type="button" data-photo="kuhinja/03-kuhinja-stednjak.jpg">{{amStove}}</button></li>
+            <li><button class="amenity__btn" type="button" data-photo="kuhinja/05-kuhinja-mikrovalna.jpg">{{amMicrowave}}</button></li>
+            <li><button class="amenity__btn" type="button" data-photo="kuhinja/04-kuhinja-frizider.jpg">{{amFridge}}</button></li>
+            <li><button class="amenity__btn" type="button" data-photo="dnevni/00-dnevni-boravak.jpg">{{amTv}}</button></li>
+            <li><button class="amenity__btn" type="button" data-photo="kupatila/06-kupatilo-sprat-ves-masina.jpg">{{amWasher}}</button></li>
             <li>{{amHeating}}</li><li>{{amHairdryer}}</li><li>{{amVacuum}}</li>
           </ul>
         </div>
@@ -281,10 +292,11 @@
               playsinline
               preload="none"
             ></video>
-            <!-- Shown when autoplay is refused (iOS Low Power Mode) or declined
-                 for reduced-motion / data-saver visitors. -->
-            <button class="video-feature__play" id="babanovac-play" type="button" aria-label="{{videoPlayAria}}" hidden>
-              <span aria-hidden="true">▶</span>
+            <!-- Always present, not just when autoplay is refused: the <video>
+                 carries no controls, so this button is the only way to play or
+                 pause it from the keyboard. Its label tracks the state. -->
+            <button class="video-feature__play" id="babanovac-play" type="button" aria-label="{{videoPlayAria}}">
+              <span class="video-feature__icon" aria-hidden="true">▶</span>
             </button>
             <div class="segment__overlay">
               <span class="segment__title">{{videoOverlay}}</span>
@@ -344,13 +356,21 @@
         </div>
       </section>
 
+      <!-- DOSTUPNOST — its own section so its heading is an h2. As an h3 inside
+           #kontakt it preceded that section's own h2, which broke the outline. -->
+      <section class="section section--dostupnost" id="dostupnost">
+        <div class="wrap">
+          <div class="section__head">
+            <h2>{{calendarTitle}}</h2>
+          </div>
+          <!-- Populated by initCalendar(); a picked range prefills the form below. -->
+          <div id="cal-mount" class="reveal"></div>
+        </div>
+      </section>
+
       <!-- KONTAKT -->
       <section class="section section--kontakt" id="kontakt">
         <div class="wrap">
-          <h3 class="subhead">{{calendarSubhead}}</h3>
-          <!-- Populated by initCalendar(); a picked range prefills the form below. -->
-          <div id="cal-mount" class="reveal"></div>
-
           <div class="contact-grid">
             <div class="contact-info">
               <p class="kicker">{{contactKicker}}</p>

@@ -163,9 +163,27 @@ export function findPhoto(path) {
   return (manifest[cat] || []).find((p) => base(p.src) === file) || null;
 }
 
-export function initHoverPreviews(root = document) {
+/** Where a "<cat>/<file>" path sits in its category, for opening the lightbox. */
+export function locatePhoto(path) {
+  const [cat, file] = String(path).split('/');
+  const index = (categories[cat]?.photos || []).findIndex((p) => base(p.src) === file);
+  return index < 0 ? null : { cat, index };
+}
+
+export function initHoverPreviews(root = document, openLightbox = null) {
   const targets = root.querySelectorAll('[data-photo]');
   if (!targets.length) return;
+
+  // Opening the photo is the actual feature and works on every device and from
+  // the keyboard; the hover panel below is only a pointer-device shortcut to it.
+  // This must be wired before the hover check returns on touch.
+  if (openLightbox) {
+    for (const el of targets) {
+      const at = locatePhoto(el.dataset.photo);
+      if (!at) continue;
+      el.addEventListener('click', () => openLightbox(at.cat, at.index));
+    }
+  }
 
   // Hover is a pointing-device affordance. On touch there is no hover to leave,
   // so the panel would stick after a tap and cover the text it belongs to.
@@ -324,7 +342,9 @@ export function createLightbox(root) {
       <img class="lightbox__img" src="" alt="" sizes="90vw" decoding="async" />
     </picture>
     <button class="lightbox__nav lightbox__next" aria-label="${esc(t.next)}">›</button>
-    <div class="lightbox__count"></div>
+    <!-- Live, so arrowing through photos announces the new position; without it
+         a screen-reader user gets silence on every step. -->
+    <div class="lightbox__count" aria-live="polite" aria-atomic="true"></div>
     <div class="lightbox__credit"></div>
   `;
   root.appendChild(el);

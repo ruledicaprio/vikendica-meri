@@ -73,6 +73,10 @@ const bs = {
     travnik: () => 'Grad Travnik, centralna Bosna',
   },
 
+  // Video
+  videoPlay: 'Pusti video',
+  videoPause: 'Pauziraj video',
+
   // Credit
   creditPhoto: 'Foto',
 
@@ -174,6 +178,9 @@ const en = {
     },
     travnik: () => 'The town of Travnik, central Bosnia',
   },
+
+  videoPlay: 'Play video',
+  videoPause: 'Pause video',
 
   creditPhoto: 'Photo',
 

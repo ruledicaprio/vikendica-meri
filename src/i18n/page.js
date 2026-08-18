@@ -103,7 +103,8 @@ export const bs = {
   galleryKicker: 'Galerija',
   galleryTitle: 'Pogledajte smještaj',
 
-  calendarSubhead: 'Dostupnost',
+  calendarTitle: 'Dostupnost',
+  floorViewPhoto: 'pogledaj fotografiju',
   contactKicker: 'Kontakt',
   contactTitle: 'Rezervišite svoj boravak',
   contactLead:
@@ -228,7 +229,8 @@ export const en = {
   galleryKicker: 'Gallery',
   galleryTitle: 'Take a look inside',
 
-  calendarSubhead: 'Availability',
+  calendarTitle: 'Availability',
+  floorViewPhoto: 'view photo',
   contactKicker: 'Contact',
   contactTitle: 'Book your stay',
   contactLead:

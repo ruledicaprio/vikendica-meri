@@ -297,8 +297,16 @@ picture {
 .section--galerija {
   background: var(--bg2);
 }
+/* Every section needs an opaque background: .content scrolls over the fixed
+   hero, so a transparent section lets the 3D scene and the hero title show
+   through it. */
+.section--dostupnost {
+  background: var(--bg);
+  padding-bottom: 0;
+}
 .section--kontakt {
   background: var(--bg);
+  padding-top: clamp(2rem, 4vw, 3rem);
 }
 
 .kicker {
@@ -359,9 +367,24 @@ picture {
   padding: 1.6rem;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
+.floor {
+  position: relative;
+}
 .floor:hover {
   transform: translateY(-4px);
   border-color: rgba(212, 148, 58, 0.45);
+}
+/* Stretched overlay control: the card contains a heading and a list, which a
+   <button> may not, so the button sits over it instead of wrapping it. */
+.floor__view {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: none;
+  background: none;
+  border-radius: 14px;
+  cursor: pointer;
+  padding: 0;
 }
 .floor h4 {
   font-size: 1.2rem;
@@ -397,6 +420,23 @@ picture {
 .amenities li:hover {
   border-color: rgba(212, 148, 58, 0.4);
   transform: translateY(-3px);
+}
+/* Chips that map to a photo carry a real button; it fills the chip so the whole
+   tile stays the hit area, and inherits type so nothing shifts visually. */
+.amenities li:has(.amenity__btn) {
+  padding: 0;
+}
+.amenity__btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.9rem 1.1rem;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 /* ============================================================
@@ -482,9 +522,16 @@ picture {
   background: none;
   border: none;
 }
+/* Traffic-light states. Amber stays with "pending" only, so the selection had
+   to move off amber — it is cream, which reads as "yours" against all three
+   status colours and matches the site's text accent. */
+.cal__day--available {
+  background: rgba(90, 170, 110, 0.16);
+  border-color: rgba(90, 170, 110, 0.28);
+}
 .cal__day--available:hover {
-  border-color: var(--amber);
-  background: rgba(212, 148, 58, 0.18);
+  border-color: rgba(120, 200, 140, 0.9);
+  background: rgba(90, 170, 110, 0.32);
 }
 /* Unavailable days are real <button disabled>, so they are skipped by Tab and
    announced as unavailable rather than just looking greyed out. */
@@ -499,24 +546,29 @@ picture {
   color: rgba(245, 240, 232, 0.25);
 }
 .cal__day--booked {
-  background: rgba(190, 60, 60, 0.28);
-  color: rgba(255, 220, 220, 0.8);
+  background: rgba(186, 62, 62, 0.34);
+  border-color: rgba(186, 62, 62, 0.5);
+  color: rgba(255, 222, 222, 0.92);
 }
 .cal__day--pending {
-  background: rgba(212, 148, 58, 0.26);
-  color: rgba(255, 236, 205, 0.85);
+  background: rgba(212, 148, 58, 0.3);
+  border-color: rgba(212, 148, 58, 0.5);
+  color: rgba(255, 238, 210, 0.95);
 }
 .cal__day--today {
-  border-color: rgba(245, 240, 232, 0.45);
+  border-color: rgba(245, 240, 232, 0.55);
 }
 .cal__day--sel-start,
 .cal__day--sel-end {
-  background: var(--amber);
+  background: var(--cream);
+  border-color: var(--cream);
   color: #14100a;
-  font-weight: 600;
+  font-weight: 700;
 }
 .cal__day--in-range {
-  background: rgba(212, 148, 58, 0.3);
+  background: rgba(245, 240, 232, 0.4);
+  border-color: rgba(245, 240, 232, 0.5);
+  color: #14100a;
 }
 .cal__sel-box {
   display: flex;
@@ -526,9 +578,10 @@ picture {
   gap: 1rem;
   margin-top: 1.4rem;
   padding: 1.1rem 1.3rem;
-  border: 1px solid rgba(212, 148, 58, 0.45);
+  /* Follows the selection colour, not amber. */
+  border: 1px solid rgba(245, 240, 232, 0.35);
   border-radius: 12px;
-  background: rgba(212, 148, 58, 0.08);
+  background: rgba(245, 240, 232, 0.07);
 }
 .cal__sel-info {
   display: flex;
@@ -563,17 +616,16 @@ picture {
   display: inline-block;
 }
 .cal__legend-dot--available {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid var(--line);
+  background: rgba(90, 170, 110, 0.55);
 }
 .cal__legend-dot--booked {
-  background: rgba(190, 60, 60, 0.6);
+  background: rgba(186, 62, 62, 0.7);
 }
 .cal__legend-dot--pending {
-  background: rgba(212, 148, 58, 0.55);
+  background: rgba(212, 148, 58, 0.7);
 }
 .cal__legend-dot--sel {
-  background: var(--amber);
+  background: var(--cream);
 }
 
 /* ============================================================
@@ -643,7 +695,7 @@ summary:focus-visible {
   border-radius: 7px;
 }
 [data-photo] {
-  cursor: help;
+  cursor: pointer;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -792,6 +844,20 @@ summary:focus-visible {
 .video-feature__play:hover {
   background: var(--amber2);
   transform: translate(-50%, -50%) scale(1.06);
+}
+/* The button is permanent so the video is keyboard-operable, but it recedes
+   while playing so it doesn't sit on top of the shot. Faded, never hidden —
+   opacity:0 would leave an invisible control still in the tab order. */
+.video-feature__play.is-playing {
+  opacity: 0.28;
+}
+.video-feature__play.is-playing:hover,
+.video-feature__play.is-playing:focus-visible {
+  opacity: 1;
+}
+.video-feature__icon {
+  font-size: 1.35rem;
+  line-height: 1;
 }
 .video-feature__play[hidden] {
   display: none;

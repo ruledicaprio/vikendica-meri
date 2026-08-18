@@ -41,7 +41,7 @@ document.querySelectorAll('.dest-card__media[data-cat]').forEach((el) => {
 });
 
 /* ---------- Etaže + sadržaji: photo preview on hover ---------- */
-initHoverPreviews();
+initHoverPreviews(document, openLightbox);
 
 /* ---------- Availability calendar ---------- */
 const calMount = document.getElementById('cal-mount');
@@ -51,28 +51,40 @@ if (calMount) initCalendar(calMount);
 const babanovacVideo = document.getElementById('babanovac-video');
 const babanovacPlay = document.getElementById('babanovac-play');
 if (babanovacVideo && babanovacPlay) {
-  const showPlayButton = () => {
-    babanovacPlay.hidden = false;
+  const icon = babanovacPlay.querySelector('.video-feature__icon');
+
+  // The button is always present, so it has to report the real state — the
+  // IntersectionObserver below can start playback without anyone pressing it.
+  const syncButton = () => {
+    const playing = !babanovacVideo.paused && !babanovacVideo.ended;
+    babanovacPlay.setAttribute('aria-label', playing ? t.videoPause : t.videoPlay);
+    babanovacPlay.classList.toggle('is-playing', playing);
+    if (icon) icon.textContent = playing ? '❚❚' : '▶';
   };
-  // A rejected play() must surface a control — iOS refuses autoplay in Low Power
-  // Mode, and swallowing that left the visitor stuck on a static poster.
-  const play = () => {
-    babanovacPlay.hidden = true;
-    babanovacVideo.play().catch(showPlayButton);
-  };
+  babanovacVideo.addEventListener('play', syncButton);
+  babanovacVideo.addEventListener('pause', syncButton);
+  babanovacVideo.addEventListener('ended', syncButton);
+
+  // A rejected play() must leave the control usable — iOS refuses autoplay in
+  // Low Power Mode, and swallowing that left the visitor stuck on a poster.
+  const play = () => babanovacVideo.play().catch(syncButton);
 
   babanovacPlay.addEventListener('click', () => {
-    babanovacVideo.preload = 'auto';
-    play();
+    if (babanovacVideo.paused || babanovacVideo.ended) {
+      babanovacVideo.preload = 'auto';
+      play();
+    } else {
+      babanovacVideo.pause();
+    }
   });
+  syncButton();
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const saveData = navigator.connection?.saveData === true;
 
-  if (reduceMotion || saveData) {
-    // Don't spend the visitor's data or override their motion preference — offer it.
-    showPlayButton();
-  } else {
+  // Under reduced motion or data-saver nothing autoplays; the button is the
+  // visitor's own way in, and it is already there.
+  if (!reduceMotion && !saveData) {
     let started = false;
     const videoObserver = new IntersectionObserver(
       (entries) => {
