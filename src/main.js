@@ -19,6 +19,25 @@ document.querySelectorAll('.dest-card__media[data-cat]').forEach((el) => {
   attachHoverSwap(el, el.dataset.cat);
 });
 
+/* ---------- Babanovac video: play once when scrolled into view ---------- */
+const babanovacVideo = document.getElementById('babanovac-video');
+if (babanovacVideo) {
+  let played = false;
+  const videoObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !played) {
+          played = true;
+          babanovacVideo.play().catch(() => {});
+          videoObserver.disconnect();
+        }
+      });
+    },
+    { threshold: 0.4 }
+  );
+  videoObserver.observe(babanovacVideo);
+}
+
 /* ---------- Navbar: transparent → dark after 100px ---------- */
 const navbar = document.getElementById('navbar');
 const onScrollNav = () => navbar.classList.toggle('is-solid', window.scrollY > 100);

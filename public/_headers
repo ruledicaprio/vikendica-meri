@@ -12,6 +12,8 @@
   Cache-Control: public, max-age=604800
 /travnik/*
   Cache-Control: public, max-age=604800
+/video/*
+  Cache-Control: public, max-age=604800
 
 # HTML must always re-validate so updates appear immediately.
 /index.html

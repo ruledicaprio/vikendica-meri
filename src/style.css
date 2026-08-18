@@ -254,6 +254,9 @@ img {
 .section--smjestaj .wrap {
   padding-top: clamp(4rem, 9vw, 7rem);
 }
+.section--babanovac {
+  background: var(--bg2);
+}
 .section--galerija {
   background: var(--bg2);
 }
@@ -452,6 +455,21 @@ img {
 .segments {
   display: grid;
   gap: 2.5rem;
+}
+.video-feature {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #122016;
+}
+.video-feature__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .segment__square {
   position: relative;
@@ -788,6 +806,9 @@ img {
     grid-template-columns: repeat(2, 1fr);
   }
   .segment__square {
+    height: 35vh;
+  }
+  .video-feature {
     height: 35vh;
   }
 }
