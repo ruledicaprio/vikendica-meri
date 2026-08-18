@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vikendica Meri">
+  <rect width="64" height="64" rx="14" fill="#0a0e1a" />
+  <!-- A-frame roof + tie beam: the cabin's silhouette, legible down to 16px -->
+  <path
+    d="M13 53 L32 11 L51 53"
+    fill="none"
+    stroke="#d4943a"
+    stroke-width="6.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path d="M21 39 H43" fill="none" stroke="#d4943a" stroke-width="5" stroke-linecap="round" />
+</svg>

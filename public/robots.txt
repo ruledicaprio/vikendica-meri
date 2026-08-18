@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vikendica-meri.iot-pages.workers.dev/sitemap.xml

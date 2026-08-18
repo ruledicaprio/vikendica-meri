@@ -1,5 +1,11 @@
-# Cache-Control rules — honoured by Cloudflare Pages and Netlify.
-# (Copied verbatim into dist/ by Vite because it lives in public/.)
+# Cache-Control and security rules — honoured by Cloudflare (Workers static assets
+# and Pages) and Netlify. Copied verbatim into dist/ by Vite because it lives in public/.
+# All matching rules apply, so the /* block below sets a baseline for every response.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
 
 # Fingerprinted build assets never change → cache forever.
 /assets/*
@@ -15,6 +21,32 @@
 /video/*
   Cache-Control: public, max-age=604800
 
+# Icons and the social card change rarely but must not be pinned forever.
+/favicon.svg
+  Cache-Control: public, max-age=604800
+/favicon.ico
+  Cache-Control: public, max-age=604800
+/apple-touch-icon.png
+  Cache-Control: public, max-age=604800
+/icon-192.png
+  Cache-Control: public, max-age=604800
+/icon-512.png
+  Cache-Control: public, max-age=604800
+/og-image.jpg
+  Cache-Control: public, max-age=604800
+
+# Crawler files — keep them fresh enough to fix quickly.
+/robots.txt
+  Cache-Control: public, max-age=3600
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
 # HTML must always re-validate so updates appear immediately.
+# Rules match the REQUEST path, not the resolved file, so "/" needs its own entry —
+# without it the bare root was never covered by the /index.html rule below.
+/
+  Cache-Control: no-cache
 /index.html
+  Cache-Control: no-cache
+/404.html
   Cache-Control: no-cache

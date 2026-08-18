@@ -471,6 +471,33 @@ img {
   height: 100%;
   object-fit: cover;
 }
+.video-feature__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  padding: 0 0 0 4px; /* optically centre the triangle */
+  border: none;
+  border-radius: 999px;
+  background: var(--amber);
+  color: #20140a;
+  font-size: 1.7rem;
+  cursor: pointer;
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.7);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.video-feature__play:hover {
+  background: var(--amber2);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+.video-feature__play[hidden] {
+  display: none;
+}
 .segment__square {
   position: relative;
   display: block;
@@ -685,6 +712,18 @@ img {
   letter-spacing: 0.04em;
   border-top: 1px solid var(--line);
 }
+.footer__credit {
+  margin-top: 0.7rem;
+  font-size: 0.82rem;
+  color: rgba(245, 240, 232, 0.5);
+}
+.footer__credit a {
+  color: rgba(245, 240, 232, 0.78);
+  transition: color 0.25s ease;
+}
+.footer__credit a:hover {
+  color: var(--amber2);
+}
 
 /* ---------- Lightbox ---------- */
 .lightbox {
@@ -763,6 +802,33 @@ img {
   font-size: 0.85rem;
   letter-spacing: 0.1em;
 }
+.lightbox__credit {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.4rem;
+}
+
+/* ---------- Media credit ---------- */
+.media-credit {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+.media-credit a {
+  color: rgba(245, 240, 232, 0.85);
+  border-bottom: 1px solid rgba(212, 148, 58, 0.5);
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+.media-credit a:hover {
+  color: var(--amber2);
+  border-color: var(--amber2);
+}
+.video-feature__credit {
+  margin-top: 0.85rem;
+  text-align: right;
+}
 
 /* ---------- Reveal ---------- */
 .reveal {
@@ -808,8 +874,20 @@ img {
   .segment__square {
     height: 35vh;
   }
+  /* Full-bleed cinematic band on phones. A 35vh `cover` box cropped this 16:9
+     aerial shot into an unreadable strip, so break out of .wrap's padding and
+     let the frame play at its own ratio instead. */
   .video-feature {
-    height: 35vh;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    width: auto;
+    margin-inline: calc(var(--pad) * -1);
+    border-radius: 0;
+  }
+  .video-feature__play {
+    width: 62px;
+    height: 62px;
+    font-size: 1.4rem;
   }
 }
 
@@ -829,6 +907,20 @@ img {
   }
   .lightbox__next {
     right: 0.5rem;
+  }
+  /* Not enough width for the counter and the credit to sit side by side. */
+  .lightbox__count {
+    bottom: 2.7rem;
+  }
+  .lightbox__credit {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 1rem;
+    white-space: nowrap;
+  }
+  .video-feature__credit {
+    text-align: center;
   }
 }
 

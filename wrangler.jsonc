@@ -5,6 +5,12 @@
   "name": "vikendica-meri",
   "compatibility_date": "2025-06-01",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    // Already the default, but pinned so a future Wrangler default cannot silently
+    // change canonical URLs: serves /path/ from /path/index.html and 307s /path → /path/.
+    "html_handling": "auto-trailing-slash",
+    // Serve dist/404.html with a real 404 status. This is not an SPA — unknown
+    // paths must not fall back to index.html.
+    "not_found_handling": "404-page"
   }
 }
