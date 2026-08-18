@@ -3,6 +3,7 @@
 // cacheable URLs. The file list is provided by the build-time `virtual:gallery`
 // manifest (see vite.config.js) — no bundling/duplication of the photos.
 import { manifest } from 'virtual:gallery';
+import { creditFor, creditHtml } from './credits.js';
 
 function base(url) {
   return url.split('/').pop();
@@ -207,12 +208,14 @@ export function createLightbox(root) {
     <img class="lightbox__img" src="" alt="" />
     <button class="lightbox__nav lightbox__next" aria-label="Sljedeća">›</button>
     <div class="lightbox__count"></div>
+    <div class="lightbox__credit"></div>
   `;
   root.appendChild(el);
 
   const img = el.querySelector('.lightbox__img');
   const label = el.querySelector('.lightbox__label');
   const count = el.querySelector('.lightbox__count');
+  const credit = el.querySelector('.lightbox__credit');
   let list = [];
   let currentKey = '';
   let i = 0;
@@ -221,6 +224,7 @@ export function createLightbox(root) {
     img.src = list[i];
     img.alt = altFor(currentKey, list[i], i);
     count.textContent = `${i + 1} / ${list.length}`;
+    credit.innerHTML = creditHtml(creditFor(list[i]));
   };
   const open = (key, index) => {
     const c = categories[key];
