@@ -34,6 +34,9 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- The hero poster is the largest contentful paint; start it before the CSS. -->
+    <link rel="preload" as="image" href="/hero-poster.jpg" fetchpriority="high" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -163,8 +166,13 @@
     <span id="top"></span>
     <a class="skip-link" href="#smjestaj">Preskoči na sadržaj</a>
 
-    <!-- Fixed 3D hero scene mount -->
-    <div id="hero-canvas"></div>
+    <!-- Fixed 3D hero scene mount. The poster paints immediately and the
+         Three.js scene fades in over it once its chunk has loaded; on
+         reduced-motion or data-saver the poster is the final state. -->
+    <div id="hero-canvas">
+      <img class="hero-poster" src="/hero-poster.jpg" alt="" aria-hidden="true"
+           width="1600" height="900" fetchpriority="high" decoding="async" />
+    </div>
 
     <!-- NAVBAR -->
     <header class="navbar" id="navbar">

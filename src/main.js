@@ -1,14 +1,33 @@
 import './style.css';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { CabinHeroScene } from './hero-scene.js';
 import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews } from './gallery.js';
 
-gsap.registerPlugin(ScrollTrigger);
+// Three.js and GSAP are ~600 KB and ~70 KB of the bundle and neither is needed
+// for first paint, so both load after it. Everything below runs immediately.
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const saveData = navigator.connection?.saveData === true;
 
-/* ---------- Hero 3D scene ---------- */
+/** Run after the page has settled, so nothing here competes with first paint. */
+function afterPaint(fn) {
+  const run = () => (window.requestIdleCallback || setTimeout)(fn, { timeout: 2000 });
+  if (document.readyState === 'complete') run();
+  else window.addEventListener('load', run, { once: true });
+}
+
+/* ---------- Hero 3D scene (lazy) ---------- */
 const heroMount = document.getElementById('hero-canvas');
-const heroScene = new CabinHeroScene(heroMount);
+const heroPoster = heroMount?.querySelector('.hero-poster');
+
+// Data-saver keeps the poster as the final hero and never downloads the 3D
+// chunk at all. Reduced motion still gets the scene: the winter/summer scroll
+// transition is content, not decoration, and hero-scene.js already renders it
+// on demand with every ambient animation switched off.
+if (heroMount && !saveData) {
+  afterPaint(async () => {
+    const { CabinHeroScene } = await import('./hero-scene.js');
+    new CabinHeroScene(heroMount);
+    heroPoster?.classList.add('is-hidden');
+  });
+}
 
 /* ---------- Gallery + lightbox ---------- */
 const openLightbox = createLightbox(document.body);
@@ -114,20 +133,37 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
   });
 });
 
-/* ---------- Reveal on scroll ---------- */
-gsap.utils.toArray('.reveal').forEach((el) => {
-  gsap.fromTo(
-    el,
-    { y: 40, autoAlpha: 0 },
-    {
-      y: 0,
-      autoAlpha: 1,
-      duration: 0.9,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
-    }
-  );
-});
+/* ---------- Reveal on scroll (lazy) ----------
+   GSAP loads after first paint. Until it does, .reveal elements are simply
+   visible and un-animated — the tween sets autoAlpha from JS, so there is no
+   hidden-content flash if the chunk is slow or never arrives.
+   autoAlpha also means visibility:hidden while pending, and Chrome will not
+   start a lazy image fetch inside a hidden element, so skipping the animation
+   under reduced motion is what keeps those photos loading at all. */
+if (!reducedMotion) {
+  afterPaint(async () => {
+    const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ]);
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.utils.toArray('.reveal').forEach((el) => {
+      gsap.fromTo(
+        el,
+        { y: 40, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.9,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+        }
+      );
+    });
+    ScrollTrigger.refresh();
+  });
+}
 
 /* ---------- Reservation form ----------
    Add a free Web3Forms access key to send in-page; otherwise opens the mail client. */
@@ -202,4 +238,3 @@ if (form) {
   });
 }
 
-window.addEventListener('load', () => ScrollTrigger.refresh());

@@ -89,6 +89,17 @@ async function main() {
     .jpeg({ quality: 82, mozjpeg: true })
     .toBuffer();
   await write(path.join(PUBLIC, 'og-image.jpg'), og, flags.force);
+
+  // Hero poster. Paints instantly while the Three.js scene loads in the
+  // background, and stays as the final hero for reduced-motion and data-saver
+  // visitors, who never download the 3D bundle at all. Same north crop as the
+  // OG card, for the same reason.
+  const poster = await sharp(flags.photo)
+    .rotate()
+    .resize(1600, 900, { fit: 'cover', position: sharp.gravity.north })
+    .jpeg({ quality: 78, mozjpeg: true })
+    .toBuffer();
+  await write(path.join(PUBLIC, 'hero-poster.jpg'), poster, flags.force);
 }
 
 main().catch((err) => {
