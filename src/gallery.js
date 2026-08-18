@@ -401,6 +401,10 @@ export function createLightbox(root) {
     const next = list[(i + 1) % list.length];
     if (next && next !== p) new Image().srcset = next.webp;
   };
+  // Where focus was before the dialog opened, so it can be given back.
+  let opener = null;
+  const focusables = () => [...el.querySelectorAll('button')];
+
   const open = (key, index) => {
     const c = categories[key];
     if (!c || !c.photos.length) return;
@@ -409,14 +413,20 @@ export function createLightbox(root) {
     i = Math.max(0, Math.min(index, list.length - 1));
     label.textContent = c.label;
     render();
+    opener = document.activeElement;
     el.classList.add('is-open');
     el.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    el.querySelector('.lightbox__close').focus();
   };
   const close = () => {
     el.classList.remove('is-open');
     el.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    // Returning focus to the thumb that opened it: without this, focus falls
+    // back to <body> and a keyboard user restarts from the top of the page.
+    if (opener && document.contains(opener)) opener.focus();
+    opener = null;
   };
   const step = (d) => {
     i = (i + d + list.length) % list.length;
@@ -434,6 +444,24 @@ export function createLightbox(root) {
     if (e.key === 'Escape') close();
     if (e.key === 'ArrowLeft') step(-1);
     if (e.key === 'ArrowRight') step(1);
+    // aria-modal only tells assistive tech the rest is inert; Tab still walks
+    // out into the page behind, so the cycle has to be closed by hand.
+    if (e.key === 'Tab') {
+      const f = focusables();
+      if (!f.length) return;
+      const first = f[0];
+      const last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!el.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
   });
 
   // Touch swipe.

@@ -74,11 +74,32 @@ window.addEventListener('scroll', onScrollNav, { passive: true });
 /* ---------- Mobile menu ---------- */
 const burger = document.getElementById('burger');
 const navLinks = document.getElementById('nav-links');
-burger.addEventListener('click', () => {
-  const open = navLinks.classList.toggle('is-open');
+// Matches the breakpoint at which .navbar__links becomes the slide-down panel.
+const isMobileNav = window.matchMedia('(max-width: 900px)');
+
+// One place that owns the state: the classes, aria-expanded and inert were
+// previously set in two places and drifted — closing via a nav link left
+// aria-expanded="true" forever.
+function setMenu(open) {
+  navLinks.classList.toggle('is-open', open);
   burger.classList.toggle('is-open', open);
   burger.setAttribute('aria-expanded', String(open));
+  // A closed panel is off-screen but still focusable; inert takes it out of the
+  // tab order and the accessibility tree. Only on mobile — on desktop the same
+  // element is the visible nav.
+  navLinks.toggleAttribute('inert', isMobileNav.matches && !open);
+}
+
+burger.addEventListener('click', () => setMenu(!navLinks.classList.contains('is-open')));
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && navLinks.classList.contains('is-open')) {
+    setMenu(false);
+    burger.focus();
+  }
 });
+// Crossing the breakpoint must clear inert, or the desktop nav goes unreachable.
+isMobileNav.addEventListener('change', () => setMenu(false));
+setMenu(false);
 
 /* ---------- Smooth in-page scrolling ---------- */
 document.querySelectorAll('a[href^="#"]').forEach((a) => {
@@ -88,8 +109,7 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
     const target = document.querySelector(id);
     if (!target) return;
     e.preventDefault();
-    navLinks.classList.remove('is-open');
-    burger.classList.remove('is-open');
+    setMenu(false);
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
@@ -140,6 +160,14 @@ if (form) {
       return;
     }
     const data = Object.fromEntries(new FormData(form).entries());
+    // Nothing stops a guest entering a checkout before their check-in, and the
+    // error is easier to fix here than in a reply email two days later.
+    if (data.checkin && data.checkout && data.checkout <= data.checkin) {
+      status.textContent = 'Datum odlaska mora biti nakon datuma dolaska.';
+      status.className = 'form-status is-err';
+      document.getElementById('f-to').focus();
+      return;
+    }
     if (!WEB3FORMS_KEY) {
       status.textContent = 'Otvaramo vaš email klijent…';
       status.className = 'form-status is-info';

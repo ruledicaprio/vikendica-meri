@@ -161,6 +161,7 @@
   </head>
   <body>
     <span id="top"></span>
+    <a class="skip-link" href="#smjestaj">Preskoči na sadržaj</a>
 
     <!-- Fixed 3D hero scene mount -->
     <div id="hero-canvas"></div>
@@ -175,7 +176,8 @@
           <a href="#galerija">Galerija</a>
           <a class="navbar__cta" href="#kontakt">Rezerviši&nbsp;→</a>
         </nav>
-        <button class="navbar__burger" id="burger" aria-label="Otvori meni" aria-expanded="false">
+        <button class="navbar__burger" id="burger" type="button" aria-label="Otvori meni"
+                aria-controls="nav-links" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -384,16 +386,19 @@
               <h3>Pošaljite upit</h3>
               <div class="field">
                 <label for="f-name">Ime i prezime</label>
-                <input id="f-name" name="name" type="text" required placeholder="Vaše ime" />
+                <input id="f-name" name="name" type="text" required autocomplete="name"
+                       placeholder="Vaše ime" />
               </div>
               <div class="field-row">
                 <div class="field">
                   <label for="f-email">Email</label>
-                  <input id="f-email" name="email" type="email" required placeholder="vas@email.com" />
+                  <input id="f-email" name="email" type="email" required autocomplete="email"
+                         inputmode="email" placeholder="vas@email.com" />
                 </div>
                 <div class="field">
                   <label for="f-phone">Telefon</label>
-                  <input id="f-phone" name="phone" type="tel" placeholder="+387…" />
+                  <input id="f-phone" name="phone" type="tel" autocomplete="tel"
+                         inputmode="tel" placeholder="+387…" />
                 </div>
               </div>
               <div class="field-row">
