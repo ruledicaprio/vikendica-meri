@@ -622,7 +622,11 @@
                   </span>
                 </li>
                 <li>📞 <a href="tel:+38761477345">+387 61 477 345</a></li>
-                <li>✉️ <a href="mailto:villa-meri@gmail.com">villa-meri@gmail.com</a></li>
+                <!-- No mail address here on purpose: the form below is the way in,
+                     and the phones and WhatsApp/Viber cover everyone who would
+                     rather not use it. The address still exists in src/main.js as
+                     the mailto fallback, for the case where the form POST fails —
+                     an enquiry must not disappear because the API is down. -->
                 <li>📍 <span>{{contactAddress}}</span></li>
               </ul>
               <p class="contact-note">{{contactNote}}</p>
