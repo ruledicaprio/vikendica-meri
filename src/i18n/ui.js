@@ -115,6 +115,7 @@ const bs = {
   calLegendBooked: 'Zauzeto',
   calLegendPending: 'Na čekanju',
   calLegendSelected: 'Vaš odabir',
+  calOffline: 'Trenutnu dostupnost nije moguće učitati — potvrdit ćemo termin na vaš upit.',
   nights: (n) => (n === 1 ? '1 noć' : `${n} noći`),
   formatDate: (d, months) => `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}.`,
 };
@@ -217,6 +218,7 @@ const en = {
   calLegendBooked: 'Booked',
   calLegendPending: 'On hold',
   calLegendSelected: 'Your selection',
+  calOffline: 'Live availability could not be loaded — we will confirm your dates by reply.',
   nights: (n) => `${n} ${n === 1 ? 'night' : 'nights'}`,
   formatDate: (d, months) => `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
 };

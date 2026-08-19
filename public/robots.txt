@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
+# Owner-only manager panel — holds guest personal data and is behind Cloudflare
+# Access. Never linked from the site and absent from sitemap.xml; this is belt
+# and braces, not the protection itself.
+Disallow: /manager
+Disallow: /api/
 
 Sitemap: https://vikendica-meri.iot-pages.workers.dev/sitemap.xml

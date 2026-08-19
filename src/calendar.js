@@ -3,17 +3,16 @@
  * ─────────────────────────────────────────────────────────────
  * Usage:  initCalendar(document.getElementById('cal-mount'))
  *
- * OWNER CONFIG ── edit BOOKED to mark reserved periods.
- *   status: 'booked'  → unavailable (red)
- *           'pending' → on hold / awaiting confirmation (amber)
+ * Availability comes from /api/availability, which the owner drives from the
+ * manager panel. Statuses map to the two states this component already renders:
+ *   'booked'  → unavailable (red)   ← a confirmed booking or a manual block
+ *   'pending' → on hold (amber)     ← a request the owner has not answered yet
  */
 import { t } from './i18n/ui.js';
 
-// Empty until the owner supplies real availability. The six ranges that used to
-// sit here were placeholders written while the component was being built; some
-// had already elapsed. Publishing invented bookings would turn guests away from
-// dates that are actually free, so an empty list — everything available — is the
-// only honest default.
+// Populated by loadAvailability() below. Starts empty so the first paint shows a
+// working calendar rather than nothing; a failed fetch says so out loud instead
+// of quietly implying every date is free.
 export const BOOKED = [];
 
 const MONTHS = t.months;
@@ -51,6 +50,9 @@ export function initCalendar(container) {
   let viewMonth = new Date().getMonth();
   let selStart  = null;
   let selEnd    = null;
+  // Set when /api/availability could not be read. render() then says so, rather
+  // than showing an all-free calendar that would be a lie.
+  let offline   = false;
 
   const root = document.createElement('div');
   root.className = 'cal';
@@ -231,6 +233,32 @@ export function initCalendar(container) {
         <span class="cal__legend-dot cal__legend-dot--sel"></span>${t.calLegendSelected}
       </div>`;
     root.appendChild(legend);
+
+    if (offline) {
+      const note = document.createElement('p');
+      note.className = 'cal__notice';
+      note.textContent = t.calOffline;
+      root.appendChild(note);
+    }
+  }
+
+  /* ── availability ── */
+  async function loadAvailability() {
+    try {
+      const res = await fetch('/api/availability', { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error(String(res.status));
+      const { ranges } = await res.json();
+      BOOKED.length = 0;
+      for (const r of ranges || []) {
+        if (!r.from || !r.to) continue;
+        // The API's vocabulary is the database's; this component's is the CSS's.
+        BOOKED.push({ from: r.from, to: r.to, status: r.status === 'pending' ? 'pending' : 'booked' });
+      }
+      offline = false;
+    } catch {
+      offline = true;
+    }
+    render();
   }
 
   /* ── click handler ── */
@@ -264,4 +292,5 @@ export function initCalendar(container) {
   }
 
   render();
+  loadAvailability();
 }

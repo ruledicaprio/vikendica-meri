@@ -236,24 +236,39 @@ if (form) {
     }
     status.textContent = t.formSending;
     status.className = 'form-status is-info';
-    try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: t.mailSubject, ...data }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        status.textContent = t.formOk;
-        status.className = 'form-status is-ok';
-        form.reset();
-        if (window.hcaptcha) window.hcaptcha.reset();
-      } else throw new Error();
-    } catch {
+
+    // Two independent paths, on purpose. The API records the enquiry so it shows
+    // up in the manager panel; Web3Forms is what actually emails the owner today.
+    // Until the Worker sends its own mail, dropping either one would lose
+    // something — so both are attempted and one success is enough.
+    const toApi = fetch('/api/requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then((r) => r.ok);
+
+    const toEmail = fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: t.mailSubject, ...data }),
+    })
+      .then((r) => r.json())
+      .then((j) => j.success === true);
+
+    const [api, email] = await Promise.all([
+      toApi.catch(() => false),
+      toEmail.catch(() => false),
+    ]);
+
+    if (api || email) {
+      status.textContent = t.formOk;
+      status.className = 'form-status is-ok';
+      form.reset();
+    } else {
       status.textContent = t.formErr;
       status.className = 'form-status is-err';
-      if (window.hcaptcha) window.hcaptcha.reset();
     }
+    if (window.hcaptcha) window.hcaptcha.reset();
   });
 }
 

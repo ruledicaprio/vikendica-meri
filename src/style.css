@@ -643,6 +643,13 @@ picture {
   font-size: 0.82rem;
   color: rgba(245, 240, 232, 0.7);
 }
+/* Shown only when /api/availability could not be read, so the calendar never
+   silently presents an all-free month as fact. */
+.cal__notice {
+  margin-top: 0.9rem;
+  font-size: 0.82rem;
+  color: var(--amber2);
+}
 .cal__legend-item {
   display: flex;
   align-items: center;

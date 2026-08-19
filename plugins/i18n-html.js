@@ -48,6 +48,21 @@ export function render(html, dict, localeName) {
   return out;
 }
 
+/**
+ * Is this the public site's entry?
+ *
+ * transformIndexHtml fires for every HTML entry, and the build has a second one
+ * — manager/index.html, the owner panel. Without this guard the validator sees a
+ * document containing no {{key}} at all and correctly reports every key as
+ * unused, failing the build. The guard narrows the plugin to its one template;
+ * it does not weaken the checks on that template.
+ */
+function isSiteEntry(ctx) {
+  if (ctx?.filename) return /(^|[\\/])index\.html$/.test(ctx.filename) && !/manager/.test(ctx.filename);
+  const p = ctx?.path || '/';
+  return !p.startsWith('/manager');
+}
+
 /** Which locale a request path belongs to. */
 function localeFor(urlPath) {
   const hit = Object.entries(LOCALES).find(
@@ -72,6 +87,7 @@ export function i18nHtml() {
       // the alternate locales then inherit them without a second pass.
       order: 'post',
       handler(html, ctx) {
+        if (!isSiteEntry(ctx)) return html;
         // Stash the un-substituted form for generateBundle.
         templateHtml = html;
         const name = localeFor(ctx?.path || '/');

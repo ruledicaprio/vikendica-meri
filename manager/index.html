@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="bs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Owner-only page holding guest personal data. Kept out of search engines
+         here, in robots.txt and in _headers (no-store); it is never linked from
+         the public site and never appears in sitemap.xml. -->
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="theme-color" content="#0a0e1a" />
+    <title>Manager — Vikendica Meri</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="mgr-bar">
+      <span class="mgr-logo">Vikendica Meri</span>
+      <span class="mgr-tag">Manager</span>
+      <button class="mgr-btn mgr-btn--ghost" id="refresh" type="button">Osvježi</button>
+    </header>
+
+    <main class="mgr-wrap">
+      <p class="mgr-status" id="status" role="status" aria-live="polite">Učitavanje…</p>
+
+      <section class="mgr-section">
+        <h2>Zahtjevi na čekanju <span class="mgr-pill" id="count-pending">0</span></h2>
+        <div class="mgr-list" id="list-pending"></div>
+      </section>
+
+      <section class="mgr-section">
+        <h2>Potvrđeno <span class="mgr-pill" id="count-confirmed">0</span></h2>
+        <div class="mgr-list" id="list-confirmed"></div>
+      </section>
+
+      <section class="mgr-section">
+        <h2>Blokiraj termin</h2>
+        <form class="mgr-block" id="block-form">
+          <label>Od <input type="date" name="checkin" required /></label>
+          <label>Do <input type="date" name="checkout" required /></label>
+          <label class="mgr-block__label">Opis <input type="text" name="label" placeholder="npr. Vlastito korištenje" /></label>
+          <button class="mgr-btn" type="submit">Blokiraj</button>
+        </form>
+      </section>
+
+      <section class="mgr-section">
+        <h2>Arhiva <span class="mgr-pill" id="count-archive">0</span></h2>
+        <div class="mgr-list" id="list-archive"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/manager.js"></script>
+  </body>
+</html>

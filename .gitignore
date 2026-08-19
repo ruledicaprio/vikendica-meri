@@ -8,6 +8,8 @@ dist
 .claude
 .wrangler
 *.plugin
+# Worker secrets and the local Access bypass. Never commit.
+.dev.vars
 
 # Orphaned duplicate of the photos (everything used by the site lives in public/)
 data
