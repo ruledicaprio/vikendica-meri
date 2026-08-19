@@ -302,8 +302,21 @@
         <p class="hero-overlay__location">{{heroLocation}}</p>
         <div class="hero-overlay__cta">
           <a class="btn btn--primary" href="#smjestaj">{{heroCtaPrimary}}</a>
-          <a class="btn btn--secondary" href="#kontakt">{{heroCtaSecondary}}</a>
+          <!-- Opens the compact check rather than jumping to the form: dates first,
+               then a prefilled form, is the better order. A free range selects
+               itself in the full calendar at #dostupnost. -->
+          <button
+            class="btn btn--secondary"
+            type="button"
+            id="hero-check"
+            aria-expanded="false"
+            aria-controls="hero-check-panel"
+          >
+            {{heroCtaSecondary}}
+          </button>
         </div>
+        <!-- Filled in by initQuickCheck(); empty (and hidden) without JS. -->
+        <div class="quick-check" id="hero-check-panel" hidden></div>
       </div>
     </div>
     <div class="scroll-hint">{{scrollHint}}</div>

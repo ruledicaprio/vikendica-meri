@@ -37,7 +37,7 @@ export const bs = {
   heroSubtitle: 'Planina Vlašić · Babanovac',
   heroLocation: 'Dolina Panjeva · Babanovac · Vlašić',
   heroCtaPrimary: 'Pogledaj smještaj',
-  heroCtaSecondary: 'Rezerviši',
+  heroCtaSecondary: 'Provjeri dostupnost',
   scrollHint: 'Istraži ↓',
 
   aboutKicker: 'O vikendici',
@@ -169,7 +169,7 @@ export const en = {
   heroSubtitle: 'Vlašić mountain · Babanovac',
   heroLocation: 'Dolina Panjeva · Babanovac · Vlašić',
   heroCtaPrimary: 'See the chalet',
-  heroCtaSecondary: 'Book',
+  heroCtaSecondary: 'Check availability',
   scrollHint: 'Explore ↓',
 
   aboutKicker: 'About the chalet',

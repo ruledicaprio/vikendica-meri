@@ -1,6 +1,7 @@
 import './style.css';
 import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews } from './gallery.js';
 import { initCalendar } from './calendar.js';
+import { initQuickCheck } from './quick-check.js';
 import { t } from './i18n/ui.js';
 
 // Three.js and GSAP are ~600 KB and ~70 KB of the bundle and neither is needed
@@ -45,7 +46,16 @@ initHoverPreviews(document, openLightbox);
 
 /* ---------- Availability calendar ---------- */
 const calMount = document.getElementById('cal-mount');
-if (calMount) initCalendar(calMount);
+if (calMount) {
+  // The hero's compact check queries and drives this calendar, so it needs the
+  // handle rather than a copy of the availability data.
+  const cal = initCalendar(calMount);
+  initQuickCheck(
+    document.getElementById('hero-check'),
+    document.getElementById('hero-check-panel'),
+    cal
+  );
+}
 
 /* ---------- Babanovac video: play once when scrolled into view ---------- */
 const babanovacVideo = document.getElementById('babanovac-video');

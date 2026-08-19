@@ -264,6 +264,110 @@ picture {
   justify-content: center;
   pointer-events: all;
 }
+
+/* ---------- Compact availability check (hero) ----------
+   Anchored under the CTA row rather than in the flow: .hero-overlay is a
+   centred grid, so a panel that took up space would shove the <h1> upwards
+   every time it opened.
+   The background is fully opaque on purpose. This floats over the fixed 3D
+   scene, and anything translucent lets the hero title read straight through the
+   date fields. */
+.hero-overlay__inner {
+  position: relative;
+}
+.quick-check {
+  position: absolute;
+  top: calc(100% + 1rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(30rem, calc(100vw - 2rem));
+  padding: 1.1rem;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  pointer-events: all;
+  text-align: left;
+  z-index: 3;
+}
+.quick-check[hidden] {
+  display: none;
+}
+.quick-check__form {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.quick-check__field {
+  flex: 1 1 9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.quick-check__field label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.quick-check__field input {
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  /* 44px total: these are the smallest tap targets on the page. */
+  padding: 0.6rem 0.7rem;
+  min-height: 44px;
+}
+.quick-check__field input:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+}
+.quick-check__submit {
+  flex: 0 0 auto;
+  min-height: 44px;
+}
+.quick-check__verdict {
+  margin-top: 0.8rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+.quick-check__verdict:empty {
+  display: none;
+}
+.quick-check__verdict--good {
+  color: #8fd694;
+}
+.quick-check__verdict--bad {
+  color: #e58a7a;
+}
+.quick-check__verdict--warn {
+  color: var(--amber2);
+}
+.quick-check__verdict--muted {
+  color: var(--muted);
+}
+
+/* Below 540px an anchored dropdown would hang off the screen, so it becomes a
+   centred sheet instead. */
+@media (max-width: 540px) {
+  .quick-check {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100vw - 1.5rem);
+    max-height: calc(100svh - 3rem);
+    overflow-y: auto;
+    z-index: 40;
+  }
+  .quick-check__submit {
+    flex: 1 1 100%;
+  }
+}
 .scroll-hint {
   position: fixed;
   bottom: calc(2rem + env(safe-area-inset-bottom));

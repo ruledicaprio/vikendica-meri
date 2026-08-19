@@ -45,6 +45,12 @@ function rangeConflicts(from, to) {
 }
 
 /* ── main export ───────────────────────────────────────────── */
+/**
+ * Mount the availability calendar into `container`.
+ *
+ * Returns a small handle so the compact check in the hero can query and drive
+ * this calendar instead of fetching and interpreting availability a second time.
+ */
 export function initCalendar(container) {
   let viewYear  = new Date().getFullYear();
   let viewMonth = new Date().getMonth();
@@ -292,5 +298,38 @@ export function initCalendar(container) {
   }
 
   render();
-  loadAvailability();
+  const ready = loadAvailability();
+
+  // The compact hero panel drives this calendar rather than keeping its own copy
+  // of the availability data: one fetch, and one definition of what "free" means.
+  return {
+    /** Resolves once /api/availability has been read (or has failed). */
+    ready,
+    /** True when the data could not be read — a verdict would be a guess. */
+    get offline() {
+      return offline;
+    },
+    /**
+     * Is every night from `from` up to `to` bookable? Returns the blocking
+     * status ('booked' | 'pending' | 'past') or null when the range is free.
+     */
+    checkRange(from, to) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (parseDate(from) < today) return 'past';
+      for (const b of BOOKED) {
+        if (from <= b.to && to >= b.from) return b.status;
+      }
+      return null;
+    },
+    /** Show `from`–`to` as the selection, and move the view to that month. */
+    setRange(from, to) {
+      selStart = from;
+      selEnd = to;
+      const d = parseDate(from);
+      viewYear = d.getFullYear();
+      viewMonth = d.getMonth();
+      render();
+    },
+  };
 }

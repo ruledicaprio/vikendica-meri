@@ -112,6 +112,18 @@ const bs = {
   videoPlay: 'Pusti video',
   videoPause: 'Pauziraj video',
 
+  // Quick availability check (hero panel)
+  qcFrom: 'Dolazak',
+  qcTo: 'Odlazak',
+  qcCheck: 'Provjeri',
+  qcChecking: 'Provjeravamo…',
+  qcNeedDates: 'Odaberite datum dolaska i odlaska.',
+  qcBadRange: 'Datum odlaska mora biti nakon datuma dolaska.',
+  qcFree: 'Slobodno! Termin je označen u kalendaru ispod.',
+  qcBooked: 'Nažalost, taj termin je već zauzet. Pogledajte kalendar ispod.',
+  qcPending: 'Za taj termin već postoji upit na čekanju. Slobodno nam pišite.',
+  qcPast: 'Taj datum je već prošao.',
+  qcOffline: 'Trenutno ne možemo provjeriti dostupnost. Pišite nam i javit ćemo se.',
   // Credit
   creditPhoto: 'Foto',
 
@@ -253,6 +265,18 @@ const en = {
   videoPlay: 'Play video',
   videoPause: 'Pause video',
 
+  // Quick availability check (hero panel)
+  qcFrom: 'Check-in',
+  qcTo: 'Check-out',
+  qcCheck: 'Check',
+  qcChecking: 'Checking…',
+  qcNeedDates: 'Please pick a check-in and a check-out date.',
+  qcBadRange: 'The check-out date must be after the check-in date.',
+  qcFree: 'Available! The dates are selected in the calendar below.',
+  qcBooked: 'Sorry, those dates are already taken. See the calendar below.',
+  qcPending: 'There is already a pending enquiry for those dates. Do get in touch anyway.',
+  qcPast: 'That date has already passed.',
+  qcOffline: 'We cannot check availability right now. Send us a message and we will reply.',
   creditPhoto: 'Photo',
 
   formSending: 'Sending…',
