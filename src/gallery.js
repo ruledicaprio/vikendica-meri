@@ -38,12 +38,48 @@ const CATEGORY_KEYS = ['eksterijer', 'dnevni', 'kuhinja', 'sobe', 'kupatila', 'v
    Generic alt ("Smještaj 3") is worthless to screen readers and invisible to
    image search, and these photos are the main thing a guest wants to see.
 ---------------------------------------------------------------------------- */
-function altFor(key, src, i) {
-  const name = base(src).replace(/\.[a-z]+$/i, '');
+// Computed once per category and cached: the numbering below has to look at all
+// of a category's photos, not just the one being rendered.
+const altsByCategory = new Map();
+
+function buildAlts(key) {
+  const photos = manifest[key] || [];
   const build = t.alt[key];
-  const text = build ? build(name) : t.categories[key] || '';
+  const textFor = (p) => {
+    const name = base(p.src).replace(/\.[a-z]+$/i, '');
+    return build ? build(name) : t.categories[key] || '';
+  };
+
+  const texts = photos.map(textFor);
+  const total = new Map();
+  for (const text of texts) total.set(text, (total.get(text) ?? 0) + 1);
+
   // Keep every alt distinct: repeated alt text is a quality signal against you.
-  return i > 0 ? `${text}${t.photoSuffix(i + 1)}` : text;
+  // But number only the ones that actually repeat — the builders now read the
+  // detail out of the curated filename, so most photos are already unique and a
+  // blanket "— fotografija 4" on them is noise a screen reader has to sit through.
+  const seen = new Map();
+  const out = new Map();
+  photos.forEach((p, idx) => {
+    const text = texts[idx];
+    if (total.get(text) === 1) {
+      out.set(p.src, text);
+      return;
+    }
+    const n = (seen.get(text) ?? 0) + 1;
+    seen.set(text, n);
+    out.set(p.src, n === 1 ? text : `${text}${t.photoSuffix(n)}`);
+  });
+  return out;
+}
+
+function altFor(key, src) {
+  let alts = altsByCategory.get(key);
+  if (!alts) {
+    alts = buildAlts(key);
+    altsByCategory.set(key, alts);
+  }
+  return alts.get(src) ?? '';
 }
 
 const photoCount = (n) => t.photoCount(n);
@@ -141,7 +177,7 @@ function makeCrossfader(frontPic, backPic, photos) {
 export function attachHoverSwap(el, key, openLightbox = null) {
   const c = categories[key];
   if (!c || !c.cover) return;
-  const alt = altFor(key, c.cover.src, 0);
+  const alt = altFor(key, c.cover.src);
   el.innerHTML =
     pictureHtml(c.cover, { cls: 'media-layer is-front', sizes: '(max-width: 900px) 100vw, 50vw', alt }) +
     pictureHtml(c.cover, { cls: 'media-layer is-back', sizes: '(max-width: 900px) 100vw, 50vw', alt: '' }) +
@@ -281,7 +317,7 @@ export function initGallery(container, openLightbox) {
           ${pictureHtml(c.cover, {
             cls: 'segment__layer is-front',
             sizes: COVER_SIZES,
-            alt: altFor(key, c.cover.src, 0),
+            alt: altFor(key, c.cover.src),
           })}
           ${pictureHtml(c.cover, { cls: 'segment__layer is-back', sizes: COVER_SIZES, alt: '' })}
           <span class="segment__overlay">
@@ -296,7 +332,7 @@ export function initGallery(container, openLightbox) {
             <button class="thumb" data-cat="${key}" data-index="${i}" aria-label="${esc(
               t.openPhoto(i + 1, c.photos.length)
             )}">
-              ${pictureHtml(p, { cls: '', sizes: THUMB_SIZES, alt: altFor(key, p.src, i) })}
+              ${pictureHtml(p, { cls: '', sizes: THUMB_SIZES, alt: altFor(key, p.src) })}
             </button>`
             )
             .join('')}
@@ -420,7 +456,7 @@ export function createLightbox(root) {
   const render = () => {
     const p = list[i];
     setSources(pic, p);
-    img.alt = altFor(currentKey, p.src, i);
+    img.alt = altFor(currentKey, p.src);
     // Reserve the box before the bytes arrive, otherwise every navigation reflows.
     img.style.aspectRatio = `${p.w} / ${p.h}`;
     count.textContent = `${i + 1} / ${list.length}`;
