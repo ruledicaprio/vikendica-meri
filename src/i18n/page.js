@@ -139,7 +139,7 @@ export const bs = {
   contactKicker: 'Kontakt',
   contactTitle: 'Rezervišite svoj boravak',
   contactLead:
-    'Za upite i rezervacije kontaktirajte nas telefonom, mailom ili putem poruke. Radujemo se vašoj posjeti.',
+    'Za upite i rezervacije nazovite nas, pišite na WhatsApp ili Viber, ili popunite formu ispod. Radujemo se vašoj posjeti.',
   contactAddress: 'Dolina Panjeva, Babanovac, Vlašić, BiH',
   contactWhatsappAria: 'Pošaljite WhatsApp poruku na +387 62 555 888',
   contactViberAria: 'Pošaljite Viber poruku na +387 62 555 888',
@@ -295,7 +295,7 @@ export const en = {
   contactKicker: 'Contact',
   contactTitle: 'Book your stay',
   contactLead:
-    'For enquiries and reservations, reach us by phone, email or the form below. We look forward to your visit.',
+    'For enquiries and reservations, call us, message us on WhatsApp or Viber, or use the form below. We look forward to your visit.',
   contactAddress: 'Dolina Panjeva, Babanovac, Vlašić, Bosnia and Herzegovina',
   contactWhatsappAria: 'Message +387 62 555 888 on WhatsApp',
   contactViberAria: 'Message +387 62 555 888 on Viber',
