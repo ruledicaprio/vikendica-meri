@@ -1,179 +1,163 @@
-# Vikendica Meri — Deployment
+# Deploying Vikendica Meri
 
-This is a **static site** (Vite build). `npm run build` produces a `dist/` folder
-with `index.html`, hashed JS/CSS in `dist/assets/`, and the photos under
-`dist/smjestaj`, `dist/vlasic`, `dist/travnik`. Any static web server can serve it —
-Vite's own `dev`/`preview` are **not** for production.
+This is **not** a static site. It is a Cloudflare **Worker** that serves a static
+asset bundle *and* owns a handful of routes backed by **D1**: the booking form,
+the availability feed, the iCal export, and the owner panel behind **Cloudflare
+Access**. Anything that treats `dist/` as the whole product will appear to work
+and then 404 on `/api/*`.
 
-```bash
-npm run build      # → dist/
-npm run preview    # local production-like check at http://localhost:5173 (NOT public)
+Host: `https://vikendica-meri.iot-pages.workers.dev` — a `workers.dev`
+subdomain, not a zone. That is a deliberate, temporary state; see
+*Custom domain* below for what it costs us.
+
+## How a deploy happens
+
+Push to `main`. Cloudflare builds from git — there is **no GitHub Actions
+workflow**:
+
+```
+npm run build      # vite build → dist/
+npx wrangler deploy
 ```
 
----
+Config lives in [`wrangler.jsonc`](wrangler.jsonc), and its comments are
+load-bearing — read them before changing anything there.
 
-## ✅ Quickstart — Variant 1: managed static host (chosen)
+> **A failed deploy leaves the previous version serving.** The site looks
+> perfectly fine while nothing new has shipped. Always hit a live endpoint after
+> pushing; never infer success from a green-looking dashboard.
 
-Free, automatic HTTPS, global CDN, nothing running at home. The repo is already
-prepared: caching via [`public/_headers`](public/_headers), build config in
-[`netlify.toml`](netlify.toml), Node pinned via [`.nvmrc`](.nvmrc).
+## Build environment
 
-### Fastest first deploy — drag & drop (no git needed)
-1. `npm run build` (already done — `dist/` is ready).
-2. Go to **Cloudflare Pages → Create → Direct Upload** (dash.cloudflare.com → Workers & Pages),
-   or **Netlify Drop** (<https://app.netlify.com/drop>).
-3. Drag the whole **`dist/`** folder in. You get a live `https://…pages.dev` /
-   `…netlify.app` URL in seconds.
+Node is pinned to **22** by [`.node-version`](.node-version). This matters:
+Cloudflare's build image still defaults to Node 20, and wrangler 4.x requires
+`>=22`. With the wrong version the *build* passes and the *deploy* aborts. The
+local machine runs Node 24, so this class of failure is invisible outside CI.
 
-### Recommended ongoing setup — git-connected (auto-deploy on each change)
-1. Put this project on GitHub/GitLab.
-2. **Cloudflare Pages → Create → Connect to Git** (or Netlify → Add new site → Import):
-   - Build command: `npm run build`
-   - Output directory: `dist`
-   (Netlify reads these from `netlify.toml` automatically.)
-3. Every push → automatic rebuild & deploy.
+## Pieces
 
-### Custom domain
-In the host's dashboard → **Custom domains** → add your **real** domain (see the
-`.meri` note below — you need a domain that actually resolves). The host issues the
-HTTPS certificate automatically; you just point a CNAME/A record as it instructs.
+| Piece | Where |
+| :--- | :--- |
+| Worker entry | [`worker/index.js`](worker/index.js) |
+| Access JWT verification | [`worker/access.js`](worker/access.js) |
+| D1 database | `vikendica-meri`, binding `DB` |
+| Schema | [`migrations/`](migrations) |
+| Owner panel | `/manager/`, behind Cloudflare Access |
+| Public site | `/` (Bosnian) and `/en/`, rendered per locale at build time |
 
-### Before going live
-- Set `data-sitekey` on the `.cf-turnstile` div in [`index.html`](index.html) to a real
-  **Cloudflare Turnstile** sitekey, and set `TURNSTILE_SECRET` on the Worker. Without a
-  valid sitekey the widget never renders and **nobody can submit the form**.
-- The **Web3Forms** key lives in [`wrangler.jsonc`](wrangler.jsonc) (`WEB3FORMS_KEY`),
-  not in `src/main.js` — the Worker sends the owner notification server-side so the
-  endpoint sits behind the captcha rather than beside it.
+### Routes the Worker owns
 
----
+`POST /api/requests` · `GET /api/availability` · `GET /calendar.ics` ·
+`/api/admin/*` and `/manager*` (both owner-only). Everything else falls through
+to the asset router.
 
-## ⚠️ First: the domain `babanovac.villa.meri` will not work publicly
+Each of those is listed in `assets.run_worker_first`. **A route added to
+`worker/index.js` alone does not work** — `not_found_handling: "404-page"` makes
+the asset router answer first, so an unlisted path gets the 404 page before the
+script ever runs. `/calendar.ics` needed this for exactly the same reason
+`/api/*` did.
 
-`.meri` is **not** a real top-level domain. Public DNS cannot resolve it and
-Let's Encrypt cannot issue an HTTPS certificate for it. You have three honest paths:
+## Cloudflare Access (the owner panel)
 
-1. **Register/own a real domain** (e.g. `vikendica-meri.ba`, `villa-meri.com`, …) and
-   point a subdomain like `babanovac.` at your server. *(recommended)*
-2. **Use a free hostname** — [DuckDNS](https://duckdns.org), or a free Cloudflare
-   subdomain — and use that as the public name.
-3. **Local network only** — keep `babanovac.villa.meri` as an internal name (hosts
-   file / local DNS) and use Caddy's `tls internal` (self-signed). Not reachable from
-   the internet.
+Application over `/manager*`, team domain `vikendica-meri.cloudflareaccess.com`.
+The team domain and the AUD are `vars` in `wrangler.jsonc`; the Worker refuses
+every admin request while they are unset, so a misconfigured deploy fails closed.
 
-Everywhere below, replace the example domain with whatever real name you choose.
+Traps, each of which cost a real deploy cycle:
 
----
+- **Renaming the Zero Trust team breaks the Worker silently.**
+  `ACCESS_TEAM_DOMAIN` is both the JWKS source and the expected token issuer, so
+  a rename has to be followed here.
+- **Recreating the application changes the AUD.** Edit it; do not recreate it.
+- **Policies are reusable objects that must be *associated* with the
+  application**, and the action must be `Allow`. `Service Auth` is for service
+  tokens — it refuses human logins while looking correctly configured.
+- **Leave "Enforce cookie path attribute" off.** The application covers
+  `/manager*`, but the panel's API is at `/api/admin/*`, outside it. Access never
+  injects `Cf-Access-Jwt-Assertion` on those calls, so they authenticate through
+  the `CF_Authorization` **cookie fallback** in `worker/access.js`. Enforcing the
+  path scopes that cookie to `/manager`: the panel would load fine and then 401
+  on every action. That fallback is load-bearing.
+  The rest: HTTP Only **on**, Binding Cookie **on**, Eager redirect **off**,
+  SameSite **Lax** (`Strict` on an Access app causes `ERR_TOO_MANY_REDIRECTS`).
 
-## Also check: do you actually have a public IPv4?
+Diagnose authorization from **Zero Trust → Insights & Logs → Access**. It names
+the email, the verdict and the matching policy — far faster than reading config
+screens.
 
-Your machine is `192.168.1.4` behind router `192.168.1.1`. Many BiH ISPs put IPv4
-behind **CGNAT**, meaning port-forwarding 80/443 **will not** make you reachable over
-IPv4 from the internet (you don't own a public IPv4). Your `systeminfo` shows a public
-**IPv6** (`2a02:27b0:…`), so IPv6 visitors could reach you, but not IPv4-only ones.
+## Secrets and vars
 
-➡️ If you're behind CGNAT (or just want zero router fiddling), **use Cloudflare Tunnel**
-(Option C) — it needs no public IP and no open ports.
+`ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` and `WEB3FORMS_KEY` are **vars**, not secrets:
+all three are public identifiers, and each carries a comment in `wrangler.jsonc`
+saying why.
 
----
+`TURNSTILE_SECRET` is a real secret (`wrangler secret put`). While it is unset
+the captcha check stays out of the way rather than hard-failing the form — which
+is what keeps `wrangler dev` and a fresh deploy usable.
 
-## Option A — Caddy on this PC (self-hosting, your stated goal)
+Web3Forms sends the owner notification, from inside the Worker rather than the
+browser. **Web3Forms' own captcha must stay off**: it speaks hCaptcha, the form
+speaks Turnstile, and their Turnstile support is a paid feature. The call sits
+behind the Turnstile check and the rate limit instead.
 
-Caddy auto-obtains and renews Let's Encrypt certificates and serves static files.
+## Database
 
-1. Download Caddy for Windows: <https://caddyserver.com/download> → put `caddy.exe`
-   somewhere (e.g. `C:\caddy\`).
-2. Use the provided [`Caddyfile`](Caddyfile) in this repo. Edit it:
-   - replace `vikendica-meri.example` with your **real** domain,
-   - confirm the `root *` path points at `E:/vikendica-meri/dist`.
-3. Open **PowerShell as Administrator** in the folder with `caddy.exe` and run:
-   ```powershell
-   .\caddy.exe run --config "E:\vikendica-meri\Caddyfile"
-   ```
-   For background / always-on, install it as a service:
-   ```powershell
-   .\caddy.exe install
-   .\caddy.exe start
-   ```
-4. **Router:** forward TCP **80** and **443** to `192.168.1.4`.
-5. **DNS:** create an `A` record (public IPv4) or `AAAA` record (your IPv6) — or a
-   `CNAME` to your DuckDNS host — for the chosen domain.
-6. **Keep it awake 24/7:** Power plan → *High performance*, disable sleep/hibernate
-   (`powercfg /change standby-timeout-ac 0` and `…/hibernate-timeout-ac 0`).
-
-> The included Caddyfile already sets sensible **Cache-Control** headers: 1-year
-> immutable for `/assets/*`, 1-week for the photo folders, `no-cache` for HTML.
-
----
-
-## Option B — nginx + win-acme (if you prefer nginx)
-
-Minimal `server` block once you have a cert:
-
-```nginx
-server {
-    listen 443 ssl;
-    server_name your-domain;
-    root E:/vikendica-meri/dist;
-    index index.html;
-
-    location /assets/ { add_header Cache-Control "public, max-age=31536000, immutable"; }
-    location ~ ^/(smjestaj|vlasic|travnik)/ { add_header Cache-Control "public, max-age=604800"; }
-    location = /index.html { add_header Cache-Control "no-cache"; }
-    location / { try_files $uri $uri/ /index.html; }
-
-    ssl_certificate     C:/certs/fullchain.pem;
-    ssl_certificate_key C:/certs/privkey.pem;
-}
-server { listen 80; server_name your-domain; return 301 https://$host$request_uri; }
+```
+npm run db:migrate:local     # wrangler d1 migrations apply --local
+npm run db:migrate           # --remote
 ```
 
-Get/renew the certificate with [win-acme](https://www.win-acme.com/) (Windows ACME
-client) and schedule renewal via Task Scheduler.
+The owner's API token is **read-only** — enough for `d1 execute` SELECTs, not for
+`d1 create` or `migrations apply`. In practice schema changes go through the
+**Console** tab of the D1 dashboard.
 
----
+## Observability
 
-## Option C — Cloudflare Tunnel (recommended if ports are blocked / CGNAT)
+`observability.enabled` plus `observability.traces.enabled` in `wrangler.jsonc`,
+at the default 100% sampling. The Worker deliberately logs almost nothing — the
+exceptions are the two paths that would otherwise fail invisibly:
 
-No port-forwarding, no public IP, free automatic HTTPS. Requires a domain on a
-Cloudflare account (a free domain works).
+- Turnstile `siteverify` being unreachable. The check **fails open** by design, so
+  without the log line the form can sit unprotected for days with nothing to show
+  for it.
+- A rejected or failed Web3Forms notification, which means a booking landed in D1
+  and the owner never heard about it.
 
-1. Add your domain to Cloudflare (free plan), so Cloudflare manages its DNS.
-2. Install `cloudflared` for Windows.
-3. Serve `dist/` locally with Caddy/nginx (or even `npm run preview`) on, say,
-   `http://localhost:8080`.
-4. Create + run the tunnel:
-   ```powershell
-   cloudflared tunnel login
-   cloudflared tunnel create vikendica
-   cloudflared tunnel route dns vikendica babanovac.your-domain
-   cloudflared tunnel --url http://localhost:8080 run vikendica
-   ```
-5. Install it as a service so it runs 24/7: `cloudflared service install`.
+Both log the reason or status **only**. This Worker handles guest PII, and none
+of it belongs in a log — the same reason `/calendar.ics` uses a constant
+`SUMMARY:Zauzeto`.
 
----
+## Local development
 
-## Option D — Managed static host (easiest, no 24/7 PC) ⭐
+```
+npm run dev        # vite, public site only — /api/* does not exist here
+npm run worker     # wrangler dev, the real thing on :8788
+```
 
-For a rental presentation site this is usually the best trade-off: free, global CDN,
-automatic HTTPS, nothing running at home.
+- `wrangler dev` **snapshots `dist/` at startup**. Build *before* starting it, and
+  hard-reload the browser afterwards.
+- The panel needs `ACCESS_DEV_BYPASS=1` in `.dev.vars` (gitignored, never
+  uploaded). Access JWTs are signed by Cloudflare, so there is no way to mint one
+  locally.
+- **Orphaned stacks.** Killing `workerd.exe` does nothing — the node parent
+  respawns it, and repeated restarts leave several stacks fighting over the port.
+  Every route then 404s or hangs, which reads exactly like a routing bug:
 
-- **Cloudflare Pages** or **Netlify**: connect the git repo (build command
-  `npm run build`, output dir `dist`) — or drag-and-drop the `dist/` folder.
-- Point your real domain at it via the dashboard. Done.
+  ```powershell
+  Get-CimInstance Win32_Process -Filter "Name='node.exe'" |
+    Where-Object { $_.CommandLine -match 'wrangler' } | Stop-Process -Force
+  Get-NetTCPConnection -LocalPort 8788 -State Listen   # must return nothing
+  ```
 
-You keep full control of the code; only the hosting moves off your PC.
+## Custom domain
 
----
+`vikendica-meri.com` is planned but not bought. Until it lands, the canonical
+host is the `workers.dev` subdomain and it is hardcoded across `index.html`
+(canonical, OG, JSON-LD), `public/sitemap.xml` and `public/robots.txt`.
 
-## After deploying — two things to finish
+Being on `workers.dev` rather than a zone also means **Cloudflare Image
+Transformations are unavailable** — which is the entire reason the responsive
+photo variants are pre-generated at build time by `npm run photo`.
 
-- **Reservation form:** the form posts to `/api/requests` only. The Worker records the
-  enquiry in D1 and emails the owner through [Web3Forms](https://web3forms.com) using
-  `WEB3FORMS_KEY` from `wrangler.jsonc`. If that single request fails, the form falls
-  back to opening the visitor's email client to `villa-meri@gmail.com`.
-  Web3Forms' own captcha setting must stay **off** — the Worker verifies Turnstile
-  instead, and Web3Forms would otherwise reject every submission for missing an
-  hCaptcha token.
-- **Rebuild after any change:** `npm run build`, then your server serves the new
-  `dist/` automatically (Caddy/nginx) or on next deploy (Pages/Netlify).
+The cutover, in order: custom domain on the Worker → canonical/sitemap/JSON-LD
+URLs → the **Access application hostname** and the **Turnstile hostname list**.
