@@ -112,6 +112,8 @@ export const bs = {
   contactLead:
     'Za upite i rezervacije kontaktirajte nas telefonom, mailom ili putem poruke. Radujemo se vašoj posjeti.',
   contactAddress: 'Dolina Panjeva, Babanovac, Vlašić, BiH',
+  contactWhatsappAria: 'Pošaljite WhatsApp poruku na +387 62 555 888',
+  contactViberAria: 'Pošaljite Viber poruku na +387 62 555 888',
   contactNote: '🕑 Minimalni boravak: 2 noći',
   // Also stated as checkinTime/checkoutTime in the JSON-LD; the two must agree.
   contactCheckin: '🕓 Prijava od 14:00 · Odjava do 11:00',
@@ -241,6 +243,8 @@ export const en = {
   contactLead:
     'For enquiries and reservations, reach us by phone, email or the form below. We look forward to your visit.',
   contactAddress: 'Dolina Panjeva, Babanovac, Vlašić, Bosnia and Herzegovina',
+  contactWhatsappAria: 'Message +387 62 555 888 on WhatsApp',
+  contactViberAria: 'Message +387 62 555 888 on Viber',
   contactNote: '🕑 Minimum stay: 2 nights',
   contactCheckin: '🕓 Check-in from 14:00 · Check-out by 11:00',
   mapTitle: 'Location — Vikendica Meri',

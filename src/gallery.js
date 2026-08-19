@@ -77,6 +77,7 @@ export function randomImage(key, excludeSrc) {
 ---------------------------------------------------------------------------- */
 const COVER_SIZES = '(max-width: 1240px) 100vw, 1180px';
 const THUMB_SIZES = '(max-width: 540px) 62px, 78px';
+const LB_THUMB_SIZES = '(max-width: 540px) 56px, 72px';
 
 function pictureHtml(p, { cls, sizes, alt, eager = false }) {
   if (!p) return '';
@@ -355,10 +356,17 @@ export function createLightbox(root) {
       <img class="lightbox__img" src="" alt="" sizes="90vw" decoding="async" />
     </picture>
     <button class="lightbox__nav lightbox__next" aria-label="${esc(t.next)}">›</button>
-    <!-- Live, so arrowing through photos announces the new position; without it
-         a screen-reader user gets silence on every step. -->
-    <div class="lightbox__count" aria-live="polite" aria-atomic="true"></div>
-    <div class="lightbox__credit"></div>
+    <!-- In the flow, as the grid's second row: the counter and the credit used to
+         be absolutely positioned and would have collided with the strip. -->
+    <div class="lightbox__footer">
+      <div class="lightbox__strip"></div>
+      <div class="lightbox__meta">
+        <!-- Live, so arrowing through photos announces the new position; without
+             it a screen-reader user gets silence on every step. -->
+        <div class="lightbox__count" aria-live="polite" aria-atomic="true"></div>
+        <div class="lightbox__credit"></div>
+      </div>
+    </div>
   `;
   root.appendChild(el);
 
@@ -367,9 +375,47 @@ export function createLightbox(root) {
   const label = el.querySelector('.lightbox__label');
   const count = el.querySelector('.lightbox__count');
   const credit = el.querySelector('.lightbox__credit');
+  const strip = el.querySelector('.lightbox__strip');
   let list = [];
   let currentKey = '';
   let i = 0;
+  // Which category the strip currently holds, so reopening the same one does not
+  // rebuild a dozen <picture> trees and restart their fetches.
+  let stripKey = '';
+  let thumbs = [];
+
+  const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Arrowing past the visible end of the strip must bring the active thumb back
+     into view, or the index stops indexing anything. */
+  const centerThumb = (behavior) =>
+    thumbs[i]?.scrollIntoView({ block: 'nearest', inline: 'center', behavior });
+
+  const buildStrip = (key, photos) => {
+    if (stripKey === key) return;
+    stripKey = key;
+    // A single photo has nothing to index, so the strip would just be the photo
+    // again in miniature.
+    strip.innerHTML =
+      photos.length < 2
+        ? ''
+        : photos
+            .map(
+              (p, n) => `
+        <button class="lightbox__thumb" type="button" data-index="${n}"
+                aria-label="${esc(t.openPhoto(n + 1, photos.length))}">
+          ${pictureHtml(p, { cls: '', sizes: LB_THUMB_SIZES, alt: '' })}
+        </button>`
+            )
+            .join('');
+    thumbs = [...strip.querySelectorAll('.lightbox__thumb')];
+    thumbs.forEach((b) =>
+      b.addEventListener('click', () => {
+        i = Number(b.dataset.index);
+        render();
+      })
+    );
+  };
 
   const render = () => {
     const p = list[i];
@@ -379,6 +425,14 @@ export function createLightbox(root) {
     img.style.aspectRatio = `${p.w} / ${p.h}`;
     count.textContent = `${i + 1} / ${list.length}`;
     credit.innerHTML = creditHtml(creditFor(p.src));
+    thumbs.forEach((b, n) => {
+      const active = n === i;
+      b.classList.toggle('is-active', active);
+      // aria-current, not aria-selected: these are buttons in a group, not tabs.
+      if (active) b.setAttribute('aria-current', 'true');
+      else b.removeAttribute('aria-current');
+    });
+    centerThumb(smooth ? 'smooth' : 'auto');
     // Warm the likely next image.
     const next = list[(i + 1) % list.length];
     if (next && next !== p) new Image().srcset = next.webp;
@@ -394,11 +448,15 @@ export function createLightbox(root) {
     currentKey = key;
     i = Math.max(0, Math.min(index, list.length - 1));
     label.textContent = c.label;
+    buildStrip(key, list);
     render();
     opener = document.activeElement;
     el.classList.add('is-open');
     el.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    // render() ran while the dialog was still display:none, where scrollIntoView
+    // is a no-op — so opening at photo 9 would leave the strip at photo 1.
+    centerThumb('auto');
     el.querySelector('.lightbox__close').focus();
   };
   const close = () => {

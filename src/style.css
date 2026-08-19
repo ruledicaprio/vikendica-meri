@@ -450,9 +450,13 @@ picture {
   font-size: 0.92rem;
   transition: border-color 0.3s ease, transform 0.3s ease;
 }
-.amenities li:hover {
-  border-color: rgba(212, 148, 58, 0.4);
-  transform: translateY(-3px);
+/* Gated: the lift latches after a tap on touch, the same defect already fixed
+   for .dest-card and .dest-link. */
+@media (hover: hover) {
+  .amenities li:hover {
+    border-color: rgba(212, 148, 58, 0.4);
+    transform: translateY(-3px);
+  }
 }
 /* Chips that map to a photo carry a real button; it fills the chip so the whole
    tile stays the hit area, and inherits type so nothing shifts visually. */
@@ -688,6 +692,8 @@ summary:focus-visible {
 .segment__square,
 .segment__more,
 .thumb,
+.lightbox__thumb,
+.chat-link,
 .amenity__btn,
 .floor__view,
 .cal__nav-btn,
@@ -700,6 +706,7 @@ summary:focus-visible {
 }
 .btn:active,
 .dest-link:active,
+.chat-link:active,
 .segment__more:active,
 .navbar__lang:active,
 .navbar__cta:active,
@@ -709,6 +716,7 @@ summary:focus-visible {
 .dest-card__media:active,
 .segment__square:active,
 .thumb:active,
+.lightbox__thumb:active,
 .amenity__btn:active,
 .video-feature__play:active {
   opacity: 0.82;
@@ -1089,6 +1097,56 @@ summary:focus-visible {
 .contact-list a:hover {
   color: var(--amber2);
 }
+/* WhatsApp / Viber pills under the mobile number. The brand colour lives on the
+   mark; the label stays cream so it keeps full contrast on the dark panel. */
+.chat-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+}
+.chat-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 0.95rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: var(--cream);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+.chat-link__icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+.chat-link--wa {
+  border-color: rgba(37, 211, 102, 0.45);
+  background: rgba(37, 211, 102, 0.1);
+}
+.chat-link--wa .chat-link__icon {
+  color: #25d366;
+}
+.chat-link--viber {
+  border-color: rgba(115, 96, 242, 0.5);
+  background: rgba(115, 96, 242, 0.14);
+}
+.chat-link--viber .chat-link__icon {
+  color: #8b7bff;
+}
+@media (hover: hover) {
+  .chat-link--wa:hover {
+    background: rgba(37, 211, 102, 0.2);
+    border-color: rgba(37, 211, 102, 0.8);
+  }
+  .chat-link--viber:hover {
+    background: rgba(115, 96, 242, 0.26);
+    border-color: rgba(139, 123, 255, 0.85);
+  }
+}
 .contact-note {
   color: var(--muted);
   font-size: 0.9rem;
@@ -1223,12 +1281,27 @@ summary:focus-visible {
 }
 .lightbox.is-open {
   display: grid;
+  /* Photo takes the space the footer leaves, rather than both guessing at a
+     fixed viewport fraction and overlapping when the guess is wrong. */
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+/* Stretched to fill the 1fr row on purpose: the image's percentage max-height
+   only resolves against a parent with a definite height, and an auto-height
+   <picture> silently drops it — the photo then rendered at its natural 2304px.
+   flex, not grid: with a grid parent Chrome still refuses to resolve the
+   percentage and the clamp is ignored either way. */
+.lightbox__pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  justify-self: center;
+  min-height: 0;
+  height: 100%;
 }
 .lightbox__img {
   max-width: 90vw;
-  /* svh: at 82vh the photo, the counter and the credit were pushed under the
-     phone's browser chrome. */
-  max-height: 82svh;
+  max-height: 100%;
   /* The width/height attributes are set per photo so the box can be reserved
      before the bytes arrive, but as presentational hints they also pin the used
      width. max-height would then clamp only the height and squash the picture,
@@ -1289,19 +1362,73 @@ summary:focus-visible {
   background: var(--amber);
   color: #20140a;
 }
+/* ---------- Lightbox footer: filmstrip + counter + credit ---------- */
+.lightbox__footer {
+  width: 100%;
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem calc(1.5rem + env(safe-area-inset-right)) calc(0.9rem + env(safe-area-inset-bottom))
+    calc(1.5rem + env(safe-area-inset-left));
+}
+.lightbox__strip {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: safe center;
+  overflow-x: auto;
+  /* A flick along the strip must not drag the page behind the overlay with it. */
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 240, 232, 0.3) transparent;
+  padding-bottom: 0.25rem;
+}
+.lightbox__strip:empty {
+  display: none;
+}
+.lightbox__thumb {
+  flex: 0 0 auto;
+  width: 72px;
+  height: 54px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.25s ease, border-color 0.25s ease;
+}
+.lightbox__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.lightbox__thumb.is-active {
+  opacity: 1;
+  border-color: var(--amber);
+}
+@media (hover: hover) {
+  .lightbox__thumb:hover {
+    opacity: 1;
+  }
+}
+.lightbox__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem 1.2rem;
+}
 .lightbox__count {
-  position: absolute;
-  bottom: calc(1.4rem + env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%);
   color: var(--muted);
   font-size: 0.85rem;
   letter-spacing: 0.1em;
 }
-.lightbox__credit {
-  position: absolute;
-  right: calc(1.5rem + env(safe-area-inset-right));
-  bottom: calc(1.4rem + env(safe-area-inset-bottom));
+/* Landscape phone: the strip would take most of the height the photo needs. */
+@media (max-height: 520px) {
+  .lightbox__strip {
+    display: none;
+  }
 }
 
 /* ---------- Media credit ---------- */
@@ -1405,8 +1532,35 @@ summary:focus-visible {
 }
 
 @media (max-width: 540px) {
+  /* Thirteen short labels ("Roštilj", "Rerna", "Fen") each got a full-width box
+     at one column, turning the section into a long scroll of empty space. As
+     wrapping pills they sit 2–3 per row; min-height keeps the ones that open a
+     photo at the 44px tap target. */
   .amenities {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .amenities li {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 0.9rem;
+    font-size: 0.85rem;
+    border-radius: 999px;
+  }
+  .amenity__btn {
+    display: inline-flex;
+    align-items: center;
+    /* The base rule is display:block; width:100%, which would make every pill
+       fill its row again. */
+    width: auto;
+    min-height: 44px;
+    padding: 0 0.9rem;
+    border-radius: 999px;
+  }
+  .subhead {
+    margin: 2.5rem 0 1rem;
   }
   .field-row {
     grid-template-columns: 1fr;
@@ -1420,16 +1574,9 @@ summary:focus-visible {
   .lightbox__next {
     right: 0.5rem;
   }
-  /* Not enough width for the counter and the credit to sit side by side. */
-  .lightbox__count {
-    bottom: calc(2.7rem + env(safe-area-inset-bottom));
-  }
-  .lightbox__credit {
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: calc(1rem + env(safe-area-inset-bottom));
-    white-space: nowrap;
+  .lightbox__thumb {
+    width: 56px;
+    height: 42px;
   }
   .video-feature__credit {
     text-align: center;
