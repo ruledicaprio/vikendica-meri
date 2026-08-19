@@ -1,16 +1,24 @@
 /* Manager panel — owner-only, deliberately separate from the public stylesheet.
    The public sheet is ~1500 lines of marketing layout none of which applies
-   here; this borrows only the palette so the two feel related. */
+   here. It used to borrow the site's dark palette; the panel is a light
+   working tool now and owns its own, so nothing here affects the public site. */
 
 :root {
-  --dark: #0a0e1a;
-  --panel: #111726;
-  --line: rgba(245, 240, 232, 0.14);
-  --cream: #f5f0e8;
-  --muted: rgba(245, 240, 232, 0.6);
-  --amber: #d4943a;
-  --green: #4caf7d;
-  --red: #d9534f;
+  /* Declared so native date pickers render light chrome to match the form. */
+  color-scheme: light;
+  --bg: #f4f2ee;
+  --surface: #ffffff;
+  --line: rgba(20, 26, 38, 0.14);
+  --ink: #161c28;
+  --ink-muted: rgba(22, 28, 40, 0.62);
+  /* Each status has a text/border tone and a fill: the fills are too pale to
+     read as text, and the text tones too dark to sit behind it. */
+  --amber: #946117;
+  --amber-soft: rgba(212, 148, 58, 0.14);
+  --green: #1f7a4d;
+  --green-soft: rgba(31, 122, 77, 0.12);
+  --red: #b3312c;
+  --red-soft: rgba(179, 49, 44, 0.1);
 }
 
 * {
@@ -18,8 +26,8 @@
 }
 body {
   margin: 0;
-  background: var(--dark);
-  color: var(--cream);
+  background: var(--bg);
+  color: var(--ink);
   font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif;
   padding-bottom: 4rem;
 }
@@ -31,7 +39,7 @@ body {
   gap: 0.8rem;
   padding: calc(0.9rem + env(safe-area-inset-top)) 1.2rem 0.9rem;
   border-bottom: 1px solid var(--line);
-  background: var(--panel);
+  background: var(--surface);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -45,7 +53,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--amber);
-  border: 1px solid rgba(212, 148, 58, 0.5);
+  border: 1px solid var(--amber);
   border-radius: 999px;
   padding: 0.15rem 0.6rem;
 }
@@ -59,7 +67,7 @@ body {
   padding: 1.5rem 1.2rem;
 }
 .mgr-status {
-  color: var(--muted);
+  color: var(--ink-muted);
   font-size: 0.9rem;
   min-height: 1.5rem;
 }
@@ -78,7 +86,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--ink-muted);
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -86,30 +94,30 @@ body {
 }
 .mgr-pill {
   font-size: 0.8rem;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(20, 26, 38, 0.06);
   border-radius: 999px;
   padding: 0.1rem 0.55rem;
-  color: var(--cream);
+  color: var(--ink);
 }
 .mgr-list {
   display: grid;
   gap: 0.8rem;
 }
 .mgr-empty {
-  color: var(--muted);
+  color: var(--ink-muted);
   font-size: 0.9rem;
   font-style: italic;
 }
 
 /* ---------- Request card ---------- */
 .req {
-  background: var(--panel);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 1rem 1.1rem;
 }
 .req--conflict {
-  border-color: rgba(217, 83, 79, 0.75);
+  border-color: var(--red);
 }
 .req__head {
   display: flex;
@@ -123,7 +131,7 @@ body {
 }
 .req__nights,
 .req__meta {
-  color: var(--muted);
+  color: var(--ink-muted);
   font-size: 0.85rem;
 }
 .req__badge {
@@ -133,18 +141,18 @@ body {
   border-radius: 999px;
   padding: 0.15rem 0.55rem;
   border: 1px solid var(--line);
-  color: var(--muted);
+  color: var(--ink-muted);
 }
 .req__badge--manual {
-  border-color: rgba(212, 148, 58, 0.5);
+  border-color: var(--amber);
   color: var(--amber);
 }
 .req__warn {
   margin: 0.7rem 0 0;
   font-size: 0.85rem;
-  color: #ffb3b1;
-  background: rgba(217, 83, 79, 0.14);
-  border: 1px solid rgba(217, 83, 79, 0.4);
+  color: var(--red);
+  background: var(--red-soft);
+  border: 1px solid var(--red);
   border-radius: 8px;
   padding: 0.5rem 0.7rem;
 }
@@ -156,13 +164,13 @@ body {
   font-size: 0.92rem;
 }
 .req__who a {
-  color: var(--cream);
+  color: var(--ink);
 }
 .req__msg {
   margin: 0.7rem 0 0;
   white-space: pre-wrap;
   font-size: 0.92rem;
-  color: rgba(245, 240, 232, 0.85);
+  color: var(--ink);
   border-left: 2px solid var(--line);
   padding-left: 0.8rem;
 }
@@ -178,7 +186,7 @@ body {
 .req__reply-label {
   flex: 1 1 100%;
   font-size: 0.82rem;
-  color: var(--muted);
+  color: var(--ink-muted);
 }
 .mgr-btn--reply {
   display: inline-flex;
@@ -187,9 +195,9 @@ body {
   /* An <a> styled as .mgr-btn: the button rules assume a form control, and a
      link brings its own underline and inherits the anchor colour. */
   text-decoration: none;
-  border-color: rgba(212, 148, 58, 0.5);
-  background: rgba(212, 148, 58, 0.12);
-  color: var(--cream);
+  border-color: var(--amber);
+  background: var(--amber-soft);
+  color: var(--ink);
 }
 
 .req__actions {
@@ -210,8 +218,8 @@ body {
   padding: 0 1rem;
   border-radius: 8px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--cream);
+  background: var(--bg);
+  color: var(--ink);
   font: inherit;
   font-size: 0.9rem;
   cursor: pointer;
@@ -225,12 +233,12 @@ body {
   cursor: default;
 }
 .mgr-btn--ok {
-  border-color: rgba(76, 175, 125, 0.6);
-  background: rgba(76, 175, 125, 0.16);
+  border-color: var(--green);
+  background: var(--green-soft);
 }
 .mgr-btn--no {
-  border-color: rgba(217, 83, 79, 0.6);
-  background: rgba(217, 83, 79, 0.14);
+  border-color: var(--red);
+  background: var(--red-soft);
 }
 .mgr-btn--ghost {
   background: none;
@@ -243,8 +251,8 @@ input[type='date'] {
   padding: 0 0.7rem;
   border-radius: 8px;
   border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.3);
-  color: var(--cream);
+  background: var(--bg);
+  color: var(--ink);
   font: inherit;
   font-size: 0.9rem;
 }
@@ -259,7 +267,7 @@ input:focus-visible,
   flex-wrap: wrap;
   gap: 0.7rem;
   align-items: end;
-  background: var(--panel);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 1rem 1.1rem;
@@ -268,7 +276,7 @@ input:focus-visible,
   display: grid;
   gap: 0.3rem;
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--ink-muted);
 }
 .mgr-block__label {
   flex: 1 1 200px;
