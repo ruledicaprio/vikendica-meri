@@ -11,6 +11,7 @@
 // keeps working the day the site moves to vikendica-meri.com.
 import fs from 'node:fs';
 import path from 'node:path';
+import { siteOrigin } from './lib/origin.js';
 
 const MEDIA = /\.(jpe?g|png|webp|avif|svg|ico|mp4|webm|xml|txt|webmanifest)$/i;
 
@@ -28,11 +29,7 @@ export function assetLinks() {
       const htmlPath = path.join(root, 'index.html');
       const html = fs.readFileSync(htmlPath, 'utf8');
 
-      const canonical = html.match(/<link rel="canonical" href="(https?:\/\/[^"{]+)/);
-      if (!canonical) {
-        throw new Error('[asset-links] no <link rel="canonical"> in index.html — cannot resolve the site origin');
-      }
-      const origin = canonical[1].replace(/\/$/, '');
+      const origin = siteOrigin(root);
 
       // Same-origin absolute URLs that look like files, deduped: several photos
       // appear both in the image array and as an ImageObject. Split on the origin
