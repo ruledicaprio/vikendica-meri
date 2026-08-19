@@ -20,7 +20,7 @@
     // would swallow /api/* before the Worker ever ran. Listing the paths here is
     // what guarantees they reach the script; everything else still hits assets
     // first and behaves exactly as it did before the Worker existed.
-    "run_worker_first": ["/api/*", "/manager", "/manager/*"]
+    "run_worker_first": ["/api/*", "/manager", "/manager/*", "/calendar.ics"]
   },
   "observability": { "enabled": true },
   "vars": {
@@ -29,7 +29,12 @@
     // Zero Trust dashboard. verifyAccess() refuses every admin request while
     // these are unset, so an unconfigured deploy fails closed.
     "ACCESS_TEAM_DOMAIN": "vikendica-meri.cloudflareaccess.com",
-    "ACCESS_AUD": "592363ef1a0aa234113012a673e3d23542498e615ad0d98ff18c1d180f820450"
+    "ACCESS_AUD": "592363ef1a0aa234113012a673e3d23542498e615ad0d98ff18c1d180f820450",
+    // Web3Forms access key. A var and not a secret: Web3Forms publishes it as a
+    // client-side value and it has been in this repo's history since the form
+    // existed. What changed is that the *endpoint* is no longer callable without
+    // passing Turnstile first, because only this Worker calls it now.
+    "WEB3FORMS_KEY": "bc60fbf4-87e2-4fa8-bde9-b5636e7bca26"
   },
   "d1_databases": [
     {

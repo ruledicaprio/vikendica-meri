@@ -184,8 +184,9 @@ if (!reducedMotion) {
 }
 
 /* ---------- Reservation form ----------
-   Add a free Web3Forms access key to send in-page; otherwise opens the mail client. */
-const WEB3FORMS_KEY = 'bc60fbf4-87e2-4fa8-bde9-b5636e7bca26';
+   Posts to /api/requests, which records the enquiry and emails the owner. The
+   Web3Forms call used to happen here too; it moved into the Worker so that it
+   sits behind the Turnstile check instead of beside it. */
 const CONTACT_EMAIL = 'villa-meri@gmail.com';
 const form = document.getElementById('reserve-form');
 const status = document.getElementById('form-status');
@@ -223,13 +224,7 @@ if (form) {
       document.getElementById('f-to').focus();
       return;
     }
-    if (!WEB3FORMS_KEY) {
-      status.textContent = t.formMailto;
-      status.className = 'form-status is-info';
-      mailtoFallback(data);
-      return;
-    }
-    if (!data['h-captcha-response']) {
+    if (!data['cf-turnstile-response']) {
       status.textContent = t.formCaptcha;
       status.className = 'form-status is-err';
       return;
@@ -237,38 +232,34 @@ if (form) {
     status.textContent = t.formSending;
     status.className = 'form-status is-info';
 
-    // Two independent paths, on purpose. The API records the enquiry so it shows
-    // up in the manager panel; Web3Forms is what actually emails the owner today.
-    // Until the Worker sends its own mail, dropping either one would lose
-    // something — so both are attempted and one success is enough.
-    const toApi = fetch('/api/requests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    }).then((r) => r.ok);
+    let ok = false;
+    try {
+      const res = await fetch('/api/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // The locale is baked into the page at build time, so this is already
+        // 'bs' or 'en'. It travels with the enquiry so the manager panel can
+        // reply in the language the guest was actually reading.
+        body: JSON.stringify({ ...data, lang: document.documentElement.lang }),
+      });
+      ok = res.ok;
+    } catch {
+      ok = false;
+    }
 
-    const toEmail = fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: t.mailSubject, ...data }),
-    })
-      .then((r) => r.json())
-      .then((j) => j.success === true);
-
-    const [api, email] = await Promise.all([
-      toApi.catch(() => false),
-      toEmail.catch(() => false),
-    ]);
-
-    if (api || email) {
+    if (ok) {
       status.textContent = t.formOk;
       status.className = 'form-status is-ok';
       form.reset();
     } else {
-      status.textContent = t.formErr;
-      status.className = 'form-status is-err';
+      // One path now instead of two, so a failure is a real failure. Hand the
+      // guest their mail client rather than a dead end — they have already
+      // typed the message, and it is prefilled from what they entered.
+      status.textContent = `${t.formErr} ${t.formMailto}`;
+      status.className = 'form-status is-info';
+      mailtoFallback(data);
     }
-    if (window.hcaptcha) window.hcaptcha.reset();
+    if (window.turnstile) window.turnstile.reset();
   });
 }
 

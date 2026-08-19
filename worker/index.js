@@ -72,7 +72,14 @@ function validateRequest(body) {
   let guests = Number.parseInt(body.guests, 10);
   if (!Number.isFinite(guests) || guests < 1 || guests > 10) guests = null;
 
-  return { data: { name, email, phone: phone || null, checkin, checkout, guests, message: message || null } };
+  // Which page the enquiry came from, so the panel can reply in that language.
+  // Anything unrecognised is Bosnian: that is the site's primary language and
+  // the panel's own.
+  const lang = body.lang === 'en' ? 'en' : 'bs';
+
+  return {
+    data: { name, email, phone: phone || null, checkin, checkout, guests, message: message || null, lang },
+  };
 }
 
 /* ------------------------------------------------------------- protections -- */
@@ -122,6 +129,59 @@ async function turnstileOk(env, token, ip) {
     return true;
   }
 }
+
+/* ----------------------------------------------------------- notification -- */
+
+/**
+ * Email the owner that an enquiry arrived, via Web3Forms.
+ *
+ * This used to be a second fetch from the browser, running in parallel with the
+ * one to this Worker. It moved here because Web3Forms' own captcha had to be
+ * switched off (it speaks hCaptcha; the form now speaks Turnstile, and their
+ * Turnstile support is a paid feature). A public access key plus no captcha is
+ * an open mailer, so the call now sits behind the Turnstile check and the rate
+ * limit rather than beside them.
+ *
+ * Never throws. The caller runs it through waitUntil and must not have a
+ * delivery problem turn into a failed submission for the guest.
+ */
+async function notifyOwner(env, data) {
+  if (!env.WEB3FORMS_KEY) return;
+  const L = data.lang === 'en' ? EN_LABELS : BS_LABELS;
+  try {
+    await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        access_key: env.WEB3FORMS_KEY,
+        subject: `Vikendica Meri — novi upit: ${data.name}`,
+        // Explicit field names rather than spreading `data`: the payload becomes
+        // the body of an email, and spreading would quietly start mailing any
+        // column added to the table later.
+        [L.name]: data.name,
+        [L.email]: data.email,
+        [L.phone]: data.phone || '—',
+        [L.checkin]: data.checkin || '—',
+        [L.checkout]: data.checkout || '—',
+        [L.guests]: data.guests || '—',
+        [L.message]: data.message || '—',
+        Jezik: data.lang,
+      }),
+    });
+  } catch {
+    // Nothing useful to do here. The request is in the database either way and
+    // the panel is the source of truth; email is the convenience layer.
+  }
+}
+
+const BS_LABELS = {
+  name: 'Ime', email: 'Email', phone: 'Telefon',
+  checkin: 'Dolazak', checkout: 'Odlazak', guests: 'Gostiju', message: 'Poruka',
+};
+const EN_LABELS = {
+  name: 'Name', email: 'Email', phone: 'Phone',
+  checkin: 'Check-in', checkout: 'Check-out', guests: 'Guests', message: 'Message',
+};
 
 /**
  * Local development only.
@@ -193,7 +253,78 @@ async function getAvailability(env) {
   );
 }
 
-async function postRequest(request, env) {
+/**
+ * Calendar feed of blocked dates, for Airbnb, Booking and the owner's phone.
+ *
+ * Same privacy rule as getAvailability(), and for the same reason: this URL is
+ * unauthenticated and will be pasted into third-party dashboards. SUMMARY is a
+ * constant — never a guest name — and no column beyond the two dates is read.
+ *
+ * No secret token in the URL on purpose. The feed carries exactly the
+ * information /api/availability already serves to every visitor of the site, so
+ * a token would suggest a confidentiality that does not exist.
+ */
+async function getCalendarIcs(env) {
+  const { results } = await env.DB.prepare(
+    `SELECT id, checkin, checkout FROM requests
+      WHERE status = 'confirmed' AND checkin IS NOT NULL AND checkout >= ?
+      UNION ALL
+     SELECT uid AS id, checkin, checkout FROM ical_blocks
+      WHERE checkout >= ?
+      ORDER BY checkin`
+  )
+    .bind(todayYmd(), todayYmd())
+    .all();
+
+  const stamp = nowIso().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Vikendica Meri//Booking//BS',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:Vikendica Meri',
+  ];
+
+  for (const row of results ?? []) {
+    lines.push(
+      'BEGIN:VEVENT',
+      `UID:${row.id}@vikendica-meri`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${compactYmd(row.checkin)}`,
+      // DTEND is exclusive in iCalendar, but this codebase treats the checkout
+      // day itself as occupied (see getAvailability). Adding a day keeps the
+      // channel calendars saying the same thing the site says — one night more
+      // conservative than the industry norm, and the single place to change it.
+      `DTEND;VALUE=DATE:${compactYmd(addDays(row.checkout, 1))}`,
+      'SUMMARY:Zauzeto',
+      'TRANSP:OPAQUE',
+      'END:VEVENT'
+    );
+  }
+  lines.push('END:VCALENDAR');
+
+  // CRLF is required by RFC 5545, and Booking.com is stricter about it than
+  // Google Calendar is. No line folding: every value here is a date, a UUID or a
+  // fixed string, all comfortably under the 75-octet limit.
+  return new Response(lines.join('\r\n') + '\r\n', {
+    headers: {
+      'Content-Type': 'text/calendar; charset=utf-8',
+      'Content-Disposition': 'inline; filename="vikendica-meri.ics"',
+      'Cache-Control': 'public, max-age=900',
+    },
+  });
+}
+
+const compactYmd = (ymd) => ymd.replace(/-/g, '');
+
+function addDays(ymd, n) {
+  const d = new Date(`${ymd}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+async function postRequest(request, env, ctx) {
   const len = Number(request.headers.get('Content-Length') || 0);
   if (len > MAX_BODY_BYTES) return json({ error: 'too_large' }, 413);
 
@@ -215,25 +346,39 @@ async function postRequest(request, env) {
   const { data, error } = validateRequest(body);
   if (error) return json({ error }, 400);
 
+  // Notify first, and independently of the insert. Before this call lived in the
+  // Worker, the browser posted to Web3Forms and to this endpoint in parallel, so
+  // a database problem still reached the owner. Keeping the two failures
+  // unlinked preserves that: the enquiry is what matters, and an email the owner
+  // can act on beats a clean 500.
+  ctx.waitUntil(notifyOwner(env, data));
+
   const id = crypto.randomUUID();
-  await env.DB.prepare(
-    `INSERT INTO requests
-       (id, created_at, name, email, phone, checkin, checkout, guests, message, status, source, client_ip)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'site', ?)`
-  )
-    .bind(
-      id,
-      nowIso(),
-      data.name,
-      data.email,
-      data.phone,
-      data.checkin,
-      data.checkout,
-      data.guests,
-      data.message,
-      ip || 'unknown'
+  try {
+    await env.DB.prepare(
+      `INSERT INTO requests
+         (id, created_at, name, email, phone, checkin, checkout, guests, message, lang, status, source, client_ip)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'site', ?)`
     )
-    .run();
+      .bind(
+        id,
+        nowIso(),
+        data.name,
+        data.email,
+        data.phone,
+        data.checkin,
+        data.checkout,
+        data.guests,
+        data.message,
+        data.lang,
+        ip || 'unknown'
+      )
+      .run();
+  } catch (err) {
+    // The owner has been emailed regardless, so this is recoverable by hand.
+    // Say so rather than reporting a success the panel will not show.
+    return json({ ok: true, stored: false, reason: String(err.message || err) }, 202);
+  }
 
   return json({ ok: true, id }, 201);
 }
@@ -241,7 +386,7 @@ async function postRequest(request, env) {
 async function listRequests(env) {
   const { results } = await env.DB.prepare(
     `SELECT id, created_at, updated_at, name, email, phone, checkin, checkout,
-            guests, message, status, source, owner_note
+            guests, message, lang, status, source, owner_note
        FROM requests
       ORDER BY
         CASE status WHEN 'pending' THEN 0 WHEN 'confirmed' THEN 1 ELSE 2 END,
@@ -313,7 +458,7 @@ async function createBlock(request, env) {
 /* ------------------------------------------------------------------- entry -- */
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const { pathname } = url;
 
@@ -326,11 +471,14 @@ export default {
       return env.ASSETS.fetch(request);
     }
 
+    if (pathname === '/calendar.ics' && request.method === 'GET') {
+      return getCalendarIcs(env);
+    }
     if (pathname === '/api/availability' && request.method === 'GET') {
       return getAvailability(env);
     }
     if (pathname === '/api/requests' && request.method === 'POST') {
-      return postRequest(request, env);
+      return postRequest(request, env, ctx);
     }
 
     if (pathname.startsWith('/api/admin/')) {

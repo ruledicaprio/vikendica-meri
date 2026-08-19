@@ -4,6 +4,7 @@
 // edge and worker/access.js verifies again. There is no login code in this file
 // on purpose: if the request reaches the API at all, the caller is the owner.
 import './manager.css';
+import { replyFor } from './reply-templates.js';
 
 const MONTHS = [
   'januar', 'februar', 'mart', 'april', 'maj', 'juni',
@@ -90,6 +91,47 @@ function conflictsFor(req) {
   );
 }
 
+/**
+ * Ready-to-send reply links for a decided request.
+ *
+ * Only for statuses where there is something to tell the guest. 'cancelled' is
+ * excluded deliberately: the decline wording says the dates are taken, which is
+ * not what happened when the owner cancels a booking they had already accepted.
+ * That case needs a real conversation, not a template.
+ */
+function replyHtml(req) {
+  const kind = req.status === 'confirmed' ? 'confirm' : req.status === 'declined' ? 'decline' : null;
+  if (!kind || req.source === 'manual') return '';
+
+  const reply = replyFor(req, kind);
+  // Null for a general enquiry with no dates — nothing to template.
+  if (!reply) return '';
+  const { subject, body } = reply;
+  const links = [];
+
+  if (req.email) {
+    // The '@' must stay literal: RFC 6068 wants an addr-spec, and a %40 here is
+    // misparsed by some mail clients. Everything else is still encoded.
+    const to = encodeURIComponent(req.email).replace(/%40/g, '@');
+    const href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    links.push(`<a class="mgr-btn mgr-btn--reply" href="${esc(href)}">✉️ Odgovori mailom</a>`);
+  }
+  if (req.phone) {
+    const digits = req.phone.replace(/\D/g, '');
+    // WhatsApp has no subject line, so the greeting has to carry it.
+    links.push(
+      `<a class="mgr-btn mgr-btn--reply" target="_blank" rel="noopener"
+          href="https://wa.me/${esc(digits)}?text=${encodeURIComponent(body)}">💬 Odgovori na WhatsApp</a>`
+    );
+  }
+  if (!links.length) return '';
+
+  return `<div class="req__reply">
+      <span class="req__reply-label">Poruka gostu (${req.lang === 'en' ? 'EN' : 'BS'}) — uredite prije slanja:</span>
+      ${links.join('')}
+    </div>`;
+}
+
 function cardHtml(req) {
   const conflicts = req.status === 'pending' ? conflictsFor(req) : [];
   const n = nights(req.checkin, req.checkout);
@@ -129,6 +171,7 @@ function cardHtml(req) {
       ${conflicts.length ? `<p class="req__warn">Preklapa se sa ${conflicts.length} potvrđenim terminom. Potvrda bi napravila dvostruku rezervaciju.</p>` : ''}
       ${who.length ? `<p class="req__who">${who.join('')}</p>` : ''}
       ${req.message ? `<p class="req__msg">${esc(req.message)}</p>` : ''}
+      ${replyHtml(req)}
       <div class="req__actions">
         ${actions}
         <input class="req__note" type="text" data-note="${req.id}"

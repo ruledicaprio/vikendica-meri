@@ -166,6 +166,32 @@ body {
   border-left: 2px solid var(--line);
   padding-left: 0.8rem;
 }
+.req__reply {
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.req__reply-label {
+  flex: 1 1 100%;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.mgr-btn--reply {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  /* An <a> styled as .mgr-btn: the button rules assume a form control, and a
+     link brings its own underline and inherits the anchor colour. */
+  text-decoration: none;
+  border-color: rgba(212, 148, 58, 0.5);
+  background: rgba(212, 148, 58, 0.12);
+  color: var(--cream);
+}
+
 .req__actions {
   margin-top: 0.9rem;
   display: flex;

@@ -39,8 +39,12 @@ In the host's dashboard → **Custom domains** → add your **real** domain (see
 HTTPS certificate automatically; you just point a CNAME/A record as it instructs.
 
 ### Before going live
-- Set a free **Web3Forms** key in [`src/main.js`](src/main.js) (`WEB3FORMS_KEY`) so the
-  reservation form sends in-page (otherwise it opens the visitor's email client).
+- Set `data-sitekey` on the `.cf-turnstile` div in [`index.html`](index.html) to a real
+  **Cloudflare Turnstile** sitekey, and set `TURNSTILE_SECRET` on the Worker. Without a
+  valid sitekey the widget never renders and **nobody can submit the form**.
+- The **Web3Forms** key lives in [`wrangler.jsonc`](wrangler.jsonc) (`WEB3FORMS_KEY`),
+  not in `src/main.js` — the Worker sends the owner notification server-side so the
+  endpoint sits behind the captcha rather than beside it.
 
 ---
 
@@ -164,8 +168,12 @@ You keep full control of the code; only the hosting moves off your PC.
 
 ## After deploying — two things to finish
 
-- **Reservation form:** set a free [Web3Forms](https://web3forms.com) access key in
-  `src/main.js` (`WEB3FORMS_KEY`) so upiti send in-page. Without it the form falls
+- **Reservation form:** the form posts to `/api/requests` only. The Worker records the
+  enquiry in D1 and emails the owner through [Web3Forms](https://web3forms.com) using
+  `WEB3FORMS_KEY` from `wrangler.jsonc`. If that single request fails, the form falls
   back to opening the visitor's email client to `villa-meri@gmail.com`.
+  Web3Forms' own captcha setting must stay **off** — the Worker verifies Turnstile
+  instead, and Web3Forms would otherwise reject every submission for missing an
+  hCaptcha token.
 - **Rebuild after any change:** `npm run build`, then your server serves the new
   `dist/` automatically (Caddy/nginx) or on next deploy (Pages/Netlify).

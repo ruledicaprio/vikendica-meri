@@ -1226,9 +1226,11 @@ summary:focus-visible {
 .field textarea {
   resize: vertical;
 }
-.contact-form .h-captcha {
+.contact-form .cf-turnstile {
   margin-bottom: 1rem;
-  min-height: 78px;
+  /* Reserves the widget's height before the script loads, so the submit button
+     does not jump down the page underneath the visitor's finger. */
+  min-height: 65px;
 }
 .contact-form .btn {
   width: 100%;

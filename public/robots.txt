@@ -5,5 +5,8 @@ Allow: /
 # and braces, not the protection itself.
 Disallow: /manager
 Disallow: /api/
+# Machine-readable availability feed for Airbnb, Booking and calendar apps.
+# Carries no guest data, but there is nothing here for a search result.
+Disallow: /calendar.ics
 
 Sitemap: https://vikendica-meri.iot-pages.workers.dev/sitemap.xml
