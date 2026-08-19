@@ -102,6 +102,22 @@ export const bs = {
     'Travnik — bivša prijestolnica Bosanskog ejaleta — krasi se historijskim utvrđenjem, šarenom čaršijom i legendom o Ivi Andriću. Udaljen je 30 minuta od Vlašića i savršen za kulturni izlet.',
   destTravnikMuseum: 'Muzej Travnik ↗',
 
+  // Location prose. Every number here traces to something the owner stated on
+  // 2026-08-19/20 — lift distance, ski-in route, drive times. Nothing invented
+  // to pad it out; the summer block is short because there is less confirmed
+  // material for it, not because it matters less.
+  locKicker: 'Lokacija',
+  locTitle: 'Vlašić kroz godinu',
+  locWinterTitle: 'Zimi',
+  locWinterBody:
+    'Ski-liftovi Babanovac I i II su oko 500 metara od vrata — pet minuta pješke preko platoa, sa skijama na ramenu. Nazad se može i na skijama: staza Markovac spušta se prema naselju, oko dva kilometra do kuće. Vikendica se grije na pelet i drva, oboje uključeno u cijenu, pa se poslije dana na snijegu vraćate u već toplu kuću.',
+  locSummerTitle: 'Ljeti',
+  locSummerBody:
+    'Dolina Panjeva je mirna strana Babanovca — borova šuma, pašnjaci i zrak zbog kojeg se na Vlašić i dolazi. Dvorište sa roštiljem gleda u šumu, a plato počinje nadomak kuće. Unutra ima mjesta za deset osoba na tri etaže, dovoljno za dvije porodice ili veće društvo.',
+  locRouteTitle: 'Kako doći',
+  locRouteBody:
+    'Iz Sarajeva je oko 130 kilometara, oko dva sata vožnje: sat vremena autoputem do Lašve, pola sata do Travnika i još pola sata uzbrdo do Babanovca. Travnik je 30 kilometara od kuće, oko pola sata — i pravo mjesto da se stane na ćevape kod Harija prije nego se krene na planinu.',
+
   galleryKicker: 'Galerija',
   galleryTitle: 'Pogledajte smještaj',
 
@@ -261,6 +277,19 @@ export const en = {
   destTravnikBody:
     'Travnik — once the capital of the Bosnian eyalet — is known for its historic fortress, its colourful old bazaar and its association with the writer Ivo Andrić. It is 30 minutes from Vlašić and makes a perfect day out.',
   destTravnikMuseum: 'Travnik Museum ↗',
+
+  // See the Bosnian block for provenance.
+  locKicker: 'Location',
+  locTitle: 'Vlašić through the year',
+  locWinterTitle: 'In winter',
+  locWinterBody:
+    'The Babanovac I and II lifts are about 500 metres from the door — five minutes on foot across the plateau, skis on your shoulder. You can come back on them too: the Markovac piste runs down towards the village, about two kilometres to the house. Heating is pellet and wood, both included, so after a day in the snow you come back to a house that is already warm.',
+  locSummerTitle: 'In summer',
+  locSummerBody:
+    'Dolina Panjeva is the quiet side of Babanovac — pine forest, pasture, and the air people come to Vlašić for. The yard and its grill look into the trees, and the plateau starts a short walk from the door. Inside there is room for ten across three floors, enough for two families or a large group.',
+  locRouteTitle: 'Getting here',
+  locRouteBody:
+    'Sarajevo is roughly 130 kilometres away, about two hours: an hour on the motorway to Lasva, half an hour to Travnik, then another half hour up to Babanovac. Travnik itself is 30 kilometres from the house, about half an hour — and the right place to stop for cevapi at Hari before heading up the mountain.',
 
   galleryKicker: 'Gallery',
   galleryTitle: 'Take a look inside',

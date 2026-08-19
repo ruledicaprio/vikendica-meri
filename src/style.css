@@ -446,6 +446,34 @@ picture {
   padding-top: clamp(2rem, 4vw, 3rem);
 }
 
+/* ---------- Lokacija ----------
+   Opaque background like every other section: .content scrolls over the fixed
+   hero. Three columns that stack below 900px. */
+.section--lokacija {
+  background: var(--bg2);
+  padding-block: clamp(3rem, 7vw, 5rem);
+}
+.seasons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.5rem, 3vw, 2.6rem);
+}
+.seasons__item h3 {
+  font-size: 1.22rem;
+  color: var(--amber2);
+  margin-bottom: 0.6rem;
+}
+.seasons__item p {
+  color: var(--muted);
+  font-size: 0.99rem;
+  max-width: 42ch;
+}
+@media (max-width: 900px) {
+  .seasons {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- Česta pitanja ----------
    <details>/<summary>, so it works with the stylesheet alone — no JS, and the
    answers are in the served HTML for the crawlers that never run any. */
