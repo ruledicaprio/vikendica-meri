@@ -20,8 +20,11 @@ export const ADEL = {
 
 export const ALMIN = {
   name: 'Almin Tabak',
-  url: 'https://www.instagram.com/alminijum/',
+  // Tumblr first: it is the portfolio, where the photography is the point.
+  // The social profiles stay as sameAs so the identity still resolves.
+  url: 'https://almintabak.tumblr.com/',
   sameAs: [
+    'https://almintabak.tumblr.com/',
     'https://www.instagram.com/alminijum/',
     'https://www.facebook.com/tabak.almin/',
   ],

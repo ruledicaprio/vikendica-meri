@@ -446,6 +446,67 @@ picture {
   padding-top: clamp(2rem, 4vw, 3rem);
 }
 
+/* ---------- Česta pitanja ----------
+   <details>/<summary>, so it works with the stylesheet alone — no JS, and the
+   answers are in the served HTML for the crawlers that never run any. */
+.section--faq {
+  background: var(--bg);
+  padding-block: clamp(3rem, 7vw, 5rem);
+}
+.faq {
+  max-width: 46rem;
+  margin: 0 auto;
+  border-top: 1px solid var(--line);
+}
+.faq__item {
+  border-bottom: 1px solid var(--line);
+}
+.faq__q {
+  /* The default triangle is replaced by the +/− below, and Safari needs the
+     -webkit- rule as well or it keeps drawing its own. */
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  /* 44px minimum tap target, same as the rest of the interactive chrome. */
+  min-height: 44px;
+  padding: 1.05rem 0;
+  font-family: var(--serif);
+  font-size: 1.08rem;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.faq__q::-webkit-details-marker {
+  display: none;
+}
+.faq__q:hover {
+  color: var(--amber2);
+}
+.faq__q:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+.faq__q::after {
+  content: '+';
+  flex: none;
+  font-family: var(--sans);
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--amber);
+  transition: transform 0.25s ease;
+}
+.faq__item[open] .faq__q::after {
+  content: '−';
+}
+.faq__a {
+  padding: 0 0 1.2rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+  max-width: 60ch;
+}
+
 .kicker {
   text-transform: uppercase;
   letter-spacing: 0.28em;

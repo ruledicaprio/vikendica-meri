@@ -106,6 +106,35 @@ export const bs = {
   galleryTitle: 'Pogledajte smještaj',
 
   calendarTitle: 'Dostupnost',
+  // FAQ. Every answer here is one the owner confirmed on 2026-08-19; where it
+  // contradicted the older operational guide (swim_lane V_011, 2026.06) the
+  // owner's newer answer is authoritative — minimum stay, deposit and pets all
+  // changed. The same strings feed the FAQPage JSON-LD, so the visible text and
+  // the structured data cannot drift.
+  faqKicker: 'Česta pitanja',
+  faqTitle: 'Prije nego rezervišete',
+  faqQ1: 'Koliko je vikendica udaljena od ski-lifta?',
+  faqA1:
+    'Ski-liftovi Babanovac I i II udaljeni su oko 500 metara — pet minuta pješke preko platoa. Do vikendice se može doći i na skijama, sa staze Markovac, oko dva kilometra.',
+  faqQ2: 'Ima li parkinga?',
+  faqA2:
+    'Ispred kuće je garantovano mjesto za dva automobila, na otvorenom. Povremeno je dostupno i natkriveno mjesto pet metara dalje.',
+  faqQ3: 'Jesu li kućni ljubimci dozvoljeni?',
+  faqA3: 'Nažalost ne — vikendica ne prima kućne ljubimce.',
+  faqQ4: 'Kako se kuća grije i plaća li se grijanje posebno?',
+  faqA4:
+    'Centralno grijanje na pelet i drva. Oboje je uključeno u cijenu, a u kući vas čekaju kratke upute za potpalu i održavanje.',
+  faqQ5: 'Koliko je najmanji boravak?',
+  faqA5:
+    'Tri noći. Oko Nove godine cijena je 50 do 75 posto viša nego u ostatku sezone.',
+  faqQ6: 'Kako se plaća i treba li depozit?',
+  faqA6:
+    'Gotovinom, bankovnim transferom ili PayPalom. Depozit tražimo samo za termine oko Nove godine i u januaru.',
+  faqQ7: 'Šta je uključeno u cijenu?',
+  faqA7: 'Posteljina, peškiri, drva za ogrjev i završno čišćenje.',
+  faqQ8: 'Koliko je do Travnika i do sarajevskog aerodroma?',
+  faqA8:
+    'Do Travnika je 30 kilometara, oko pola sata vožnje. Do aerodroma u Sarajevu oko 130 kilometara, oko dva sata: sat vremena autoputem do Lašve, pola sata do Travnika i još pola sata do Babanovca. Ako dolazite tim putem, vrijedi stati na ćevape kod Harija u Travniku.',
   floorViewPhoto: 'pogledaj fotografiju',
   contactKicker: 'Kontakt',
   contactTitle: 'Rezervišite svoj boravak',
@@ -114,7 +143,7 @@ export const bs = {
   contactAddress: 'Dolina Panjeva, Babanovac, Vlašić, BiH',
   contactWhatsappAria: 'Pošaljite WhatsApp poruku na +387 62 555 888',
   contactViberAria: 'Pošaljite Viber poruku na +387 62 555 888',
-  contactNote: '🕑 Minimalni boravak: 2 noći',
+  contactNote: '🕑 Minimalni boravak: 3 noći',
   // Also stated as checkinTime/checkoutTime in the JSON-LD; the two must agree.
   contactCheckin: '🕓 Prijava od 14:00 · Odjava do 11:00',
   mapTitle: 'Lokacija — Vikendica Meri',
@@ -237,6 +266,31 @@ export const en = {
   galleryTitle: 'Take a look inside',
 
   calendarTitle: 'Availability',
+  // See the Bosnian block above for where these facts come from.
+  faqKicker: 'Frequently asked',
+  faqTitle: 'Before you book',
+  faqQ1: 'How far is the chalet from the ski lift?',
+  faqA1:
+    'The Babanovac I and II lifts are about 500 metres away — a five minute walk across the plateau. You can also ski to the door from the Markovac piste, about two kilometres.',
+  faqQ2: 'Is there parking?',
+  faqA2:
+    'There is guaranteed open parking for two cars in front of the house. A covered space five metres away is sometimes available as well.',
+  faqQ3: 'Are pets allowed?',
+  faqA3: 'Unfortunately not — the chalet does not accept pets.',
+  faqQ4: 'How is the house heated, and is heating charged separately?',
+  faqA4:
+    'Central heating on pellets and wood. Both are included in the price, and short instructions for lighting and upkeep are waiting for you in the house.',
+  faqQ5: 'What is the minimum stay?',
+  faqA5:
+    'Three nights. Around New Year the price is 50 to 75 percent higher than the rest of the season.',
+  faqQ6: 'How do I pay, and is a deposit required?',
+  faqA6:
+    'Cash, bank transfer or PayPal. We ask for a deposit only for dates around New Year and in January.',
+  faqQ7: 'What is included in the price?',
+  faqA7: 'Bedding, towels, firewood and the final cleaning.',
+  faqQ8: 'How far is Travnik, and Sarajevo airport?',
+  faqA8:
+    'Travnik is 30 kilometres away, about half an hour by car. Sarajevo airport is roughly 130 kilometres, about two hours: an hour on the motorway to Lasva, half an hour to Travnik and another half hour up to Babanovac. If you come that way, it is worth stopping for cevapi at Hari in Travnik.',
   floorViewPhoto: 'view photo',
   contactKicker: 'Contact',
   contactTitle: 'Book your stay',
@@ -245,7 +299,7 @@ export const en = {
   contactAddress: 'Dolina Panjeva, Babanovac, Vlašić, Bosnia and Herzegovina',
   contactWhatsappAria: 'Message +387 62 555 888 on WhatsApp',
   contactViberAria: 'Message +387 62 555 888 on Viber',
-  contactNote: '🕑 Minimum stay: 2 nights',
+  contactNote: '🕑 Minimum stay: 3 nights',
   contactCheckin: '🕓 Check-in from 14:00 · Check-out by 11:00',
   mapTitle: 'Location — Vikendica Meri',
   mapButton: 'Open in Google Maps',

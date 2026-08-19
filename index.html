@@ -174,11 +174,58 @@
             ]
           },
           {
+            "@type": "FAQPage",
+            "@id": "https://vikendica-meri.iot-pages.workers.dev/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "{{faqQ1}}",
+                "acceptedAnswer": { "@type": "Answer", "text": "{{faqA1}}" }
+              },
+              {
+                "@type": "Question",
+                "name": "{{faqQ2}}",
+                "acceptedAnswer": { "@type": "Answer", "text": "{{faqA2}}" }
+              },
+              {
+                "@type": "Question",
+                "name": "{{faqQ3}}",
+                "acceptedAnswer": { "@type": "Answer", "text": "{{faqA3}}" }
+              },
+              {
+                "@type": "Question",
+                "name": "{{faqQ4}}",
+                "acceptedAnswer": { "@type": "Answer", "text": "{{faqA4}}" }
+              },
+              {
+                "@type": "Question",
+                "name": "{{faqQ5}}",
+                "acceptedAnswer": { "@type": "Answer", "text": "{{faqA5}}" }
+              },
+              {
+                "@type": "Question",
+                "name": "{{faqQ6}}",
+                "acceptedAnswer": { "@type": "Answer", "text": "{{faqA6}}" }
+              },
+              {
+                "@type": "Question",
+                "name": "{{faqQ7}}",
+                "acceptedAnswer": { "@type": "Answer", "text": "{{faqA7}}" }
+              },
+              {
+                "@type": "Question",
+                "name": "{{faqQ8}}",
+                "acceptedAnswer": { "@type": "Answer", "text": "{{faqA8}}" }
+              }
+            ]
+          },
+          {
             "@type": "Person",
             "@id": "https://vikendica-meri.iot-pages.workers.dev/#almin",
             "name": "Almin Tabak",
-            "url": "https://www.instagram.com/alminijum/",
+            "url": "https://almintabak.tumblr.com/",
             "sameAs": [
+              "https://almintabak.tumblr.com/",
               "https://www.instagram.com/alminijum/",
               "https://www.facebook.com/tabak.almin/"
             ]
@@ -495,6 +542,53 @@
           </div>
           <!-- Populated by initCalendar(); a picked range prefills the form below. -->
           <div id="cal-mount" class="reveal"></div>
+        </div>
+      </section>
+
+      <!-- ČESTA PITANJA — between availability and the form on purpose: these are
+           the questions a guest wants answered before they write. <details> is
+           native, keyboard-accessible and needs no JavaScript, and Google
+           explicitly supports expandable sections for FAQPage. -->
+      <section class="section section--faq" id="faq">
+        <div class="wrap">
+          <div class="section__head">
+            <p class="kicker">{{faqKicker}}</p>
+            <h2>{{faqTitle}}</h2>
+          </div>
+          <div class="faq reveal">
+            <details class="faq__item">
+              <summary class="faq__q">{{faqQ1}}</summary>
+              <p class="faq__a">{{faqA1}}</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">{{faqQ2}}</summary>
+              <p class="faq__a">{{faqA2}}</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">{{faqQ3}}</summary>
+              <p class="faq__a">{{faqA3}}</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">{{faqQ4}}</summary>
+              <p class="faq__a">{{faqA4}}</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">{{faqQ5}}</summary>
+              <p class="faq__a">{{faqA5}}</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">{{faqQ6}}</summary>
+              <p class="faq__a">{{faqA6}}</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">{{faqQ7}}</summary>
+              <p class="faq__a">{{faqA7}}</p>
+            </details>
+            <details class="faq__item">
+              <summary class="faq__q">{{faqQ8}}</summary>
+              <p class="faq__a">{{faqA8}}</p>
+            </details>
+          </div>
         </div>
       </section>
 
