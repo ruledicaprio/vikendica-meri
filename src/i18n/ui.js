@@ -101,8 +101,13 @@ const bs = {
       return `${room} sa tuš kabinom`;
     },
     vlasic: (n) => {
-      if (/galica/.test(n)) return 'Pogled na Galicu, planina Vlašić';
-      if (/ugar/.test(n)) return 'Pogled na Ugar, planina Vlašić';
+      if (/galica-greben/.test(n)) return 'Greben Galice ljeti, planina Vlašić';
+      if (/galica/.test(n)) return 'Serpentina ispod Galice, planina Vlašić';
+      if (/ugar-vodopad/.test(n)) return 'Vodopad na Ugru, planina Vlašić';
+      if (/ugar/.test(n)) return 'Rijeka Ugar kroz borovu šumu, planina Vlašić';
+      if (/babanovac-naselje/.test(n)) return 'Pogled na naselje Babanovac sa Vlašića';
+      if (/pasnjak/.test(n)) return 'Planinski pašnjak sa smrčom i odašiljačem, Vlašić';
+      if (/plato-snijeg/.test(n)) return 'Zavejani plato Vlašića zimi';
       return 'Planina Vlašić i Babanovac';
     },
     travnik: () => 'Grad Travnik, centralna Bosna',
@@ -255,8 +260,13 @@ const en = {
       return `${room} with shower cabin`;
     },
     vlasic: (n) => {
-      if (/galica/.test(n)) return 'View towards Galica, Vlašić mountain';
-      if (/ugar/.test(n)) return 'View towards Ugar, Vlašić mountain';
+      if (/galica-greben/.test(n)) return 'The Galica ridge in summer, Vlašić mountain';
+      if (/galica/.test(n)) return 'The switchback road below Galica, Vlašić mountain';
+      if (/ugar-vodopad/.test(n)) return 'Waterfall on the Ugar, Vlašić mountain';
+      if (/ugar/.test(n)) return 'The Ugar river through pine forest, Vlašić mountain';
+      if (/babanovac-naselje/.test(n)) return 'Babanovac village seen from Vlašić';
+      if (/pasnjak/.test(n)) return 'Mountain pasture with a spruce and the transmitter, Vlašić';
+      if (/plato-snijeg/.test(n)) return 'The Vlašić plateau under snow';
       return 'Vlašić mountain and Babanovac';
     },
     travnik: () => 'The town of Travnik, central Bosnia',

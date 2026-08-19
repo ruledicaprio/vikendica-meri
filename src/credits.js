@@ -33,11 +33,11 @@ export const ALMIN = {
 // Path → photographer. A Map rather than a per-person Set: there are two of them
 // now, and a second Set would make "who shot this?" a search instead of a lookup.
 const CREDITED = new Map([
-  ['/vlasic/scene-0.jpg', ADEL],
-  ['/vlasic/scene-0-galica.jpg', ADEL],
-  ['/vlasic/scene-0-ugar.jpg', ADEL],
-  ['/vlasic/scene-1-galica.jpg', ADEL],
-  ['/vlasic/scene-1-ugar.jpg', ADEL],
+  ['/vlasic/scene-0-galica-greben-ljeto.jpg', ADEL],
+  ['/vlasic/scene-1-galica-serpentina.jpg', ADEL],
+  ['/vlasic/scene-2-ugar-rijeka-suma.jpg', ADEL],
+  ['/vlasic/scene-3-ugar-vodopad.jpg', ADEL],
+  ['/vlasic/scene-4-babanovac-naselje.jpg', ADEL],
   ['/travnik/scene-0-photo-44.jpg', ALMIN],
 ]);
 
