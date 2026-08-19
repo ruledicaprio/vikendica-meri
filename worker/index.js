@@ -140,7 +140,16 @@ function isLocalDevBypass(request, env) {
 
 async function requireOwner(request, env) {
   if (isLocalDevBypass(request, env)) return null;
-  const result = await verifyAccess(request, env);
+  let result;
+  try {
+    result = await verifyAccess(request, env);
+  } catch (err) {
+    // verifyAccess only throws when the JWKS itself cannot be fetched — a wrong
+    // team domain, or Cloudflare's certs endpoint being unavailable. Letting it
+    // escape turned every admin request into a 1101 "Worker threw an exception",
+    // which says nothing about the cause. Still a refusal, but a legible one.
+    return json({ error: 'unavailable', reason: String(err.message || err) }, 503);
+  }
   if (result.ok) return null;
   return json({ error: 'unauthorized', reason: result.reason }, 401);
 }
