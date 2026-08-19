@@ -7,6 +7,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { CACHE_DIR, ensureVariants, pool } from '../scripts/lib/variants.js';
+import { segmentsHtml } from '../src/gallery-markup.js';
+import { LOCALES } from '../src/i18n/ui.js';
 
 const VIRTUAL_ID = 'virtual:gallery';
 const RESOLVED_ID = '\0' + VIRTUAL_ID;
@@ -100,8 +102,27 @@ export function galleryManifest() {
     return data;
   };
 
+  // Building hashes every photo, and there are now three consumers per run —
+  // the virtual module, plus one segmentsFor() call per locale. Memoize the
+  // promise so they share one pass; the dev watcher clears it when a photo
+  // appears or disappears.
+  let pending = null;
+  const manifest = () => (pending ??= build());
+
   return {
     name: 'vikendica-gallery-manifest',
+
+    /**
+     * The gallery grid for one locale, as HTML.
+     *
+     * Wired into i18n-html's `computed` option in vite.config.js, which
+     * substitutes it for {{gallerySegments}} in index.html. Rendering it here
+     * rather than in the browser is what puts the photos in the served HTML for
+     * crawlers that do not run JavaScript.
+     */
+    async segmentsFor(localeName) {
+      return segmentsHtml(await manifest(), LOCALES[localeName]);
+    },
 
     configResolved(config) {
       root = config.root;
@@ -122,6 +143,9 @@ export function galleryManifest() {
       // Dropping a photo into public/<cat>/ now shows up without a restart.
       const invalidate = (file) => {
         if (!/[\\/]public[\\/][^\\/]+[\\/][^\\/]+\.(jpe?g|png)$/i.test(file)) return;
+        // Drop the memoized manifest, or the reload below re-renders the same
+        // grid and the new photo never appears.
+        pending = null;
         const mod = server.moduleGraph.getModuleById(RESOLVED_ID);
         if (mod) server.moduleGraph.invalidateModule(mod);
         server.ws.send({ type: 'full-reload' });
@@ -135,7 +159,7 @@ export function galleryManifest() {
 
     async load(id) {
       if (id === RESOLVED_ID) {
-        return `export const manifest = ${JSON.stringify(await build())};`;
+        return `export const manifest = ${JSON.stringify(await manifest())};`;
       }
     },
 

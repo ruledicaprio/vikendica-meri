@@ -2,6 +2,15 @@
 <html lang="{{lang}}">
   <head>
     <meta charset="UTF-8" />
+    <!-- .reveal hides its element until GSAP animates it in. That is only safe
+         where the script can actually run: without this class the gallery grid,
+         which the build now writes into the HTML, would be visibility:hidden for
+         anything that does not execute JS — and permanently invisible to a real
+         visitor whose GSAP chunk fails to load. Inline and first, so it applies
+         before the stylesheet paints. -->
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
     <!-- viewport-fit=cover lets the fixed hero fill a notched screen edge to edge;
          the fixed chrome over it pads itself back out with env(safe-area-inset-*). -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -469,7 +478,11 @@
             <p class="kicker">{{galleryKicker}}</p>
             <h2>{{galleryTitle}}</h2>
           </div>
-          <div class="segments" id="gallery-segments"></div>
+          <!-- Rendered at build time by plugins/gallery-manifest.js, per locale.
+               src/gallery.js attaches behaviour to this markup and never rebuilds
+               it, so the photos are in the served HTML for crawlers that do not
+               run JavaScript. -->
+          <div class="segments" id="gallery-segments">{{gallerySegments}}</div>
         </div>
       </section>
 

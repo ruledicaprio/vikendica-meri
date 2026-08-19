@@ -162,18 +162,24 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
 });
 
 /* ---------- Reveal on scroll (lazy) ----------
-   GSAP loads after first paint. Until it does, .reveal elements are simply
-   visible and un-animated — the tween sets autoAlpha from JS, so there is no
-   hidden-content flash if the chunk is slow or never arrives.
-   autoAlpha also means visibility:hidden while pending, and Chrome will not
-   start a lazy image fetch inside a hidden element, so skipping the animation
-   under reduced motion is what keeps those photos loading at all. */
+   .js .reveal is visibility:hidden until GSAP animates it in, so the content
+   under it — including the gallery grid the build now writes into the HTML —
+   depends on this chunk arriving. If it does not, drop the .js class and let
+   everything show, un-animated: a slow CDN must not cost the page its photos.
+   The images themselves are fine either way — a lazy fetch inside a hidden
+   element still starts — but the markup around them would sit invisible. */
 if (!reducedMotion) {
   afterPaint(async () => {
-    const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
-      import('gsap'),
-      import('gsap/ScrollTrigger'),
-    ]);
+    let gsap, ScrollTrigger;
+    try {
+      [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger'),
+      ]);
+    } catch {
+      document.documentElement.classList.remove('js');
+      return;
+    }
     gsap.registerPlugin(ScrollTrigger);
 
     gsap.utils.toArray('.reveal').forEach((el) => {

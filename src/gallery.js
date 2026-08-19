@@ -1,86 +1,19 @@
-// Segmented gallery + lightbox.
-//
-// Masters live in /public/<cat>/ and are served at /<cat>/ as stable, cacheable
-// URLs. Responsive AVIF/WebP variants are generated at build time and served
-// from /img/<cat>/. Both come from the `virtual:gallery` manifest, whose entries
-// are descriptors: { src, w, h, avif, webp, jpeg } with pre-joined srcsets.
 import { manifest } from 'virtual:gallery';
+import {
+  CATEGORY_KEYS,
+  LB_THUMB_SIZES,
+  base,
+  esc,
+  makeAlts,
+  pickCover,
+  pictureHtml,
+} from './gallery-markup.js';
 import { creditFor, creditHtml } from './credits.js';
 import { t } from './i18n/ui.js';
 
-function base(url) {
-  return url.split('/').pop();
-}
-
-function esc(s) {
-  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-}
-
-// Cover image: a scene-* file, then a front-* file, else the first. The villa
-// categories deliberately use neither prefix, so their curated `00-*` file — the
-// alphabetically first — becomes the cover.
-function pickCover(photos) {
-  return (
-    photos.find((p) => base(p.src).startsWith('scene-')) ||
-    photos.find((p) => base(p.src).startsWith('front-')) ||
-    photos[0] ||
-    null
-  );
-}
-
-// Category order is fixed; the labels come from the active locale.
-const CATEGORY_KEYS = ['eksterijer', 'dnevni', 'kuhinja', 'sobe', 'kupatila', 'vlasic', 'travnik'];
-
-/* ----------------------------------------------------------------------------
-   Alt text
-   Derived from the curated filename — the patterns matched are the Bosnian
-   filenames, which are locale-independent, while the text returned is not.
-   Generic alt ("Smještaj 3") is worthless to screen readers and invisible to
-   image search, and these photos are the main thing a guest wants to see.
----------------------------------------------------------------------------- */
-// Computed once per category and cached: the numbering below has to look at all
-// of a category's photos, not just the one being rendered.
-const altsByCategory = new Map();
-
-function buildAlts(key) {
-  const photos = manifest[key] || [];
-  const build = t.alt[key];
-  const textFor = (p) => {
-    const name = base(p.src).replace(/\.[a-z]+$/i, '');
-    return build ? build(name) : t.categories[key] || '';
-  };
-
-  const texts = photos.map(textFor);
-  const total = new Map();
-  for (const text of texts) total.set(text, (total.get(text) ?? 0) + 1);
-
-  // Keep every alt distinct: repeated alt text is a quality signal against you.
-  // But number only the ones that actually repeat — the builders now read the
-  // detail out of the curated filename, so most photos are already unique and a
-  // blanket "— fotografija 4" on them is noise a screen reader has to sit through.
-  const seen = new Map();
-  const out = new Map();
-  photos.forEach((p, idx) => {
-    const text = texts[idx];
-    if (total.get(text) === 1) {
-      out.set(p.src, text);
-      return;
-    }
-    const n = (seen.get(text) ?? 0) + 1;
-    seen.set(text, n);
-    out.set(p.src, n === 1 ? text : `${text}${t.photoSuffix(n)}`);
-  });
-  return out;
-}
-
-function altFor(key, src) {
-  let alts = altsByCategory.get(key);
-  if (!alts) {
-    alts = buildAlts(key);
-    altsByCategory.set(key, alts);
-  }
-  return alts.get(src) ?? '';
-}
+// The same alt builder the build used to render the grid — reused here for the
+// lightbox, so a photo reads identically in both places.
+const altFor = makeAlts(manifest, t);
 
 const photoCount = (n) => t.photoCount(n);
 
@@ -106,26 +39,6 @@ export function randomImage(key, excludeSrc) {
     pick = photos[Math.floor(Math.random() * photos.length)];
   }
   return pick;
-}
-
-/* ----------------------------------------------------------------------------
-   <picture> rendering
----------------------------------------------------------------------------- */
-const COVER_SIZES = '(max-width: 1240px) 100vw, 1180px';
-const THUMB_SIZES = '(max-width: 540px) 62px, 78px';
-const LB_THUMB_SIZES = '(max-width: 540px) 56px, 72px';
-
-function pictureHtml(p, { cls, sizes, alt, eager = false }) {
-  if (!p) return '';
-  return `<picture>
-      <source type="image/avif" srcset="${p.avif}" sizes="${sizes}" />
-      <source type="image/webp" srcset="${p.webp}" sizes="${sizes}" />
-      <img class="${cls}" src="${p.src}" srcset="${p.jpeg}" sizes="${sizes}"
-           width="${p.w}" height="${p.h}" alt="${esc(alt)}"
-           loading="${eager ? 'eager' : 'lazy'}" decoding="async"${
-             eager ? ' fetchpriority="high"' : ''
-           } />
-    </picture>`;
 }
 
 /** Point an existing <picture> at a different photo. */
@@ -301,57 +214,20 @@ export function initHoverPreviews(root = document, openLightbox = null) {
 }
 
 /* ----------------------------------------------------------------------------
-   Build segments
+   Attach to the build-rendered grid
+   The markup comes from segmentsHtml() in gallery-markup.js, substituted into
+   index.html at build time. Nothing is rendered here — one renderer means the
+   static and runtime versions cannot drift apart, and a build that failed to
+   emit the grid shows as an empty gallery rather than as a subtle difference.
 ---------------------------------------------------------------------------- */
-const ORDER = CATEGORY_KEYS;
-const THUMB_COUNT = 6;
-
 export function initGallery(container, openLightbox) {
-  container.innerHTML = ORDER.filter((key) => categories[key]?.photos.length)
-    .map((key) => {
-      const c = categories[key];
-      const thumbs = c.photos.slice(0, THUMB_COUNT);
-      return `
-      <article class="segment reveal" data-cat="${key}">
-        <button class="segment__square" data-cat="${key}" aria-label="${esc(t.openGallery(c.label))}">
-          ${pictureHtml(c.cover, {
-            cls: 'segment__layer is-front',
-            sizes: COVER_SIZES,
-            alt: altFor(key, c.cover.src),
-          })}
-          ${pictureHtml(c.cover, { cls: 'segment__layer is-back', sizes: COVER_SIZES, alt: '' })}
-          <span class="segment__overlay">
-            <span class="segment__title">${c.label}</span>
-            <span class="segment__count">${photoCount(c.photos.length)}</span>
-          </span>
-        </button>
-        <div class="segment__thumbs">
-          ${thumbs
-            .map(
-              (p, i) => `
-            <button class="thumb" data-cat="${key}" data-index="${i}" aria-label="${esc(
-              t.openPhoto(i + 1, c.photos.length)
-            )}">
-              ${pictureHtml(p, { cls: '', sizes: THUMB_SIZES, alt: altFor(key, p.src) })}
-            </button>`
-            )
-            .join('')}
-          ${
-            c.photos.length > THUMB_COUNT
-              ? `<button class="segment__more" data-cat="${key}">${esc(
-                  t.showAll(c.photos.length)
-                )}</button>`
-              : ''
-          }
-        </div>
-      </article>`;
-    })
-    .join('');
+  if (!container) return;
 
-  // Wire crossfade hover on each square.
+  // Crossfade hover on each cover square.
   container.querySelectorAll('.segment__square').forEach((sq) => {
     const key = sq.dataset.cat;
     const c = categories[key];
+    if (!c) return;
     const pics = sq.querySelectorAll('picture');
     const swap = makeCrossfader(pics[0], pics[1], c.photos);
     let current = c.cover.src;
@@ -365,8 +241,8 @@ export function initGallery(container, openLightbox) {
   });
 
   // Thumbnails + "Prikaži sve".
-  container.querySelectorAll('.thumb').forEach((t) => {
-    t.addEventListener('click', () => openLightbox(t.dataset.cat, Number(t.dataset.index)));
+  container.querySelectorAll('.thumb').forEach((el) => {
+    el.addEventListener('click', () => openLightbox(el.dataset.cat, Number(el.dataset.index)));
   });
   container.querySelectorAll('.segment__more').forEach((m) => {
     m.addEventListener('click', () => openLightbox(m.dataset.cat, 0));

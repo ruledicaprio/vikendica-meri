@@ -1567,7 +1567,16 @@ summary:focus-visible {
 }
 
 /* ---------- Reveal ---------- */
-.reveal {
+/* Scoped to .js, set by an inline script in <head>: the gallery grid is rendered
+   into the HTML at build time, and hiding it here unconditionally would hide it
+   from every client that cannot run the script that unhides it — which is the
+   whole point of rendering the gallery into the HTML in the first place.
+
+   visibility and not opacity, so an un-revealed section is not still clickable
+   and tabbable. Measured in Chrome 141: a lazy image inside a visibility:hidden
+   element does start its fetch, so the gallery's 53 lazy images load on schedule
+   regardless of when their segment is revealed. */
+.js .reveal {
   visibility: hidden;
 }
 

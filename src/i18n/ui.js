@@ -317,8 +317,15 @@ const en = {
   formatDate: (d, months) => `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
 };
 
-const LOCALES = { bs, en };
+// Exported because the build imports these too: plugins/gallery-manifest.js
+// renders the gallery grid into index.html once per locale, using the same alt
+// builders the lightbox uses at runtime.
+export const LOCALES = { bs, en };
 
 /** Active locale, from the <html lang> the build stamped on this page. */
-export const lang = LOCALES[document.documentElement.lang] ? document.documentElement.lang : 'bs';
+// Guarded: this module is imported from Node during the build, where there is
+// no document. `lang` and `t` are meaningless there — the build asks for a
+// locale by name instead.
+const htmlLang = typeof document === 'undefined' ? '' : document.documentElement.lang;
+export const lang = LOCALES[htmlLang] ? htmlLang : 'bs';
 export const t = LOCALES[lang];

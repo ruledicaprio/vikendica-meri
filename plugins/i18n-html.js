@@ -71,9 +71,24 @@ function localeFor(urlPath) {
   return hit ? hit[0] : DEFAULT_LOCALE;
 }
 
-export function i18nHtml() {
+/**
+ * @param {object} [options]
+ * @param {Record<string, (localeName: string) => string | Promise<string>>} [options.computed]
+ *   Keys whose value is produced at build time rather than written by hand in
+ *   page.js — the gallery grid, which is rendered per locale from the photo
+ *   manifest. Merged over the locale dictionary, so the validation above covers
+ *   them exactly as it covers the static keys.
+ */
+export function i18nHtml({ computed = {} } = {}) {
   let root = process.cwd();
   let templateHtml = '';
+
+  /** The locale dictionary with the computed keys resolved into it. */
+  const dictFor = async (name) => {
+    const extra = {};
+    for (const [key, fn] of Object.entries(computed)) extra[key] = await fn(name);
+    return { ...LOCALES[name], ...extra };
+  };
 
   return {
     name: 'i18n-html',
@@ -86,12 +101,12 @@ export function i18nHtml() {
       // `post` so the HTML already has the hashed script/style tags injected —
       // the alternate locales then inherit them without a second pass.
       order: 'post',
-      handler(html, ctx) {
+      async handler(html, ctx) {
         if (!isSiteEntry(ctx)) return html;
         // Stash the un-substituted form for generateBundle.
         templateHtml = html;
         const name = localeFor(ctx?.path || '/');
-        return render(html, LOCALES[name], name);
+        return render(html, await dictFor(name), name);
       },
     },
 
@@ -100,13 +115,13 @@ export function i18nHtml() {
       // generateBundle — without this ours runs first and templateHtml is still
       // empty, which the validator correctly reports as "every key unused".
       order: 'post',
-      handler() {
+      async handler() {
         for (const [name, dict] of Object.entries(LOCALES)) {
           if (name === DEFAULT_LOCALE) continue;
           this.emitFile({
             type: 'asset',
             fileName: `${dict.path.replace(/^\/|\/$/g, '')}/index.html`,
-            source: render(templateHtml, dict, name),
+            source: render(templateHtml, await dictFor(name), name),
           });
         }
       },
