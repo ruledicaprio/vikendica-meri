@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
+import { assetLinks } from './plugins/asset-links.js';
 import { galleryManifest } from './plugins/gallery-manifest.js';
 import { i18nHtml } from './plugins/i18n-html.js';
 
 export default defineConfig({
-  plugins: [galleryManifest(), i18nHtml()],
+  plugins: [assetLinks(), galleryManifest(), i18nHtml()],
   server: {
     // Honour a PORT assigned by the environment (e.g. preview harness),
     // otherwise default to Vite's 5173.

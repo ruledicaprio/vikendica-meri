@@ -46,6 +46,43 @@ function copyDir(from, to) {
   }
 }
 
+/**
+ * Delete cached variants no photo points at any more.
+ *
+ * The cache is content-hash keyed, so it goes stale in two ways that both look
+ * like nothing happening: deleting a photo from public/<cat>/ leaves its
+ * variants behind, and *editing* one — re-saving it with an IPTC caption is
+ * enough — changes the hash and orphans the whole previous set. Neither is
+ * visible in git, because the cache is ignored. Left alone it only grows, and
+ * closeBundle() copies every orphan into dist/img/.
+ *
+ * The live set is read back out of the srcset strings rather than threaded
+ * through ensureVariants(), so the two cannot drift apart.
+ */
+function pruneCache(root, data) {
+  let removed = 0;
+  for (const [cat, photos] of Object.entries(data)) {
+    const dir = path.join(root, CACHE_DIR, cat);
+    if (!fs.existsSync(dir)) continue;
+
+    const live = new Set();
+    for (const ph of photos) {
+      for (const set of [ph.avif, ph.webp, ph.jpeg]) {
+        for (const m of set.matchAll(/\/img\/[^/]+\/([^\s,]+)/g)) live.add(m[1]);
+      }
+    }
+
+    for (const name of fs.readdirSync(dir)) {
+      if (live.has(name)) continue;
+      fs.rmSync(path.join(dir, name), { force: true });
+      removed++;
+    }
+  }
+  // Worth a line: a large number here means photos were deleted or re-saved,
+  // which is exactly when you want to know the gallery changed under you.
+  if (removed) console.log(`[gallery] pruned ${removed} orphaned image variant(s)`);
+}
+
 export function galleryManifest() {
   let root;
   let isBuild = false;
@@ -59,6 +96,7 @@ export function galleryManifest() {
         ensureVariants(path.join(root, 'public', cat, f), cat, root)
       );
     }
+    pruneCache(root, data);
     return data;
   };
 
