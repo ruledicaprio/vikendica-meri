@@ -28,8 +28,8 @@
     // Application Audience tag of the /manager application. Both come from the
     // Zero Trust dashboard. verifyAccess() refuses every admin request while
     // these are unset, so an unconfigured deploy fails closed.
-    "ACCESS_TEAM_DOMAIN": "",
-    "ACCESS_AUD": ""
+    "ACCESS_TEAM_DOMAIN": "polished-mouse-5f60.cloudflareaccess.com",
+    "ACCESS_AUD": "592363ef1a0aa234113012a673e3d23542498e615ad0d98ff18c1d180f820450"
   },
   "d1_databases": [
     {
