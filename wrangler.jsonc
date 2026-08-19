@@ -22,7 +22,15 @@
     // first and behaves exactly as it did before the Worker existed.
     "run_worker_first": ["/api/*", "/manager", "/manager/*", "/calendar.ics"]
   },
-  "observability": { "enabled": true },
+  // Workers Logs, plus request tracing. This Worker owns no AI agent, so the
+  // agent-framework half of Cloudflare's tracing setup does not apply; what
+  // traces buy here is visibility into the paths that fail silently by design
+  // (Turnstile siteverify, the Web3Forms notification). No head_sampling_rate:
+  // omitted means 100%, which is right at this traffic level.
+  "observability": {
+    "enabled": true,
+    "traces": { "enabled": true }
+  },
   "vars": {
     // Public identifiers, not secrets: the Access team domain and the
     // Application Audience tag of the /manager application. Both come from the

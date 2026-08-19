@@ -104,10 +104,10 @@ async function overRateLimit(env, ip) {
 /**
  * Cloudflare Turnstile, enforced only when a secret is configured.
  *
- * The form currently ships hCaptcha's public *test* sitekey, which always
- * passes — so today there is effectively no captcha. Rather than hard-require a
- * secret that does not exist yet and break the form, this enforces the check as
- * soon as TURNSTILE_SECRET is set and stays out of the way until then.
+ * The form ships a real Turnstile sitekey and production has TURNSTILE_SECRET
+ * set, so the check is live. The secret is still treated as optional rather than
+ * hard-required, which is what keeps `wrangler dev` and a fresh deploy usable
+ * before the secret is put in place.
  */
 async function turnstileOk(env, token, ip) {
   if (!env.TURNSTILE_SECRET) return true;
@@ -123,9 +123,12 @@ async function turnstileOk(env, token, ip) {
     });
     const out = await res.json();
     return out.success === true;
-  } catch {
+  } catch (err) {
     // A Turnstile outage must not swallow a real booking enquiry; the rate limit
-    // and validation still apply.
+    // and validation still apply. But failing open silently means the form can
+    // sit unprotected for days with nothing to show for it, so say so — the
+    // reason only, never the token or the enquiry.
+    console.warn('turnstile siteverify unreachable, failing open:', err?.message ?? err);
     return true;
   }
 }
@@ -149,7 +152,7 @@ async function notifyOwner(env, data) {
   if (!env.WEB3FORMS_KEY) return;
   const L = data.lang === 'en' ? EN_LABELS : BS_LABELS;
   try {
-    await fetch('https://api.web3forms.com/submit', {
+    const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
@@ -168,9 +171,16 @@ async function notifyOwner(env, data) {
         Jezik: data.lang,
       }),
     });
-  } catch {
-    // Nothing useful to do here. The request is in the database either way and
-    // the panel is the source of truth; email is the convenience layer.
+    // A bad key or an exhausted quota comes back as a perfectly resolved 4xx,
+    // which is the likelier failure than the network throwing — and either way
+    // the owner simply never hears about a booking. Log the status, never the
+    // enquiry: this payload is guest PII.
+    if (!res.ok) console.warn('web3forms notification rejected:', res.status);
+  } catch (err) {
+    // The request is in the database either way and the panel is the source of
+    // truth; email is the convenience layer. Still worth a line, so a silent
+    // outage is discoverable instead of being inferred from missing mail.
+    console.warn('web3forms notification failed:', err?.message ?? err);
   }
 }
 
