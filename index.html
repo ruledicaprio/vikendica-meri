@@ -2,7 +2,9 @@
 <html lang="{{lang}}">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover lets the fixed hero fill a notched screen edge to edge;
+         the fixed chrome over it pads itself back out with env(safe-area-inset-*). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{{title}}</title>
     <meta name="description" content="{{description}}" />
     <link rel="canonical" href="https://vikendica-meri.iot-pages.workers.dev{{path}}" />
@@ -20,10 +22,17 @@
     <meta property="og:title" content="{{ogTitle}}" />
     <meta property="og:description" content="{{ogDescription}}" />
     <meta property="og:image" content="https://vikendica-meri.iot-pages.workers.dev/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="{{ogImageAlt}}" />
+    <!-- Twitter falls back to the og:* tags, but only for the properties it still
+         maps; naming them outright is one line each and cannot regress. -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ogTitle}}" />
+    <meta name="twitter:description" content="{{ogDescription}}" />
+    <meta name="twitter:image" content="https://vikendica-meri.iot-pages.workers.dev/og-image.jpg" />
+    <meta name="twitter:image:alt" content="{{ogImageAlt}}" />
 
     <!-- Icons -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -50,7 +59,10 @@
             "@id": "https://vikendica-meri.iot-pages.workers.dev/#lodging",
             "name": "Vikendica Meri",
             "description": "{{ldDescription}}",
-            "url": "https://vikendica-meri.iot-pages.workers.dev/",
+            "url": "https://vikendica-meri.iot-pages.workers.dev{{path}}",
+            "inLanguage": "{{lang}}",
+            "knowsLanguage": ["bs", "en"],
+            "hasMap": "https://maps.app.goo.gl/46PD85bbz4XNFv8J9",
             "image": [
               "https://vikendica-meri.iot-pages.workers.dev/og-image.jpg",
               "https://vikendica-meri.iot-pages.workers.dev/eksterijer/00-vikendica-prednja-strana.jpg",
@@ -68,10 +80,38 @@
             },
             "geo": {
               "@type": "GeoCoordinates",
-              "latitude": 44.309258,
-              "longitude": 17.574111
+              "latitude": 44.309737,
+              "longitude": 17.573858
+            },
+            "priceRange": "100–200 KM",
+            "currenciesAccepted": "BAM",
+            "makesOffer": {
+              "@type": "Offer",
+              "availability": "https://schema.org/InStock",
+              "url": "https://vikendica-meri.iot-pages.workers.dev{{path}}#kontakt",
+              "priceSpecification": {
+                "@type": "UnitPriceSpecification",
+                "priceCurrency": "BAM",
+                "minPrice": 100,
+                "maxPrice": 200,
+                "unitCode": "DAY"
+              }
+            },
+            "containedInPlace": {
+              "@type": "Place",
+              "name": "Babanovac, Vlašić",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Babanovac",
+                "addressRegion": "Vlašić",
+                "addressCountry": "BA"
+              }
             },
             "numberOfRooms": 4,
+            "numberOfBedrooms": 4,
+            "numberOfBathroomsTotal": 2,
+            "checkinTime": "14:00",
+            "checkoutTime": "11:00",
             "occupancy": {
               "@type": "QuantitativeValue",
               "unitText": "{{ldOccupancyUnit}}",
@@ -93,6 +133,28 @@
             ]
           },
           {
+            "@type": "TouristAttraction",
+            "@id": "https://vikendica-meri.iot-pages.workers.dev/#vlasic",
+            "name": "{{destVlasicTitle}}",
+            "description": "{{destVlasicBody}}",
+            "address": {
+              "@type": "PostalAddress",
+              "addressRegion": "Vlašić",
+              "addressCountry": "BA"
+            }
+          },
+          {
+            "@type": "TouristAttraction",
+            "@id": "https://vikendica-meri.iot-pages.workers.dev/#travnik",
+            "name": "{{destTravnikTitle}}",
+            "description": "{{destTravnikBody}}",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Travnik",
+              "addressCountry": "BA"
+            }
+          },
+          {
             "@type": "Person",
             "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel",
             "name": "Adel Huseinspahić",
@@ -106,6 +168,7 @@
             "@type": "ImageObject",
             "contentUrl": "https://vikendica-meri.iot-pages.workers.dev/vlasic/scene-0.jpg",
             "creditText": "Adel Huseinspahić",
+            "contentLocation": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#vlasic" },
             "creator": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" },
             "copyrightHolder": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" }
           },
@@ -113,6 +176,7 @@
             "@type": "ImageObject",
             "contentUrl": "https://vikendica-meri.iot-pages.workers.dev/vlasic/scene-0-galica.jpg",
             "creditText": "Adel Huseinspahić",
+            "contentLocation": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#vlasic" },
             "creator": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" },
             "copyrightHolder": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" }
           },
@@ -120,6 +184,7 @@
             "@type": "ImageObject",
             "contentUrl": "https://vikendica-meri.iot-pages.workers.dev/vlasic/scene-0-ugar.jpg",
             "creditText": "Adel Huseinspahić",
+            "contentLocation": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#vlasic" },
             "creator": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" },
             "copyrightHolder": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" }
           },
@@ -127,6 +192,7 @@
             "@type": "ImageObject",
             "contentUrl": "https://vikendica-meri.iot-pages.workers.dev/vlasic/scene-1-galica.jpg",
             "creditText": "Adel Huseinspahić",
+            "contentLocation": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#vlasic" },
             "creator": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" },
             "copyrightHolder": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" }
           },
@@ -134,6 +200,7 @@
             "@type": "ImageObject",
             "contentUrl": "https://vikendica-meri.iot-pages.workers.dev/vlasic/scene-1-ugar.jpg",
             "creditText": "Adel Huseinspahić",
+            "contentLocation": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#vlasic" },
             "creator": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" },
             "copyrightHolder": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#adel" }
           },
@@ -155,6 +222,21 @@
             "name": "Vikendica Meri",
             "inLanguage": "{{lang}}",
             "publisher": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#lodging" }
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://vikendica-meri.iot-pages.workers.dev{{path}}#webpage",
+            "url": "https://vikendica-meri.iot-pages.workers.dev{{path}}",
+            "name": "{{title}}",
+            "description": "{{description}}",
+            "inLanguage": "{{lang}}",
+            "isPartOf": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#website" },
+            "about": { "@id": "https://vikendica-meri.iot-pages.workers.dev/#lodging" },
+            "primaryImageOfPage": "https://vikendica-meri.iot-pages.workers.dev/og-image.jpg",
+            "mentions": [
+              { "@id": "https://vikendica-meri.iot-pages.workers.dev/#vlasic" },
+              { "@id": "https://vikendica-meri.iot-pages.workers.dev/#travnik" }
+            ]
           }
         ]
       }
@@ -223,6 +305,7 @@
                 <li>{{factCapacity}}</li>
                 <li>{{factHeating}}</li>
                 <li>{{factLocation}}</li>
+                <li>{{factPrice}}</li>
               </ul>
             </div>
           </div>
@@ -319,7 +402,10 @@
           </div>
           <div class="dest-grid">
             <article class="dest-card" data-cat="vlasic">
-              <div class="dest-card__media" data-cat="vlasic"></div>
+              <!-- A button, not a div: the photo swap used to be hover-only, so on a
+                   phone this card was one frozen image. The label and the count come
+                   from the runtime dictionary in attachHoverSwap(). -->
+              <button class="dest-card__media" type="button" data-cat="vlasic"></button>
               <div class="dest-card__body">
                 <h3>{{destVlasicTitle}}</h3>
                 <p>{{destVlasicBody}}</p>
@@ -332,7 +418,7 @@
               </div>
             </article>
             <article class="dest-card" data-cat="travnik">
-              <div class="dest-card__media" data-cat="travnik"></div>
+              <button class="dest-card__media" type="button" data-cat="travnik"></button>
               <div class="dest-card__body">
                 <h3>{{destTravnikTitle}}</h3>
                 <p>{{destTravnikBody}}</p>
@@ -383,10 +469,13 @@
                 <li>📍 <span>{{contactAddress}}</span></li>
               </ul>
               <p class="contact-note">{{contactNote}}</p>
+              <!-- Visible because the JSON-LD claims the same times: a checkinTime
+                   that appears nowhere on the page is the mismatch Google discounts. -->
+              <p class="contact-note">{{contactCheckin}}</p>
               <div class="map">
                 <iframe
                   title="{{mapTitle}}"
-                  src="https://www.google.com/maps?q=44.309258,17.574111&z=15&output=embed"
+                  src="https://www.google.com/maps?q=44.309737,17.573858&z=15&output=embed"
                   width="100%" height="100%" style="border:0" allowfullscreen=""
                   loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
               </div>

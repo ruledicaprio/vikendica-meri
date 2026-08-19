@@ -58,11 +58,16 @@ picture {
 }
 
 /* ---------- Hero canvas mount (fixed) ---------- */
+/* svh, not vh or dvh. vh is the *large* viewport on phones, so the hero was
+   taller than the screen and the scroll hint sat under the URL bar. dvh would
+   fix that but changes as the bar collapses, and .content's top margin has to
+   agree with this fixed box — a moving offset would shift the page mid-scroll.
+   svh is stable and always fits. Keep all three in sync. */
 #hero-canvas {
   position: fixed;
   inset: 0;
   width: 100%;
-  height: 100vh;
+  height: 100svh;
   z-index: 0;
 }
 #hero-canvas canvas {
@@ -136,7 +141,10 @@ picture {
 .navbar__inner {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0.7rem var(--pad);
+  /* viewport-fit=cover puts the page under the notch and the rounded corners, so
+     the horizontal padding has to clear them. */
+  padding: 0.7rem calc(var(--pad) + env(safe-area-inset-right)) 0.7rem
+    calc(var(--pad) + env(safe-area-inset-left));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -172,13 +180,16 @@ picture {
   background: var(--amber2);
 }
 .navbar__lang {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 0.82rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: rgba(245, 240, 232, 0.6);
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 0.28rem 0.8rem;
+  padding: 0.28rem 1rem;
   transition: color 0.2s ease, border-color 0.2s ease;
 }
 .navbar__lang:hover {
@@ -188,11 +199,16 @@ picture {
 .navbar__burger {
   display: none;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 5px;
+  /* The three bars are 26×2px; without the box the hit area was ~27px square. */
+  width: 44px;
+  height: 44px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px;
+  padding: 0;
 }
 .navbar__burger span {
   width: 26px;
@@ -214,7 +230,7 @@ picture {
 .hero-overlay {
   position: fixed;
   inset: 0;
-  height: 100vh;
+  height: 100svh;
   display: grid;
   place-items: center;
   text-align: center;
@@ -250,7 +266,7 @@ picture {
 }
 .scroll-hint {
   position: fixed;
-  bottom: 2rem;
+  bottom: calc(2rem + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
@@ -274,7 +290,7 @@ picture {
 .content {
   position: relative;
   z-index: 2;
-  margin-top: 100vh;
+  margin-top: 100svh;
 }
 .section {
   padding: clamp(4rem, 9vw, 7rem) 0;
@@ -470,8 +486,8 @@ picture {
   margin-bottom: 1.2rem;
 }
 .cal__nav-btn {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--line);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.04);
@@ -662,6 +678,42 @@ summary:focus-visible {
   border-radius: 4px;
 }
 
+/* Touch press feedback. Every control's only feedback was a :hover state, which
+   on touch either never fires or latches after the tap — so a press read as
+   nothing happening. Suppress the grey Android/iOS flash and give the press its
+   own state instead. */
+.btn,
+.dest-link,
+.dest-card__media,
+.segment__square,
+.segment__more,
+.thumb,
+.amenity__btn,
+.floor__view,
+.cal__nav-btn,
+.cal__day,
+.navbar__lang,
+.navbar__cta,
+.navbar__burger,
+.video-feature__play {
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active,
+.dest-link:active,
+.segment__more:active,
+.navbar__lang:active,
+.navbar__cta:active,
+.cal__nav-btn:active {
+  transform: scale(0.97);
+}
+.dest-card__media:active,
+.segment__square:active,
+.thumb:active,
+.amenity__btn:active,
+.video-feature__play:active {
+  opacity: 0.82;
+}
+
 .skip-link {
   position: fixed;
   top: 0;
@@ -739,15 +791,39 @@ summary:focus-visible {
   overflow: hidden;
   transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
-.dest-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.8);
+/* Hover-gated: on touch a :hover transform latches after a tap and the card
+   stays lifted until something else is tapped. */
+@media (hover: hover) {
+  .dest-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.8);
+  }
 }
+/* A <button> that has to look like the plain box it replaced. */
 .dest-card__media {
   position: relative;
+  display: block;
+  width: 100%;
   height: 280px;
+  padding: 0;
+  border: 0;
   overflow: hidden;
   background: #122016;
+  cursor: pointer;
+}
+.dest-card__badge {
+  position: absolute;
+  right: 0.9rem;
+  bottom: 0.9rem;
+  z-index: 2;
+  padding: 0.3rem 0.75rem;
+  border-radius: 50px;
+  background: rgba(10, 14, 26, 0.72);
+  backdrop-filter: blur(6px);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  pointer-events: none;
 }
 .dest-card__body {
   padding: 1.8rem;
@@ -771,7 +847,10 @@ summary:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.45rem 0.9rem;
+  /* min-height, not a larger font: four of these sit side by side in the Vlašić
+     card and at their old ~30px they were well under the 44px tap minimum. */
+  min-height: 44px;
+  padding: 0.45rem 1.1rem;
   border-radius: 50px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.05);
@@ -779,19 +858,23 @@ summary:focus-visible {
   color: var(--cream);
   transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
-.dest-link:hover {
-  background: var(--amber);
-  border-color: var(--amber);
-  color: #20140a;
+@media (hover: hover) {
+  .dest-link:hover {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #20140a;
+  }
 }
 .dest-link--live {
   color: #ff8a7a;
   border-color: rgba(255, 120, 100, 0.4);
 }
-.dest-link--live:hover {
-  background: #e0563f;
-  border-color: #e0563f;
-  color: #fff;
+@media (hover: hover) {
+  .dest-link--live:hover {
+    background: #e0563f;
+    border-color: #e0563f;
+    color: #fff;
+  }
 }
 
 /* Shared crossfade layers (segments + dest media) */
@@ -964,7 +1047,8 @@ summary:focus-visible {
 }
 .segment__more {
   margin-left: 0.4rem;
-  padding: 0.6rem 1.1rem;
+  min-height: 44px;
+  padding: 0.6rem 1.3rem;
   border-radius: 50px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.05);
@@ -1133,13 +1217,18 @@ summary:focus-visible {
   place-items: center;
   background: rgba(6, 9, 16, 0.95);
   backdrop-filter: blur(6px);
+  /* A swipe that runs past the photo used to rubber-band the page behind it.
+     No touch-action clamp — pinch-zooming a photo is worth keeping. */
+  overscroll-behavior: contain;
 }
 .lightbox.is-open {
   display: grid;
 }
 .lightbox__img {
   max-width: 90vw;
-  max-height: 82vh;
+  /* svh: at 82vh the photo, the counter and the credit were pushed under the
+     phone's browser chrome. */
+  max-height: 82svh;
   /* The width/height attributes are set per photo so the box can be reserved
      before the bytes arrive, but as presentational hints they also pin the used
      width. max-height would then clamp only the height and squash the picture,
@@ -1176,8 +1265,8 @@ summary:focus-visible {
   transition: background 0.25s ease, color 0.25s ease;
 }
 .lightbox__close {
-  top: 1.4rem;
-  right: 1.4rem;
+  top: calc(1.4rem + env(safe-area-inset-top));
+  right: calc(1.4rem + env(safe-area-inset-right));
   width: 46px;
   height: 46px;
   font-size: 1.6rem;
@@ -1202,7 +1291,7 @@ summary:focus-visible {
 }
 .lightbox__count {
   position: absolute;
-  bottom: 1.4rem;
+  bottom: calc(1.4rem + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   color: var(--muted);
@@ -1211,8 +1300,8 @@ summary:focus-visible {
 }
 .lightbox__credit {
   position: absolute;
-  right: 1.5rem;
-  bottom: 1.4rem;
+  right: calc(1.5rem + env(safe-area-inset-right));
+  bottom: calc(1.4rem + env(safe-area-inset-bottom));
 }
 
 /* ---------- Media credit ---------- */
@@ -1254,7 +1343,8 @@ summary:focus-visible {
     align-items: flex-start;
     gap: 0.4rem;
     background: var(--dark);
-    padding: 5rem var(--pad) 2rem;
+    padding: calc(5rem + env(safe-area-inset-top)) calc(var(--pad) + env(safe-area-inset-right))
+      2rem calc(var(--pad) + env(safe-area-inset-left));
     transform: translateY(-100%);
     transition: transform 0.35s ease;
     box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.8);
@@ -1282,6 +1372,13 @@ summary:focus-visible {
     /* One column here, so the box is the full viewport width — close to the
        source's own 0.75 keeps almost the whole photo. */
     aspect-ratio: 4 / 5;
+  }
+  /* Same fix as .segment__square and .video-feature: a fixed 280px height in a
+     one-column layout is a 3:1 strip at this breakpoint, cropping the Vlašić and
+     Travnik landscapes down to nothing. */
+  .dest-card__media {
+    height: auto;
+    aspect-ratio: 4 / 3;
   }
   .cal__months {
     grid-template-columns: 1fr;
@@ -1325,17 +1422,36 @@ summary:focus-visible {
   }
   /* Not enough width for the counter and the credit to sit side by side. */
   .lightbox__count {
-    bottom: 2.7rem;
+    bottom: calc(2.7rem + env(safe-area-inset-bottom));
   }
   .lightbox__credit {
     right: auto;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom));
     white-space: nowrap;
   }
   .video-feature__credit {
     text-align: center;
+  }
+}
+
+/* Narrow phones (iPhone SE / Android 360px). The clamp() floors above were set
+   for a 390px screen and start overflowing below it. */
+@media (max-width: 400px) {
+  .hero-overlay__title {
+    /* 48px "Vikendica Meri" wrapped mid-word at 360px. */
+    font-size: clamp(2.4rem, 12vw, 3rem);
+  }
+  .dest-card__body,
+  .cal__month {
+    padding: 1.25rem;
+  }
+  .segment__more {
+    margin-left: 0;
+  }
+  .navbar__logo {
+    font-size: 1.15rem;
   }
 }
 

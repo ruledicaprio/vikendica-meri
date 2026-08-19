@@ -51,6 +51,8 @@ export const bs = {
   factCapacity: '🛏️ Kapacitet ~10 osoba',
   factHeating: '🔥 Centralno grijanje',
   factLocation: '📍 Babanovac, Vlašić',
+  // Also stated as priceRange/makesOffer in the JSON-LD; the two must agree.
+  factPrice: '💰 100–200 KM / noć',
 
   floorsSubhead: 'Raspored po etažama',
   floorGround: 'Prizemlje',
@@ -111,6 +113,8 @@ export const bs = {
     'Za upite i rezervacije kontaktirajte nas telefonom, mailom ili putem poruke. Radujemo se vašoj posjeti.',
   contactAddress: 'Dolina Panjeva, Babanovac, Vlašić, BiH',
   contactNote: '🕑 Minimalni boravak: 2 noći',
+  // Also stated as checkinTime/checkoutTime in the JSON-LD; the two must agree.
+  contactCheckin: '🕓 Prijava od 14:00 · Odjava do 11:00',
   mapTitle: 'Lokacija — Vikendica Meri',
   mapButton: 'Otvori u Google Maps',
 
@@ -177,6 +181,7 @@ export const en = {
   factCapacity: '🛏️ Sleeps around 10',
   factHeating: '🔥 Central heating',
   factLocation: '📍 Babanovac, Vlašić',
+  factPrice: '💰 100–200 KM / night',
 
   floorsSubhead: 'Floor by floor',
   floorGround: 'Ground floor',
@@ -237,6 +242,7 @@ export const en = {
     'For enquiries and reservations, reach us by phone, email or the form below. We look forward to your visit.',
   contactAddress: 'Dolina Panjeva, Babanovac, Vlašić, Bosnia and Herzegovina',
   contactNote: '🕑 Minimum stay: 2 nights',
+  contactCheckin: '🕓 Check-in from 14:00 · Check-out by 11:00',
   mapTitle: 'Location — Vikendica Meri',
   mapButton: 'Open in Google Maps',
 

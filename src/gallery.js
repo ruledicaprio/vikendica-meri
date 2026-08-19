@@ -129,14 +129,27 @@ function makeCrossfader(frontPic, backPic, photos) {
   };
 }
 
-/** Two crossfade layers in `el`, swapping to a random photo on hover. */
-export function attachHoverSwap(el, key) {
+/**
+ * Two crossfade layers in `el`, opening the category's lightbox when pressed and
+ * swapping to a random photo on hover.
+ *
+ * The click is the actual feature and the hover swap is only a pointer-device
+ * extra — same split as initHoverPreviews below. Bound the other way round,
+ * these cards were a single frozen image on every phone.
+ */
+export function attachHoverSwap(el, key, openLightbox = null) {
   const c = categories[key];
   if (!c || !c.cover) return;
   const alt = altFor(key, c.cover.src, 0);
   el.innerHTML =
     pictureHtml(c.cover, { cls: 'media-layer is-front', sizes: '(max-width: 900px) 100vw, 50vw', alt }) +
-    pictureHtml(c.cover, { cls: 'media-layer is-back', sizes: '(max-width: 900px) 100vw, 50vw', alt: '' });
+    pictureHtml(c.cover, { cls: 'media-layer is-back', sizes: '(max-width: 900px) 100vw, 50vw', alt: '' }) +
+    `<span class="dest-card__badge">${esc(photoCount(c.photos.length))}</span>`;
+
+  if (openLightbox) {
+    el.setAttribute('aria-label', t.openGallery(c.label));
+    el.addEventListener('click', () => openLightbox(key, 0));
+  }
 
   const pics = el.querySelectorAll('picture');
   const swap = makeCrossfader(pics[0], pics[1], c.photos);

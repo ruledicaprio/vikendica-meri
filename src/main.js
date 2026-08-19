@@ -35,9 +35,9 @@ if (heroMount && !saveData) {
 const openLightbox = createLightbox(document.body);
 initGallery(document.getElementById('gallery-segments'), openLightbox);
 
-/* ---------- Destinacije hover-random media ---------- */
+/* ---------- Destinacije media: opens the lightbox, swaps photo on hover ---------- */
 document.querySelectorAll('.dest-card__media[data-cat]').forEach((el) => {
-  attachHoverSwap(el, el.dataset.cat);
+  attachHoverSwap(el, el.dataset.cat, openLightbox);
 });
 
 /* ---------- Etaže + sadržaji: photo preview on hover ---------- */
