@@ -610,8 +610,11 @@ input:focus-visible,
 }
 
 @media (max-width: 540px) {
+  /* flex-basis, not width: the labels carry a basis of their own, and a flex
+     item sizes from that rather than from `width`, so setting width alone
+     leaves two fields sharing a row at phone widths. */
   .mgr-block,
   .mgr-block label {
-    width: 100%;
+    flex-basis: 100%;
   }
 }
