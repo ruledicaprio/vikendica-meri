@@ -19,6 +19,8 @@
   --green-soft: rgba(31, 122, 77, 0.12);
   --red: #b3312c;
   --red-soft: rgba(179, 49, 44, 0.1);
+  /* Height of the sticky bar, so the sticky rail can clear it. */
+  --bar-h: 4.5rem;
 }
 
 * {
@@ -57,19 +59,13 @@ body {
   border-radius: 999px;
   padding: 0.15rem 0.6rem;
 }
-.mgr-bar .mgr-btn {
-  margin-left: auto;
-}
-
-.mgr-wrap {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem 1.2rem;
-}
+/* Transient feedback only — it says "Sačuvano." and then nothing. Pushed to the
+   right so the toolbar does not reflow when it fills and empties. */
 .mgr-status {
+  margin: 0 0 0 auto;
+  text-align: right;
   color: var(--ink-muted);
-  font-size: 0.9rem;
-  min-height: 1.5rem;
+  font-size: 0.85rem;
 }
 .mgr-status.is-err {
   color: var(--red);
@@ -78,8 +74,138 @@ body {
   color: var(--green);
 }
 
+/* ---------- Page shell ---------- */
+/* One column on a phone, with the summary first because the DOM puts the rail
+   before the lists. From 900px the rail moves to the right and stays put. */
+.mgr-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 1.5rem 1.2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+#alert:empty {
+  display: none;
+}
+.mgr-rail,
+.mgr-main {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .mgr-wrap {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    column-gap: 1.5rem;
+    /* Zero, because the alert carries its own bottom margin: an empty alert is
+       display:none and must not leave a gap behind it. */
+    row-gap: 0;
+    align-items: start;
+  }
+  #alert {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-bottom: 1.5rem;
+  }
+  .mgr-main {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .mgr-rail {
+    grid-column: 2;
+    grid-row: 2;
+    position: sticky;
+    top: calc(var(--bar-h) + 1rem);
+  }
+}
+
+/* ---------- Summary strip ---------- */
+.mgr-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.7rem;
+}
+.mgr-stat {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.mgr-stat__value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  /* A guest name lands here as often as a number does. */
+  overflow-wrap: anywhere;
+}
+.mgr-stat__label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+.mgr-stat__sub {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+.mgr-stat.is-amber {
+  border-left-color: var(--amber);
+  background: linear-gradient(var(--amber-soft), var(--amber-soft)), var(--surface);
+}
+.mgr-stat.is-amber .mgr-stat__value {
+  color: var(--amber);
+}
+.mgr-stat.is-green {
+  border-left-color: var(--green);
+}
+.mgr-stat.is-green .mgr-stat__value {
+  color: var(--green);
+}
+.mgr-stat.is-red {
+  border-left-color: var(--red);
+  background: linear-gradient(var(--red-soft), var(--red-soft)), var(--surface);
+}
+.mgr-stat.is-red .mgr-stat__value {
+  color: var(--red);
+}
+
+/* ---------- Alert ---------- */
+.mgr-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.92rem;
+}
+.mgr-alert.is-err {
+  color: var(--red);
+  background: var(--red-soft);
+  border: 1px solid var(--red);
+}
+.mgr-alert__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  flex: 1 1 100%;
+  font-weight: 600;
+}
+.mgr-alert a {
+  color: inherit;
+}
+
+/* ---------- Sections ---------- */
 .mgr-section {
   margin-top: 2.2rem;
+}
+.mgr-rail .mgr-section:first-child,
+.mgr-main .mgr-section:first-child {
+  margin-top: 0;
 }
 .mgr-section h2 {
   font-size: 1.05rem;
@@ -109,15 +235,102 @@ body {
   font-style: italic;
 }
 
+/* ---------- Month groups ---------- */
+.mgr-groups {
+  display: grid;
+  gap: 1.6rem;
+}
+.mgr-group h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+.mgr-group__sum {
+  margin-left: auto;
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  text-transform: none;
+}
+
+/* ---------- Archive ---------- */
+.mgr-archive > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mgr-archive > summary::-webkit-details-marker {
+  display: none;
+}
+.mgr-archive > summary::before {
+  content: '▸';
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+}
+.mgr-archive[open] > summary::before {
+  content: '▾';
+}
+.mgr-archive > summary h2 {
+  margin: 0;
+}
+.mgr-filters {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+.mgr-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.mgr-chip {
+  min-height: 36px;
+  padding: 0 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mgr-chip[aria-pressed='true'] {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-weight: 600;
+}
+.mgr-chip:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
 /* ---------- Request card ---------- */
 .req {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 1rem 1.1rem;
+  /* Cleared by the sticky bar when the conflict banner anchors to a card. */
+  scroll-margin-top: calc(var(--bar-h) + 1rem);
 }
 .req--conflict {
   border-color: var(--red);
+}
+.req.is-stale {
+  border-left: 3px solid var(--amber);
+}
+.req--block {
+  background: linear-gradient(var(--amber-soft), var(--amber-soft)), var(--surface);
 }
 .req__head {
   display: flex;
@@ -134,7 +347,11 @@ body {
   color: var(--ink-muted);
   font-size: 0.85rem;
 }
-.req__badge {
+.req__meta {
+  margin: 0.4rem 0 0;
+}
+.req__badge,
+.req__status {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -146,6 +363,24 @@ body {
 .req__badge--manual {
   border-color: var(--amber);
   color: var(--amber);
+}
+.req__status {
+  margin-left: auto;
+}
+.req__status.is-pending {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.req__status.is-confirmed {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+.req__status.is-declined,
+.req__status.is-cancelled {
+  border-color: var(--red);
+  color: var(--red);
 }
 .req__warn {
   margin: 0.7rem 0 0;
@@ -174,8 +409,61 @@ body {
   border-left: 2px solid var(--line);
   padding-left: 0.8rem;
 }
-.req__reply {
+
+/* ---------- Card footer: one decision, the rest behind a disclosure ---------- */
+.req__foot {
   margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.8rem;
+}
+.req__foot > .mgr-btn {
+  font-weight: 600;
+  padding: 0 1.4rem;
+}
+.req__more {
+  flex: 1 1 100%;
+}
+.req__more > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  -webkit-tap-highlight-color: transparent;
+}
+.req__more > summary::-webkit-details-marker {
+  display: none;
+}
+.req__more > summary::after {
+  content: '▾';
+  font-size: 0.75rem;
+}
+.req__more[open] > summary::after {
+  content: '▴';
+}
+.req__more > summary:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+.req__more-body {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: 0.3rem;
+}
+.req__secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.req__reply {
   padding-top: 0.8rem;
   border-top: 1px dashed var(--line);
   display: flex;
@@ -200,16 +488,49 @@ body {
   color: var(--ink);
 }
 
-.req__actions {
-  margin-top: 0.9rem;
+.req__edit {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.6rem;
+  align-items: end;
+  padding-top: 0.8rem;
+  border-top: 1px dashed var(--line);
+}
+.req__edit label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  flex: 1 1 140px;
+}
+
+.req__note-row {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 0.4rem 0.6rem;
+}
+.req__note-label {
+  flex: 1 1 100%;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
 }
 .req__note {
   flex: 1 1 220px;
   min-width: 0;
+}
+/* Autosave feedback, deliberately quiet: the note is a scratchpad and a save
+   confirmation for one should not read like a decision was recorded. */
+.req__note-state {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  min-width: 5rem;
+}
+.req__note-state.is-ok {
+  color: var(--green);
+}
+.req__note-state.is-err {
+  color: var(--red);
 }
 
 /* ---------- Controls ---------- */
@@ -245,6 +566,8 @@ body {
 }
 
 input[type='text'],
+input[type='search'],
+input[type='number'],
 input[type='date'] {
   min-height: 44px;
   width: 100%;
@@ -277,9 +600,13 @@ input:focus-visible,
   gap: 0.3rem;
   font-size: 0.85rem;
   color: var(--ink-muted);
+  flex: 1 1 140px;
 }
 .mgr-block__label {
   flex: 1 1 200px;
+}
+.mgr-block button {
+  flex: 1 1 100%;
 }
 
 @media (max-width: 540px) {
