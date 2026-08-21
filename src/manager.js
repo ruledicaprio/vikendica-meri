@@ -215,7 +215,7 @@ function renderSummary(s) {
         s.oldestPendingDays === null
           ? 'sve riješeno'
           : `najstariji čeka ${daysLabel(s.oldestPendingDays)}`,
-      tone: s.conflicts ? 'red' : s.pending ? 'amber' : '',
+      tone: s.conflicts ? 'red' : s.pending ? 'brown' : '',
     }),
     statHtml({
       value: arrival,
@@ -229,7 +229,7 @@ function renderSummary(s) {
       value: String(s.nights30),
       label: `Noći / ${HORIZON_DAYS} dana`,
       sub: `od mogućih ${HORIZON_DAYS}`,
-      tone: '',
+      tone: s.nights30 ? 'blue' : '',
     }),
     statHtml({
       value: s.inHouse ? s.inHouse.name : 'prazno',

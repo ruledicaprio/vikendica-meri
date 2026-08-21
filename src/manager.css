@@ -6,19 +6,28 @@
 :root {
   /* Declared so native date pickers render light chrome to match the form. */
   color-scheme: light;
-  --bg: #f4f2ee;
-  --surface: #ffffff;
-  --line: rgba(20, 26, 38, 0.14);
-  --ink: #161c28;
-  --ink-muted: rgba(22, 28, 40, 0.62);
+  /* A warm greige ground rather than near-white. The cards are the working
+     surface and need to lift off the page; against #f4f2ee they barely did. */
+  --bg: #e3ded3;
+  --surface: #faf8f4;
+  --line: rgba(48, 42, 32, 0.16);
+  --ink: #221f1a;
+  --ink-muted: rgba(34, 31, 26, 0.62);
   /* Each status has a text/border tone and a fill: the fills are too pale to
-     read as text, and the text tones too dark to sit behind it. */
-  --amber: #946117;
-  --amber-soft: rgba(212, 148, 58, 0.14);
-  --green: #1f7a4d;
-  --green-soft: rgba(31, 122, 77, 0.12);
-  --red: #b3312c;
-  --red-soft: rgba(179, 49, 44, 0.1);
+     read as text, and the text tones too dark to sit behind it. The text tones
+     stay dark enough to clear 4.5:1 on --surface — "lighter" is the hue, not
+     the contrast. */
+  --brown: #8a6224;
+  --brown-soft: rgba(168, 124, 58, 0.16);
+  --green: #2f7350;
+  --green-soft: rgba(70, 130, 95, 0.15);
+  --blue: #35657f;
+  --blue-soft: rgba(70, 120, 150, 0.14);
+  /* Kept distinct from the trio on purpose: a double booking has to read as a
+     warning, so it is the one tone that is not part of the theme. Warmed to a
+     brick so it sits with the browns instead of shouting over them. */
+  --red: #a4443a;
+  --red-soft: rgba(164, 68, 58, 0.12);
   /* Height of the sticky bar, so the sticky rail can clear it. */
   --bar-h: 4.5rem;
 }
@@ -54,8 +63,8 @@ body {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--amber);
-  border: 1px solid var(--amber);
+  color: var(--blue);
+  border: 1px solid var(--blue);
   border-radius: 999px;
   padding: 0.15rem 0.6rem;
 }
@@ -152,12 +161,18 @@ body {
   color: var(--ink-muted);
   overflow-wrap: anywhere;
 }
-.mgr-stat.is-amber {
-  border-left-color: var(--amber);
-  background: linear-gradient(var(--amber-soft), var(--amber-soft)), var(--surface);
+.mgr-stat.is-brown {
+  border-left-color: var(--brown);
+  background: linear-gradient(var(--brown-soft), var(--brown-soft)), var(--surface);
 }
-.mgr-stat.is-amber .mgr-stat__value {
-  color: var(--amber);
+.mgr-stat.is-brown .mgr-stat__value {
+  color: var(--brown);
+}
+.mgr-stat.is-blue {
+  border-left-color: var(--blue);
+}
+.mgr-stat.is-blue .mgr-stat__value {
+  color: var(--blue);
 }
 .mgr-stat.is-green {
   border-left-color: var(--green);
@@ -220,7 +235,7 @@ body {
 }
 .mgr-pill {
   font-size: 0.8rem;
-  background: rgba(20, 26, 38, 0.06);
+  background: rgba(48, 42, 32, 0.08);
   border-radius: 999px;
   padding: 0.1rem 0.55rem;
   color: var(--ink);
@@ -304,13 +319,13 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 .mgr-chip[aria-pressed='true'] {
-  border-color: var(--amber);
-  background: var(--amber-soft);
-  color: var(--amber);
+  border-color: var(--blue);
+  background: var(--blue-soft);
+  color: var(--blue);
   font-weight: 600;
 }
 .mgr-chip:focus-visible {
-  outline: 2px solid var(--amber);
+  outline: 2px solid var(--blue);
   outline-offset: 2px;
 }
 
@@ -327,10 +342,10 @@ body {
   border-color: var(--red);
 }
 .req.is-stale {
-  border-left: 3px solid var(--amber);
+  border-left: 3px solid var(--brown);
 }
 .req--block {
-  background: linear-gradient(var(--amber-soft), var(--amber-soft)), var(--surface);
+  background: linear-gradient(var(--brown-soft), var(--brown-soft)), var(--surface);
 }
 .req__head {
   display: flex;
@@ -361,16 +376,16 @@ body {
   color: var(--ink-muted);
 }
 .req__badge--manual {
-  border-color: var(--amber);
-  color: var(--amber);
+  border-color: var(--brown);
+  color: var(--brown);
 }
 .req__status {
   margin-left: auto;
 }
 .req__status.is-pending {
-  border-color: var(--amber);
-  background: var(--amber-soft);
-  color: var(--amber);
+  border-color: var(--brown);
+  background: var(--brown-soft);
+  color: var(--brown);
 }
 .req__status.is-confirmed {
   border-color: var(--green);
@@ -449,7 +464,7 @@ body {
   content: '▴';
 }
 .req__more > summary:focus-visible {
-  outline: 2px solid var(--amber);
+  outline: 2px solid var(--blue);
   outline-offset: 2px;
 }
 .req__more-body {
@@ -483,8 +498,8 @@ body {
   /* An <a> styled as .mgr-btn: the button rules assume a form control, and a
      link brings its own underline and inherits the anchor colour. */
   text-decoration: none;
-  border-color: var(--amber);
-  background: var(--amber-soft);
+  border-color: var(--brown);
+  background: var(--brown-soft);
   color: var(--ink);
 }
 
@@ -581,7 +596,7 @@ input[type='date'] {
 }
 input:focus-visible,
 .mgr-btn:focus-visible {
-  outline: 2px solid var(--amber);
+  outline: 2px solid var(--blue);
   outline-offset: 2px;
 }
 
