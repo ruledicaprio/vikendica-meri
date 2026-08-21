@@ -15,36 +15,60 @@
     <header class="mgr-bar">
       <span class="mgr-logo">Vikendica Meri</span>
       <span class="mgr-tag">Manager</span>
+      <!-- Transient feedback only. The counts live in the summary strip, so a
+           page load no longer announces anything to a screen reader. -->
+      <p class="mgr-status" id="status" role="status" aria-live="polite"></p>
       <button class="mgr-btn mgr-btn--ghost" id="refresh" type="button">Osvježi</button>
     </header>
 
     <main class="mgr-wrap">
-      <p class="mgr-status" id="status" role="status" aria-live="polite">Učitavanje…</p>
+      <!-- Full width, above both columns: a double booking is the one thing
+           worth interrupting whatever else the page is showing. -->
+      <div id="alert"></div>
 
-      <section class="mgr-section">
-        <h2>Zahtjevi na čekanju <span class="mgr-pill" id="count-pending">0</span></h2>
-        <div class="mgr-list" id="list-pending"></div>
-      </section>
+      <!-- Before .mgr-main in the DOM so the summary is the first thing on a
+           phone; the desktop grid places it in the right rail. -->
+      <aside class="mgr-rail">
+        <section class="mgr-summary" id="summary" aria-label="Pregled"></section>
 
-      <section class="mgr-section">
-        <h2>Potvrđeno <span class="mgr-pill" id="count-confirmed">0</span></h2>
-        <div class="mgr-list" id="list-confirmed"></div>
-      </section>
+        <section class="mgr-section">
+          <h2>Blokiraj termin</h2>
+          <form class="mgr-block" id="block-form">
+            <label>Od <input type="date" name="checkin" required /></label>
+            <label>Do <input type="date" name="checkout" required /></label>
+            <label class="mgr-block__label">Opis <input type="text" name="label" placeholder="npr. Vlastito korištenje" /></label>
+            <label class="mgr-block__label">Bilješka <input type="text" name="note" placeholder="neobavezno" /></label>
+            <button class="mgr-btn" type="submit">Blokiraj</button>
+          </form>
+        </section>
+      </aside>
 
-      <section class="mgr-section">
-        <h2>Blokiraj termin</h2>
-        <form class="mgr-block" id="block-form">
-          <label>Od <input type="date" name="checkin" required /></label>
-          <label>Do <input type="date" name="checkout" required /></label>
-          <label class="mgr-block__label">Opis <input type="text" name="label" placeholder="npr. Vlastito korištenje" /></label>
-          <button class="mgr-btn" type="submit">Blokiraj</button>
-        </form>
-      </section>
+      <div class="mgr-main">
+        <section class="mgr-section">
+          <h2>Zahtjevi na čekanju <span class="mgr-pill" id="count-pending">0</span></h2>
+          <div class="mgr-list" id="list-pending"></div>
+        </section>
 
-      <section class="mgr-section">
-        <h2>Arhiva <span class="mgr-pill" id="count-archive">0</span></h2>
-        <div class="mgr-list" id="list-archive"></div>
-      </section>
+        <section class="mgr-section">
+          <h2>Potvrđeno <span class="mgr-pill" id="count-confirmed">0</span></h2>
+          <div class="mgr-groups" id="list-confirmed"></div>
+        </section>
+
+        <section class="mgr-section">
+          <details class="mgr-archive" id="archive">
+            <summary><h2>Arhiva <span class="mgr-pill" id="count-archive">0</span></h2></summary>
+            <div class="mgr-filters">
+              <input type="search" id="archive-q" placeholder="Traži po imenu, mailu, poruci…" aria-label="Pretraži arhivu" />
+              <div class="mgr-chips" id="archive-chips" role="group" aria-label="Filter po statusu">
+                <button class="mgr-chip" type="button" data-chip="declined" aria-pressed="false">Odbijeno</button>
+                <button class="mgr-chip" type="button" data-chip="cancelled" aria-pressed="false">Otkazano</button>
+                <button class="mgr-chip" type="button" data-chip="past" aria-pressed="false">Prošlo</button>
+              </div>
+            </div>
+            <div class="mgr-list" id="list-archive"></div>
+          </details>
+        </section>
+      </div>
     </main>
 
     <script type="module" src="/src/manager.js"></script>

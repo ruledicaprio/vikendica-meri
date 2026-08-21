@@ -426,6 +426,31 @@ async function updateRequest(request, env, id) {
     sets.push('owner_note = ?');
     args.push(trim(body.owner_note, LIMITS.message) || null);
   }
+
+  // Dates move as a pair or not at all. The column pair is either two dates or
+  // two nulls — a row with one half of a range would be counted as dateless by
+  // the panel but matched by the availability query's `checkin IS NOT NULL`.
+  if (body.checkin !== undefined || body.checkout !== undefined) {
+    const checkin = trim(body.checkin, 10);
+    const checkout = trim(body.checkout, 10);
+    if (checkin && checkout) {
+      // Deliberately not applying the public form's `dates_past` rule: the owner
+      // legitimately corrects a date on a stay that has already happened.
+      if (!isValidYmd(checkin) || !isValidYmd(checkout)) return json({ error: 'dates_invalid' }, 400);
+      if (checkout <= checkin) return json({ error: 'dates_order' }, 400);
+    } else if (checkin || checkout) {
+      return json({ error: 'dates_incomplete' }, 400);
+    }
+    sets.push('checkin = ?', 'checkout = ?');
+    args.push(checkin || null, checkout || null);
+  }
+
+  if (body.guests !== undefined) {
+    const guests = Number.parseInt(body.guests, 10);
+    sets.push('guests = ?');
+    args.push(Number.isFinite(guests) && guests >= 1 && guests <= 10 ? guests : null);
+  }
+
   if (!sets.length) return json({ error: 'nothing_to_update' }, 400);
 
   sets.push('updated_at = ?');
