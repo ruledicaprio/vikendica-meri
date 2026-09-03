@@ -78,7 +78,7 @@ Za objekat koji je već na Airbnb-u/Booking-u i treba mu vlastita, ozbiljna adre
 
 **Obim prilagodbe: ~70 sati · Rok: 3–4 sedmice**
 
-### **3.400 € · 6.650 KM**
+### **2.250 € · 4.400 KM**
 
 ---
 
@@ -99,10 +99,10 @@ Sve iz Paketa 1, plus ono što stranicu pretvara iz brošure u kanal prodaje:
 
 **Obim prilagodbe: ~132 sata · Rok: 5–7 sedmica**
 
-### **6.800 € · 13.300 KM**
+### **4.400 € · 8.600 KM**
 
-> **Opcija:** bez 3D scene (hero od videa/fotografije) — **−1.400 € / −2.740 KM**
-> → **5.400 € · 10.560 KM**
+> **Opcija:** bez 3D scene (hero od videa/fotografije) — **−750 € / −1.470 KM**
+> → **3.650 € · 7.140 KM**
 
 ---
 
@@ -112,7 +112,7 @@ Sve iz Paketa 2, plus svi moduli iz tačke 4, uz **10 % popusta na module**.
 
 **Obim prilagodbe: ~234 sata · Rok: 9–11 sedmica**
 
-### **10.400 € · 20.340 KM**
+### **6.700 € · 13.100 KM**
 
 ---
 
@@ -122,14 +122,14 @@ Mogu se dokupiti uz Paket 2 u bilo kojem trenutku, prije ili poslije primopredaj
 
 | Modul | Šta rješava | Sati | Cijena |
 | :--- | :--- | ---: | ---: |
-| **Sinhronizacija s Airbnb / Booking.com** | Dvosmjerni iCal: njihove rezervacije zatvaraju vaš kalendar, vaše zatvaraju njihov. Kraj dvostrukim rezervacijama. *Tabela u bazi je već pripremljena za ovo.* | 28 | **1.120 € · 2.190 KM** |
-| **Automatski e-mail gostu** | Potvrda i odgovor idu gostu sa `@vasadomena.com`, s ispravnim SPF/DKIM/DMARC zapisima da ne padnu u spam | 14 | **560 € · 1.095 KM** |
-| **Sezonski cjenovnik** | Cijene po sezoni/danu u sedmici/broju noći, s izračunom ukupne cijene odmah u formi | 20 | **800 € · 1.565 KM** |
-| **Online uplata akontacije** | Plaćanje karticom (Stripe), potvrda rezervacije tek nakon uplate | 24 | **960 € · 1.880 KM** |
-| **Analitika + kolačići** | Analitika koja poštuje privatnost, banner za saglasnost, usklađenost s GDPR-om | 10 | **400 € · 780 KM** |
-| **Pravne stranice** | Politika privatnosti, uslovi korištenja, kućni red — na oba jezika | 6 | **240 € · 470 KM** |
-| **Dodatni jezik** | npr. njemački ili nizozemski — 402 ključa, prijevod i provjera | 12 | **480 € · 940 KM** |
-| **Google Business Profile** | Postavljanje i optimizacija, povezivanje sa stranicom | 6 | **240 € · 470 KM** |
+| **Sinhronizacija s Airbnb / Booking.com** | Dvosmjerni iCal: njihove rezervacije zatvaraju vaš kalendar, vaše zatvaraju njihov. Kraj dvostrukim rezervacijama. *Tabela u bazi je već pripremljena za ovo.* | 28 | **700 € · 1.370 KM** |
+| **Automatski e-mail gostu** | Potvrda i odgovor idu gostu sa `@vasadomena.com`, s ispravnim SPF/DKIM/DMARC zapisima da ne padnu u spam | 14 | **350 € · 685 KM** |
+| **Sezonski cjenovnik** | Cijene po sezoni/danu u sedmici/broju noći, s izračunom ukupne cijene odmah u formi | 20 | **500 € · 980 KM** |
+| **Online uplata akontacije** | Plaćanje karticom (Stripe), potvrda rezervacije tek nakon uplate | 24 | **600 € · 1.175 KM** |
+| **Analitika + kolačići** | Analitika koja poštuje privatnost, banner za saglasnost, usklađenost s GDPR-om | 10 | **250 € · 490 KM** |
+| **Pravne stranice** | Politika privatnosti, uslovi korištenja, kućni red — na oba jezika | 6 | **150 € · 295 KM** |
+| **Dodatni jezik** | npr. njemački ili nizozemski — 402 ključa, prijevod i provjera | 12 | **300 € · 585 KM** |
+| **Google Business Profile** | Postavljanje i optimizacija, povezivanje sa stranicom | 6 | **150 € · 295 KM** |
 
 **Nije uključeno u cijenu, ali mogu organizovati:** profesionalno fotografisanje i
 snimanje dronom (podizvođač, **400–800 €**, fakturiše se po stvarnom trošku).
@@ -158,8 +158,8 @@ nove cijene za sezonu. Zato održavanje nudim odvojeno od izrade.
 | | **M0 — Samostalno** | **M1 — Osnovno** | **M2 — Aktivno** ⭐ | **M3 — Partner** |
 | :--- | :---: | :---: | :---: | :---: |
 | | *vi držite račune* | | *preporučeno* | *za 2+ objekta* |
-| **Mjesečno** | **0 €** | **65 € · 127 KM** | **120 € · 235 KM** | **250 € · 489 KM** |
-| **Godišnje (−10 %)** | — | **702 € · 1.373 KM** | **1.296 € · 2.535 KM** | **2.700 € · 5.281 KM** |
+| **Mjesečno** | **0 €** | **30 € · 59 KM** | **80 € · 157 KM** | **165 € · 323 KM** |
+| **Godišnje (−10 %)** | — | **486 € · 950 KM** | **864 € · 1.690 KM** | **1.782 € · 3.485 KM** |
 | Administracija domene, DNS-a, Cloudflarea | vi | ✅ | ✅ | ✅ |
 | Infrastruktura plaćena i uključena | vi | ✅ | ✅ | ✅ |
 | Nadzor dostupnosti (uptime) | — | ✅ | ✅ | ✅ |
@@ -174,8 +174,8 @@ nove cijene za sezonu. Zato održavanje nudim odvojeno od izrade.
 | Razvoj novih funkcija | po satu | po satu | po satu | 5 h/mj uključeno |
 | **Vrijeme odziva** | po dogovoru | 3 radna dana | 1 radni dan | isti radni dan |
 
-**Rad izvan paketa:** 45 € / 88 KM po satu.
-Hitne intervencije, vikendom i van radnog vremena: 65 € / 127 KM po satu.
+**Rad izvan paketa:** 30 € / 59 KM po satu.
+Hitne intervencije, vikendom i van radnog vremena: 42 € / 82 KM po satu.
 
 Neiskorišteni sati se ne prenose u naredni mjesec. Ugovor o održavanju je na 12
 mjeseci, s otkaznim rokom od 30 dana.
@@ -253,7 +253,7 @@ pomjera rok isporuke za isto vrijeme.
   identitetom.
 
 **Isključivost za regiju** (obaveza da isto rješenje ne prodam drugom objektu na
-Vlašiću / u vašoj opštini, na 3 godine): **+6.000 € · 11.735 KM**.
+Vlašiću / u vašoj opštini, na 3 godine): **+4.000 € · 7.825 KM**.
 
 ---
 
