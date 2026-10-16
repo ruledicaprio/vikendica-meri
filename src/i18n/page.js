@@ -145,9 +145,9 @@ export const bs = {
   faqQ5: 'Koliko je najmanji boravak?',
   faqA5:
     'Tri noći.',
-  faqQ6: 'Kako se plaća i treba li depozit?',
+  faqQ6: 'Kako se plaća i treba li avans?',
   faqA6:
-    'Gotovinom, bankovnim transferom ili PayPalom. Depozit tražimo samo za termine oko Nove godine i u januaru.',
+    'Gotovinom, bankovnim transferom ili PayPalom. Rezervacija se potvrđuje uplatom avansa od 30% ukupnog iznosa.',
   faqQ7: 'Šta je uključeno u cijenu?',
   faqA7: 'Posteljina, pelet za grijanje i završno čišćenje.',
   faqQ8: 'Koliko je do Travnika i do sarajevskog aerodroma?',
@@ -162,6 +162,7 @@ export const bs = {
   contactWhatsappAria: 'Pošaljite WhatsApp poruku na +387 61 833 834',
   contactViberAria: 'Pošaljite Viber poruku na +387 61 833 834',
   contactNote: '🕑 Minimalni boravak: 3 noći',
+  contactDeposit: '💳 Avans 30% za potvrdu rezervacije',
   // Also stated as checkinTime/checkoutTime in the JSON-LD; the two must agree.
   contactCheckin: '🕓 Prijava od 14:00 · Odjava do 11:00',
   mapTitle: 'Lokacija — Vikendica Meri',
@@ -319,7 +320,7 @@ export const en = {
     'Three nights.',
   faqQ6: 'How do I pay, and is a deposit required?',
   faqA6:
-    'Cash, bank transfer or PayPal. We ask for a deposit only for dates around New Year and in January.',
+    'Cash, bank transfer or PayPal. A 30% deposit, paid in advance, confirms the booking.',
   faqQ7: 'What is included in the price?',
   faqA7: 'Bedding, heating pellets and the final cleaning.',
   faqQ8: 'How far is Travnik, and Sarajevo airport?',
@@ -334,6 +335,7 @@ export const en = {
   contactWhatsappAria: 'Message +387 61 833 834 on WhatsApp',
   contactViberAria: 'Message +387 61 833 834 on Viber',
   contactNote: '🕑 Minimum stay: 3 nights',
+  contactDeposit: '💳 30% deposit to confirm the booking',
   contactCheckin: '🕓 Check-in from 14:00 · Check-out by 11:00',
   mapTitle: 'Location — Vikendica Meri',
   mapButton: 'Open in Google Maps',
