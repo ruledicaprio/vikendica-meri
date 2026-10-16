@@ -51,8 +51,6 @@ export const bs = {
   factCapacity: '🛏️ Kapacitet ~10 osoba',
   factHeating: '🔥 Centralno grijanje',
   factLocation: '📍 Babanovac · 200 m od hotela Blanca',
-  // Also stated as priceRange/makesOffer in the JSON-LD; the two must agree.
-  factPrice: '💰 100–200 KM / noć',
 
   floorsSubhead: 'Raspored po etažama',
   floorGround: 'Prizemlje',
@@ -146,7 +144,7 @@ export const bs = {
     'Centralno grijanje na pelet. Pelet je uključen u cijenu, a u kući vas čekaju kratke upute za potpalu i održavanje.',
   faqQ5: 'Koliko je najmanji boravak?',
   faqA5:
-    'Tri noći. Oko Nove godine cijena je 50 do 75 posto viša nego u ostatku sezone.',
+    'Tri noći.',
   faqQ6: 'Kako se plaća i treba li depozit?',
   faqA6:
     'Gotovinom, bankovnim transferom ili PayPalom. Depozit tražimo samo za termine oko Nove godine i u januaru.',
@@ -232,7 +230,6 @@ export const en = {
   factCapacity: '🛏️ Sleeps around 10',
   factHeating: '🔥 Central heating',
   factLocation: '📍 Babanovac · 200 m from Hotel Blanca',
-  factPrice: '💰 100–200 KM / night',
 
   floorsSubhead: 'Floor by floor',
   floorGround: 'Ground floor',
@@ -319,7 +316,7 @@ export const en = {
     'Pellet central heating. The pellets are included in the price, and short instructions for lighting and upkeep are waiting for you in the house.',
   faqQ5: 'What is the minimum stay?',
   faqA5:
-    'Three nights. Around New Year the price is 50 to 75 percent higher than the rest of the season.',
+    'Three nights.',
   faqQ6: 'How do I pay, and is a deposit required?',
   faqA6:
     'Cash, bank transfer or PayPal. We ask for a deposit only for dates around New Year and in January.',
