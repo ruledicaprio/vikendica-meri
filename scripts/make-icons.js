@@ -2,7 +2,9 @@
 // Generate the favicon/PWA icon set from public/favicon.svg, and the social-share
 // card from a photo in public/eksterijer/. Both land in public/ so Vite copies
 // them verbatim into dist/. Usage:
-//   node scripts/make-icons.js [--photo=public/eksterijer/00-vikendica-prednja-strana.jpg] [--force]
+//   node scripts/make-icons.js [--photo=public/eksterijer/00-vikendica-prednja-strana.jpg] [--top=0.19] [--force]
+// --top is where the crop band starts, as a fraction of the photo's height.
+// Without it the band hugs the top edge (north gravity).
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -19,12 +21,30 @@ const PNG_ICONS = [
 ];
 
 function parseArgs(argv) {
-  const flags = { photo: DEFAULT_PHOTO, force: false };
+  const flags = { photo: DEFAULT_PHOTO, force: false, top: null };
   for (const arg of argv) {
     if (arg === '--force') flags.force = true;
     else if (arg.startsWith('--photo=')) flags.photo = arg.slice(8);
+    else if (arg.startsWith('--top=')) flags.top = Number(arg.slice(6));
+  }
+  if (flags.top !== null && !(flags.top >= 0 && flags.top < 1)) {
+    console.error(`--top must be a fraction in [0, 1), got ${flags.top}`);
+    process.exit(1);
   }
   return flags;
+}
+
+// Crop a landscape band out of a (portrait) photo and resize it to w×h.
+// North gravity by default; with `top` the band starts at that fraction of the
+// height instead — the winter night photo is mostly black sky above the roof,
+// so a north crop of it shows sky and a roof tip.
+async function band(photo, w, h, top) {
+  const img = sharp(photo).rotate();
+  if (top === null) return img.resize(w, h, { fit: 'cover', position: sharp.gravity.north });
+  const { width, height } = await sharp(photo).rotate().metadata();
+  const bandH = Math.min(height, Math.round((width * h) / w));
+  const y = Math.min(Math.round(top * height), height - bandH);
+  return img.extract({ left: 0, top: y, width, height: bandH }).resize(w, h);
 }
 
 async function write(dest, buffer, force) {
@@ -83,20 +103,16 @@ async function main() {
     console.error(`Photo not found: ${flags.photo}`);
     process.exit(1);
   }
-  const og = await sharp(flags.photo)
-    .rotate()
-    .resize(1200, 630, { fit: 'cover', position: sharp.gravity.north })
+  const og = await (await band(flags.photo, 1200, 630, flags.top))
     .jpeg({ quality: 82, mozjpeg: true })
     .toBuffer();
   await write(path.join(PUBLIC, 'og-image.jpg'), og, flags.force);
 
   // Hero poster. Paints instantly while the Three.js scene loads in the
   // background, and stays as the final hero for reduced-motion and data-saver
-  // visitors, who never download the 3D bundle at all. Same north crop as the
-  // OG card, for the same reason.
-  const poster = await sharp(flags.photo)
-    .rotate()
-    .resize(1600, 900, { fit: 'cover', position: sharp.gravity.north })
+  // visitors, who never download the 3D bundle at all. Same crop as the OG
+  // card, for the same reason.
+  const poster = await (await band(flags.photo, 1600, 900, flags.top))
     .jpeg({ quality: 78, mozjpeg: true })
     .toBuffer();
   await write(path.join(PUBLIC, 'hero-poster.jpg'), poster, flags.force);
