@@ -105,14 +105,14 @@ export const bs = {
   destTravnikMuseum: 'Muzej Travnik ↗',
 
   // Location prose. Every number here traces to something the owner stated on
-  // 2026-08-19/20 — lift distance, ski-in route, drive times. Nothing invented
+  // 2026-08-19/20 or later — lift proximity, ski-in route, drive times. Nothing invented
   // to pad it out; the summer block is short because there is less confirmed
   // material for it, not because it matters less.
   locKicker: 'Lokacija',
   locTitle: 'Vlašić kroz godinu',
   locWinterTitle: 'Zimi',
   locWinterBody:
-    'Ski-liftovi Babanovac I i II su oko 500 metara od vrata — pet minuta pješke preko platoa, sa skijama na ramenu. Nazad se može i na skijama: staza Markovac spušta se prema naselju, oko dva kilometra do kuće. Vikendica ima centralno grijanje na pelet, uključeno u cijenu, pa se poslije dana na snijegu vraćate u već toplu kuću.',
+    'Sve je na dohvat ruke: ski-liftovi Babanovac I i II su par minuta pješke preko platoa, a hotel Blanca 200 metara od kuće. Nazad se može i na skijama: staza Markovac spušta se prema naselju, oko dva kilometra do kuće. Vikendica ima centralno grijanje na pelet, uključeno u cijenu, pa se poslije dana na snijegu vraćate u već toplu kuću.',
   locSummerTitle: 'Ljeti',
   locSummerBody:
     'Dolina Panjeva je mirna strana Babanovca — borova šuma, pašnjaci i zrak zbog kojeg se na Vlašić i dolazi. Dvorište sa roštiljem gleda u šumu, a plato počinje nadomak kuće. Unutra ima mjesta za deset osoba na tri etaže, dovoljno za dvije porodice ili veće društvo.',
@@ -131,9 +131,9 @@ export const bs = {
   // the structured data cannot drift.
   faqKicker: 'Česta pitanja',
   faqTitle: 'Prije nego rezervišete',
-  faqQ1: 'Koliko je vikendica udaljena od ski-lifta?',
+  faqQ1: 'Šta je u blizini vikendice?',
   faqA1:
-    'Ski-liftovi Babanovac I i II udaljeni su oko 500 metara — pet minuta pješke preko platoa. Do vikendice se može doći i na skijama, sa staze Markovac, oko dva kilometra.',
+    'Sve što treba za odmor je blizu: ski-liftovi Babanovac I i II su par minuta pješke preko platoa, hotel Blanca 200 metara, a sa staze Markovac do vikendice se može i na skijama. Travnik je oko pola sata vožnje.',
   faqQ2: 'Ima li parkinga?',
   faqA2:
     'Ispred kuće su garantovana tri parking mjesta, na otvorenom.',
@@ -289,7 +289,7 @@ export const en = {
   locTitle: 'Vlašić through the year',
   locWinterTitle: 'In winter',
   locWinterBody:
-    'The Babanovac I and II lifts are about 500 metres from the door — five minutes on foot across the plateau, skis on your shoulder. You can come back on them too: the Markovac piste runs down towards the village, about two kilometres to the house. Pellet central heating is included, so after a day in the snow you come back to a house that is already warm.',
+    'Everything is within easy reach: the Babanovac I and II lifts are a few minutes on foot across the plateau, and Hotel Blanca is 200 metres from the house. You can come back on them too: the Markovac piste runs down towards the village, about two kilometres to the house. Pellet central heating is included, so after a day in the snow you come back to a house that is already warm.',
   locSummerTitle: 'In summer',
   locSummerBody:
     'Dolina Panjeva is the quiet side of Babanovac — pine forest, pasture, and the air people come to Vlašić for. The yard and its grill look into the trees, and the plateau starts a short walk from the door. Inside there is room for ten across three floors, enough for two families or a large group.',
@@ -304,9 +304,9 @@ export const en = {
   // See the Bosnian block above for where these facts come from.
   faqKicker: 'Frequently asked',
   faqTitle: 'Before you book',
-  faqQ1: 'How far is the chalet from the ski lift?',
+  faqQ1: 'What is near the chalet?',
   faqA1:
-    'The Babanovac I and II lifts are about 500 metres away — a five minute walk across the plateau. You can also ski to the door from the Markovac piste, about two kilometres.',
+    'Everything you need is close by: the Babanovac I and II lifts are a few minutes on foot across the plateau, Hotel Blanca is 200 metres away, and you can ski back to the door from the Markovac piste. Travnik is about half an hour by car.',
   faqQ2: 'Is there parking?',
   faqA2:
     'There are three guaranteed open-air parking spaces in front of the house.',
