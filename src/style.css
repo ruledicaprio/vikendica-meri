@@ -966,8 +966,8 @@ picture {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.4rem 0.8rem;
   margin-bottom: 0.8rem;
 }
 .cal__month-head .cal__month-title {
