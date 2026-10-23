@@ -146,7 +146,7 @@ export function initCalendar(container) {
         const { openCalShare } = await import('./cal-share.js');
         openCalShare(year, month);
       });
-      wrap.appendChild(expand);
+      title.after(expand);
     }
     return wrap;
   }

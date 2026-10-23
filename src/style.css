@@ -960,10 +960,10 @@ picture {
 .cal__legend-dot--sel {
   background: var(--cream);
 }
-/* Opens the full-screen, shareable month (cal-share.js); one under each month. */
+/* Opens the full-screen, shareable month (cal-share.js); one under each month's title. */
 .cal__expand {
   display: block;
-  margin: 1rem auto 0;
+  margin: 0 auto 0.9rem;
   min-height: 44px;
   padding: 0.45rem 0.9rem;
   border: 1px solid var(--line);
