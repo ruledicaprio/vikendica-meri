@@ -9,10 +9,10 @@ export const bs = {
   ogLocale: 'bs_BA',
   path: '/',
 
-  title: 'Vikendica Meri — A-frame vikendica na Vlašiću, Babanovac',
+  title: 'Vikendica Meri — planinska vikendica na Vlašiću, Babanovac',
   description:
     'Vikendica Meri — klasična A-frame planinska vikendica u Dolini Panjeva, Babanovac, Vlašić. Smještaj za ~10 osoba, blizu ski-centra i grada Travnika.',
-  ogTitle: 'Vikendica Meri — A-frame vikendica na Vlašiću, Babanovac',
+  ogTitle: 'Vikendica Meri — planinska vikendica na Vlašiću, Babanovac',
   ogDescription:
     'Klasična A-frame planinska vikendica u Dolini Panjeva na Babanovcu. Smještaj za do 10 osoba, blizu ski-centra Vlašić.',
   ogImageAlt: 'A-frame vikendica Meri zimi, pod snijegom, Babanovac, Vlašić',
@@ -34,8 +34,8 @@ export const bs = {
   langSwitchLabel: 'English',
   langSwitchAria: 'Switch to English',
 
-  heroSubtitle: 'Planina Vlašić · Babanovac',
-  heroLocation: 'Dolina Panjeva · Babanovac · Vlašić',
+  heroSubtitle: 'Planina Vlašić',
+  heroLocation: 'Dolina Panjeva · Babanovac',
   heroCtaPrimary: 'Pogledaj smještaj',
   heroCtaSecondary: 'Provjeri dostupnost',
   scrollHint: 'Istraži ↓',
@@ -187,10 +187,10 @@ export const en = {
   ogLocale: 'en_US',
   path: '/en/',
 
-  title: 'Vikendica Meri — A-frame chalet on Vlašić mountain, Babanovac',
+  title: 'Vikendica Meri — mountain chalet on Vlašić, Babanovac',
   description:
     'Vikendica Meri — a classic A-frame mountain chalet in Dolina Panjeva, Babanovac, Vlašić. Sleeps around 10, close to the ski centre and the town of Travnik.',
-  ogTitle: 'Vikendica Meri — A-frame chalet on Vlašić mountain, Babanovac',
+  ogTitle: 'Vikendica Meri — mountain chalet on Vlašić, Babanovac',
   ogDescription:
     'A classic A-frame mountain chalet in Dolina Panjeva, Babanovac. Sleeps up to 10, close to the Vlašić ski centre.',
   ogImageAlt: 'Vikendica Meri A-frame chalet in winter, under snow, Babanovac, Vlašić',
@@ -212,8 +212,8 @@ export const en = {
   langSwitchLabel: 'Bosanski',
   langSwitchAria: 'Prebaci na bosanski',
 
-  heroSubtitle: 'Vlašić mountain · Babanovac',
-  heroLocation: 'Dolina Panjeva · Babanovac · Vlašić',
+  heroSubtitle: 'Vlašić mountain',
+  heroLocation: 'Dolina Panjeva · Babanovac',
   heroCtaPrimary: 'See the chalet',
   heroCtaSecondary: 'Check availability',
   scrollHint: 'Explore ↓',

@@ -963,6 +963,7 @@ picture {
 /* Opens the full-screen, shareable month (cal-share.js). */
 .cal__expand {
   margin-left: auto;
+  min-height: 44px;
   padding: 0.45rem 0.9rem;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -1881,7 +1882,9 @@ summary:focus-visible {
   .floors,
   .dest-grid,
   .contact-grid {
-    grid-template-columns: 1fr;
+    /* minmax(0, …): a bare 1fr track grows to its content's min-content width,
+       which pushed the contact column 13px past a 360px screen. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .amenities {
     grid-template-columns: repeat(2, 1fr);
