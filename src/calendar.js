@@ -202,20 +202,7 @@ export function initCalendar(container) {
         </div>`;
       root.appendChild(box);
 
-      root.querySelector('#cal-cta').addEventListener('click', () => {
-        // Pre-fill the contact form
-        const fromEl    = document.getElementById('f-from');
-        const toEl      = document.getElementById('f-to');
-        const msgEl     = document.getElementById('f-msg');
-        if (fromEl) fromEl.value = selStart;
-        if (toEl)   toEl.value   = selEnd;
-        if (msgEl && !msgEl.value) {
-          msgEl.value =
-            `Dolazak: ${selStart}\nOdlazak: ${selEnd}\nBroj noći: ${nights}`;
-        }
-        const form = document.getElementById('reserve-form');
-        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      root.querySelector('#cal-cta').addEventListener('click', toForm);
 
       root.querySelector('#cal-clear').addEventListener('click', () => {
         selStart = selEnd = null;
@@ -311,6 +298,26 @@ export function initCalendar(container) {
       }
     }
     renderKeepingFocus(ymd);
+    // A finished range is the whole point of the calendar: take the guest
+    // straight to the form instead of waiting for "Pošalji upit".
+    if (selEnd) toForm();
+  }
+
+  // Copy the selection into the contact form and scroll there. The message is
+  // filled only while it still holds our own text, so re-picking dates updates
+  // it but never overwrites what the guest typed.
+  let autoMsg = '';
+  function toForm() {
+    const fromEl = document.getElementById('f-from');
+    const toEl   = document.getElementById('f-to');
+    const msgEl  = document.getElementById('f-msg');
+    if (fromEl) fromEl.value = selStart;
+    if (toEl)   toEl.value   = selEnd;
+    if (msgEl && (!msgEl.value || msgEl.value === autoMsg)) {
+      autoMsg = `Dolazak: ${selStart}\nOdlazak: ${selEnd}\nBroj noći: ${diffDays(selStart, selEnd)}`;
+      msgEl.value = autoMsg;
+    }
+    document.getElementById('reserve-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   render();

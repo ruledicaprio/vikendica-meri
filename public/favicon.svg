@@ -1,13 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vikendica Meri">
   <rect width="64" height="64" rx="14" fill="#0a0e1a" />
-  <!-- A-frame roof + tie beam: the cabin's silhouette, legible down to 16px -->
-  <path
-    d="M13 53 L32 11 L51 53"
-    fill="none"
-    stroke="#d4943a"
-    stroke-width="6.5"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-  <path d="M21 39 H43" fill="none" stroke="#d4943a" stroke-width="5" stroke-linecap="round" />
+  <!-- The cabin, not the letter A: a roof that runs to the ground, the recessed
+       timber gable inside it, a balcony rail and one lit window. Legible at 16px. -->
+  <path d="M32 7 L57 55 H7 Z" fill="#d4943a" stroke="#d4943a" stroke-width="2" stroke-linejoin="round" />
+  <path d="M32 19 L49 52 H15 Z" fill="#4a2c16" />
+  <path d="M21 41 H43" stroke="#d4943a" stroke-width="3" stroke-linecap="round" />
+  <rect x="27.5" y="29" width="9" height="8" rx="1" fill="#ffd27a" />
+  <rect x="28.5" y="44" width="7" height="8" fill="#ffd27a" opacity="0.85" />
 </svg>

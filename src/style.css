@@ -237,6 +237,9 @@ picture {
   z-index: 1;
   pointer-events: none;
   padding: var(--pad);
+  /* The fixed navbar's height on top: a column taller than the screen is
+     centred upwards and would otherwise slide under the logo. */
+  padding-top: calc(var(--pad) + 4.5rem);
 }
 .hero-overlay__subtitle {
   text-transform: uppercase;
@@ -263,6 +266,14 @@ picture {
   flex-wrap: wrap;
   justify-content: center;
   pointer-events: all;
+}
+/* On a phone this button lands on the lit balcony; a dark fill keeps it legible. */
+.hero-overlay__cta .btn--secondary {
+  background: rgba(10, 14, 26, 0.55);
+  backdrop-filter: blur(4px);
+}
+.hero-overlay__cta .btn--secondary:hover {
+  background: rgba(10, 14, 26, 0.75);
 }
 
 /* ---------- Mini availability calendar (hero) ----------
@@ -435,8 +446,10 @@ picture {
     padding: 0.7rem;
   }
 }
-/* Landscape phones: there is no height left for it under the title. */
-@media (max-height: 560px) {
+/* Landscape phones: there is no height left for it under the title. Portrait
+   phones: it pushed the hero past the screen, so "Provjeri dostupnost" is the
+   way into the calendar there. */
+@media (max-height: 560px), (max-width: 600px) {
   .mini-cal {
     display: none;
   }

@@ -42,8 +42,6 @@ export const bs = {
 
   aboutKicker: 'O vikendici',
   aboutTitle: 'Topli planinski dom sa dušom',
-  aboutP1:
-    'Klasična A-frame vikendica sa strmim drvenim krovom, prostranim balkonima i pogledom na borovu šumu. Generacijama je ovo mjesto okupljanja porodice i prijatelja, gdje miris drveta i toplina peći stvaraju nezaboravan ugođaj.',
   aboutP2Before: 'Smještena u mirnoj Dolini Panjeva na Babanovcu, nudi udoban prostor za',
   aboutP2Strong: 'do 10 osoba',
   aboutP2After:
@@ -222,8 +220,6 @@ export const en = {
 
   aboutKicker: 'About the chalet',
   aboutTitle: 'A warm mountain home with a soul',
-  aboutP1:
-    'A classic A-frame chalet with a steep timber roof, generous balconies and a view over the pine forest. For generations this has been where family and friends gather, where the scent of wood and the warmth of the stove make a stay memorable.',
   aboutP2Before: 'Set in the quiet Dolina Panjeva valley at Babanovac, it offers comfortable space for',
   aboutP2Strong: 'up to 10 people',
   aboutP2After:

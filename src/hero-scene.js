@@ -19,6 +19,10 @@ const C_DIR_SUMMER = new THREE.Color(0xffffee);
 
 const SNOW_MAX = 1400;
 const STAR_MAX = 500;
+// Narrowest aspect that still shows the whole cabin from the default z = 18, and
+// how far up (world units) the camera aims on the narrowest screens.
+const FIT_ASPECT = 0.85;
+const PORTRAIT_LIFT = 13;
 
 // Quality tiers. The sky is a full-screen backside sphere running domain-warped
 // fbm noise per pixel — comfortably the most expensive thing here — so the octave
@@ -88,6 +92,21 @@ export class CabinHeroScene {
     return 'high';
   }
 
+  // The scene is framed for a landscape screen with a fixed vertical FOV, so on a
+  // portrait phone the horizontal view shrinks and the cabin overflows the width.
+  // Below FIT_ASPECT the camera backs off to keep the cabin's width in frame, and
+  // aims higher so the cabin sits under the hero text instead of behind it.
+  // _animate() eases x/y only, so z survives; it re-aims at this.lookY.
+  _fitCamera(w, h) {
+    const aspect = w / h;
+    const narrow = Math.max(0, 1 - aspect / FIT_ASPECT);
+    this.camera.aspect = aspect;
+    this.camera.position.z = 18 * Math.max(1, FIT_ASPECT / aspect);
+    this.lookY = 3 + PORTRAIT_LIFT * narrow;
+    this.camera.lookAt(0, this.lookY, 0);
+    this.camera.updateProjectionMatrix();
+  }
+
   // ----------------------------------------------------------
   //  INIT
   // ----------------------------------------------------------
@@ -97,7 +116,7 @@ export class CabinHeroScene {
 
     this.camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 200);
     this.camera.position.set(0, 4, 18);
-    this.camera.lookAt(0, 3, 0);
+    this._fitCamera(w, h);
 
     // alpha:false — the sky sphere (r=80, camera always inside) covers every
     // pixel, so there is nothing to blend against and an opaque buffer is cheaper.
@@ -635,8 +654,7 @@ export class CabinHeroScene {
     };
     this._onResize = () => {
       const { w, h } = this._size();
-      this.camera.aspect = w / h;
-      this.camera.updateProjectionMatrix();
+      this._fitCamera(w, h);
       this.renderer.setSize(w, h);
       this._dirty = true;
     };
@@ -789,7 +807,7 @@ export class CabinHeroScene {
       // Camera subtle parallax.
       this.camera.position.x += (this.mouseX * 1.5 - this.camera.position.x) * 0.02;
       this.camera.position.y += (4 + this.mouseY * 0.5 - this.camera.position.y) * 0.02;
-      this.camera.lookAt(0, 3, 0);
+      this.camera.lookAt(0, this.lookY, 0);
     }
 
     this.renderer.toneMappingExposure = 1.0 + this.scrollProgress * 0.5;

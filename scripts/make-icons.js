@@ -116,6 +116,15 @@ async function main() {
     .jpeg({ quality: 78, mozjpeg: true })
     .toBuffer();
   await write(path.join(PUBLIC, 'hero-poster.jpg'), poster, flags.force);
+
+  // Portrait phones: the landscape band, cropped again to a tall screen, was all
+  // roof. The photo is already portrait, so this is the whole frame.
+  const portrait = await sharp(flags.photo)
+    .rotate()
+    .resize(1080, 1440, { fit: 'cover' })
+    .jpeg({ quality: 74, mozjpeg: true })
+    .toBuffer();
+  await write(path.join(PUBLIC, 'hero-poster-portrait.jpg'), portrait, flags.force);
 }
 
 main().catch((err) => {
