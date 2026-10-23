@@ -146,7 +146,10 @@ export function initCalendar(container) {
         const { openCalShare } = await import('./cal-share.js');
         openCalShare(year, month);
       });
-      title.after(expand);
+      const head = document.createElement('div');
+      head.className = 'cal__month-head';
+      title.replaceWith(head);
+      head.append(title, expand);
     }
     return wrap;
   }
