@@ -59,6 +59,7 @@ export function initCalendar(container) {
   // Set when /api/availability could not be read. render() then says so, rather
   // than showing an all-free calendar that would be a lie.
   let offline   = false;
+  let loaded    = false;
 
   const root = document.createElement('div');
   root.className = 'cal';
@@ -238,6 +239,20 @@ export function initCalendar(container) {
       <div class="cal__legend-item">
         <span class="cal__legend-dot cal__legend-dot--sel"></span>${t.calLegendSelected}
       </div>`;
+    // Full-screen month that doubles as a shareable image. Not offered when the
+    // data has not been read (yet, or at all): the image would show a fake
+    // all-free month.
+    if (loaded && !offline) {
+      const expand = document.createElement('button');
+      expand.type = 'button';
+      expand.className = 'cal__expand';
+      expand.textContent = `⤢ ${t.calExpand}`;
+      expand.addEventListener('click', async () => {
+        const { openCalShare } = await import('./cal-share.js');
+        openCalShare(viewYear, viewMonth);
+      });
+      legend.appendChild(expand);
+    }
     root.appendChild(legend);
 
     if (offline) {
@@ -264,6 +279,7 @@ export function initCalendar(container) {
     } catch {
       offline = true;
     }
+    loaded = true;
     render();
   }
 
