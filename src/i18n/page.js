@@ -147,7 +147,7 @@ export const bs = {
   faqA6:
     'Gotovinom, bankovnim transferom ili PayPalom. Rezervacija se potvrđuje uplatom avansa od 30% ukupnog iznosa.',
   faqQ7: 'Šta je uključeno u cijenu?',
-  faqA7: 'Posteljina, pelet za grijanje i završno čišćenje.',
+  faqA7: 'Posteljina i pelet za grijanje.',
   faqQ8: 'Koliko je do Travnika i do sarajevskog aerodroma?',
   faqA8:
     'Do Travnika je 30 kilometara, oko pola sata vožnje. Do aerodroma u Sarajevu oko 130 kilometara, oko dva sata: sat vremena autoputem do Lašve, pola sata do Travnika i još pola sata do Babanovca. Ako dolazite tim putem, vrijedi stati na ćevape kod Harija u Travniku.',
@@ -318,7 +318,7 @@ export const en = {
   faqA6:
     'Cash, bank transfer or PayPal. A 30% deposit, paid in advance, confirms the booking.',
   faqQ7: 'What is included in the price?',
-  faqA7: 'Bedding, heating pellets and the final cleaning.',
+  faqA7: 'Bedding and heating pellets.',
   faqQ8: 'How far is Travnik, and Sarajevo airport?',
   faqA8:
     'Travnik is 30 kilometres away, about half an hour by car. Sarajevo airport is roughly 130 kilometres, about two hours: an hour on the motorway to Lasva, half an hour to Travnik and another half hour up to Babanovac. If you come that way, it is worth stopping for cevapi at Hari in Travnik.',
