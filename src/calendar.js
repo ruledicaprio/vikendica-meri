@@ -238,6 +238,19 @@ export function initCalendar(container) {
       <div class="cal__legend-item">
         <span class="cal__legend-dot cal__legend-dot--sel"></span>${t.calLegendSelected}
       </div>`;
+    // Full-screen month that doubles as a shareable image. Not offered when the
+    // data could not be read: the image would show a fake all-free month.
+    if (!offline) {
+      const expand = document.createElement('button');
+      expand.type = 'button';
+      expand.className = 'cal__expand';
+      expand.textContent = `⤢ ${t.calExpand}`;
+      expand.addEventListener('click', async () => {
+        const { openCalShare } = await import('./cal-share.js');
+        openCalShare(viewYear, viewMonth);
+      });
+      legend.appendChild(expand);
+    }
     root.appendChild(legend);
 
     if (offline) {

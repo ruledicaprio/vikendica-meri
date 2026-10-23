@@ -939,6 +939,78 @@ picture {
 .cal__legend-dot--sel {
   background: var(--cream);
 }
+/* Opens the full-screen, shareable month (cal-share.js). */
+.cal__expand {
+  margin-left: auto;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--cream);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.cal__expand:hover {
+  border-color: var(--amber);
+}
+.cal-share {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 1rem;
+  border: 0;
+  background: rgba(6, 9, 16, 0.96);
+  color: var(--cream);
+  overscroll-behavior: contain;
+}
+.cal-share[open] {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  place-items: center;
+  gap: 1rem;
+}
+.cal-share::backdrop {
+  background: rgba(6, 9, 16, 0.96);
+}
+/* The 1080×1350 bitmap scaled to fit whatever is left above the bar. */
+.cal-share__canvas {
+  /* A percentage max-height does not resolve against the 1fr row (same trap as
+     .lightbox__pic), so the bar's height is subtracted from the viewport. */
+  max-width: 100%;
+  max-height: calc(100dvh - 6.5rem);
+  width: auto;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  border-radius: 12px;
+}
+.cal-share__bar .cal__nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.cal-share__bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.cal-share__close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.8rem;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: none;
+  color: var(--cream);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
 
 /* ============================================================
    Focus visibility

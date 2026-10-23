@@ -157,6 +157,10 @@ const bs = {
   calLegendPending: 'Na čekanju',
   calLegendSelected: 'Vaš odabir',
   calOffline: 'Trenutnu dostupnost nije moguće učitati — potvrdit ćemo termin na vaš upit.',
+  calExpand: 'Cijeli ekran',
+  calShare: 'Podijeli sliku',
+  calShareSubtitle: 'Slobodni termini',
+  calShareContact: 'Tel · Viber · WhatsApp',
   nights: (n) => (n === 1 ? '1 noć' : `${n} noći`),
   formatDate: (d, months) => `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}.`,
 };
@@ -301,6 +305,10 @@ const en = {
   calLegendPending: 'On hold',
   calLegendSelected: 'Your selection',
   calOffline: 'Live availability could not be loaded — we will confirm your dates by reply.',
+  calExpand: 'Full screen',
+  calShare: 'Share image',
+  calShareSubtitle: 'Available dates',
+  calShareContact: 'Phone · Viber · WhatsApp',
   nights: (n) => `${n} ${n === 1 ? 'night' : 'nights'}`,
   formatDate: (d, months) => `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
 };
