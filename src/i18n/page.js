@@ -9,16 +9,16 @@ export const bs = {
   ogLocale: 'bs_BA',
   path: '/',
 
-  title: 'Vikendica Meri — planinska vikendica na Babanovcu, Vlašić',
+  title: 'Vikendica Meri — vikendica na Vlašiću, Babanovac',
   description:
-    'Vikendica Meri — planinska vikendica na Babanovcu, u Dolini Panjeva na Vlašiću. Smještaj za ~10 osoba, blizu ski-centra i grada Travnika.',
-  ogTitle: 'Vikendica Meri — planinska vikendica na Babanovcu, Vlašić',
+    'Vikendica Meri — vikendica na Vlašiću, u Dolini Panjeva na Babanovcu. Smještaj za ~10 osoba, blizu ski-centra i grada Travnika.',
+  ogTitle: 'Vikendica Meri — vikendica na Vlašiću, Babanovac',
   ogDescription:
-    'Planinska vikendica na Babanovcu, u Dolini Panjeva. Smještaj za do 10 osoba, blizu ski-centra Vlašić.',
+    'Vikendica na Vlašiću, u Dolini Panjeva na Babanovcu. Smještaj za do 10 osoba, blizu ski-centra.',
   ogImageAlt: 'Vikendica Meri zimi, pod snijegom, Babanovac, Vlašić',
 
   ldDescription:
-    'Planinska vikendica na Babanovcu sa strmim drvenim krovom i prostranim balkonima, u mirnoj Dolini Panjeva na Vlašiću. Smještaj za do 10 osoba.',
+    'Vikendica na Vlašiću sa strmim drvenim krovom i prostranim balkonima, u mirnoj Dolini Panjeva na Babanovcu. Smještaj za do 10 osoba.',
   ldOccupancyUnit: 'osoba',
   ldVideoName: 'Babanovac iz zraka — Vlašić',
   ldVideoDescription: 'Snimak iz zraka naselja Babanovac na planini Vlašić.',
