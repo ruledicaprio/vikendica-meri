@@ -237,6 +237,9 @@ picture {
   z-index: 1;
   pointer-events: none;
   padding: var(--pad);
+  /* The fixed navbar's height on top: a column taller than the screen is
+     centred upwards and would otherwise slide under the logo. */
+  padding-top: calc(var(--pad) + 4.5rem);
 }
 .hero-overlay__subtitle {
   text-transform: uppercase;
@@ -263,6 +266,14 @@ picture {
   flex-wrap: wrap;
   justify-content: center;
   pointer-events: all;
+}
+/* On a phone this button lands on the lit balcony; a dark fill keeps it legible. */
+.hero-overlay__cta .btn--secondary {
+  background: rgba(10, 14, 26, 0.55);
+  backdrop-filter: blur(4px);
+}
+.hero-overlay__cta .btn--secondary:hover {
+  background: rgba(10, 14, 26, 0.75);
 }
 
 /* ---------- Mini availability calendar (hero) ----------
@@ -435,8 +446,10 @@ picture {
     padding: 0.7rem;
   }
 }
-/* Landscape phones: there is no height left for it under the title. */
-@media (max-height: 560px) {
+/* Landscape phones: there is no height left for it under the title. Portrait
+   phones: it pushed the hero past the screen, so "Provjeri dostupnost" is the
+   way into the calendar there. */
+@media (max-height: 560px), (max-width: 600px) {
   .mini-cal {
     display: none;
   }
@@ -506,6 +519,14 @@ picture {
   /* Biased up towards the A-frame apex; centred would land on empty sky. */
   background-position: center 30%;
   padding-block: clamp(4rem, 9vw, 7rem);
+}
+/* Same media query as the hero's <picture>, so it stays the image already loaded. */
+@media (orientation: portrait) {
+  .section--dostupnost {
+    background-image:
+      linear-gradient(rgba(10, 14, 26, 0.9), rgba(10, 14, 26, 0.94)),
+      url('/hero-poster-portrait.jpg');
+  }
 }
 /* Parallax only where it behaves: iOS Safari sizes a fixed background to the
    viewport and judders, and a parallax is motion, so reduced-motion opts out. */
@@ -939,9 +960,21 @@ picture {
 .cal__legend-dot--sel {
   background: var(--cream);
 }
-/* Opens the full-screen, shareable month (cal-share.js). */
+/* Opens the full-screen, shareable month (cal-share.js), beside each month's
+   title; it wraps under the title on a screen too narrow for both. */
+.cal__month-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.cal__month-head .cal__month-title {
+  margin-bottom: 0;
+}
 .cal__expand {
-  margin-left: auto;
+  min-height: 44px;
   padding: 0.45rem 0.9rem;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -1860,7 +1893,9 @@ summary:focus-visible {
   .floors,
   .dest-grid,
   .contact-grid {
-    grid-template-columns: 1fr;
+    /* minmax(0, …): a bare 1fr track grows to its content's min-content width,
+       which pushed the contact column 13px past a 360px screen. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .amenities {
     grid-template-columns: repeat(2, 1fr);

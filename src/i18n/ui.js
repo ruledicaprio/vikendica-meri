@@ -45,13 +45,13 @@ const bs = {
       if (/okolina-borovi/.test(n)) return 'Borova šuma oko vikendice Meri na Vlašiću';
       if (/okolina-naselje/.test(n)) return 'Naselje Dolina Panjeva na Babanovcu, planina Vlašić';
       if (/okolina/.test(n)) return 'Okolina vikendice Meri na Babanovcu, planina Vlašić';
-      if (/bocna/.test(n)) return 'Bočna strana A-frame vikendice Meri';
+      if (/bocna/.test(n)) return 'Bočna strana vikendice Meri';
       if (/prilaz/.test(n)) return 'Prilaz i parking ispred vikendice Meri';
-      if (/zimski-pogled/.test(n)) return 'Zimski pogled na A-frame vikendicu Meri, Babanovac';
-      if (/vece-snijeg/.test(n)) return 'A-frame vikendica Meri uvečer pod snijegom, Babanovac';
-      if (/snijeg|zimski|zimi/.test(n)) return 'A-frame vikendica Meri pod snijegom, Babanovac';
-      if (/a-frame-ljeto/.test(n)) return 'A-frame vikendica Meri ljeti, Dolina Panjeva';
-      return 'A-frame vikendica Meri, Dolina Panjeva, Babanovac';
+      if (/zimski-pogled/.test(n)) return 'Zimski pogled na vikendicu Meri, Babanovac';
+      if (/vece-snijeg/.test(n)) return 'Vikendica Meri uvečer pod snijegom, Babanovac';
+      if (/snijeg|zimski|zimi/.test(n)) return 'Vikendica Meri pod snijegom, Babanovac';
+      if (/a-frame-ljeto/.test(n)) return 'Vikendica Meri ljeti, Dolina Panjeva';
+      return 'Vikendica Meri, Dolina Panjeva, Babanovac';
     },
     dnevni: (n) => {
       if (/trpezarija/.test(n)) return 'Trpezarija sa velikim stolom u vikendici Meri';
@@ -197,13 +197,13 @@ const en = {
       if (/okolina-borovi/.test(n)) return 'Pine forest around Vikendica Meri on Vlašić';
       if (/okolina-naselje/.test(n)) return 'The Dolina Panjeva settlement at Babanovac, Vlašić mountain';
       if (/okolina/.test(n)) return 'Surroundings of Vikendica Meri at Babanovac, Vlašić mountain';
-      if (/bocna/.test(n)) return 'Side elevation of the Vikendica Meri A-frame';
+      if (/bocna/.test(n)) return 'Side of the Vikendica Meri mountain cabin';
       if (/prilaz/.test(n)) return 'Driveway and parking in front of Vikendica Meri';
-      if (/zimski-pogled/.test(n)) return 'Winter view of the Vikendica Meri A-frame, Babanovac';
-      if (/vece-snijeg/.test(n)) return 'Vikendica Meri A-frame in the evening under snow, Babanovac';
-      if (/snijeg|zimski|zimi/.test(n)) return 'Vikendica Meri A-frame chalet under snow, Babanovac';
-      if (/a-frame-ljeto/.test(n)) return 'Vikendica Meri A-frame chalet in summer, Dolina Panjeva';
-      return 'Vikendica Meri A-frame chalet, Dolina Panjeva, Babanovac';
+      if (/zimski-pogled/.test(n)) return 'Winter view of the Vikendica Meri mountain cabin, Babanovac';
+      if (/vece-snijeg/.test(n)) return 'Vikendica Meri mountain cabin in the evening under snow, Babanovac';
+      if (/snijeg|zimski|zimi/.test(n)) return 'Vikendica Meri mountain cabin under snow, Babanovac';
+      if (/a-frame-ljeto/.test(n)) return 'Vikendica Meri mountain cabin in summer, Dolina Panjeva';
+      return 'Vikendica Meri mountain cabin, Dolina Panjeva, Babanovac';
     },
     dnevni: (n) => {
       if (/trpezarija/.test(n)) return 'Dining area with a large table at Vikendica Meri';

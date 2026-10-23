@@ -131,6 +131,26 @@ export function initCalendar(container) {
     }
 
     wrap.appendChild(grid);
+
+    // This month full screen, as a shareable image. Not offered when the data
+    // has not been read (yet, or at all): the image would show a fake all-free
+    // month. Nor for a past month, which the share view does not show.
+    const now = new Date();
+    if (loaded && !offline && year * 12 + month >= now.getFullYear() * 12 + now.getMonth()) {
+      const expand = document.createElement('button');
+      expand.type = 'button';
+      expand.className = 'cal__expand';
+      expand.textContent = `⤢ ${t.calExpand}`;
+      expand.setAttribute('aria-label', `${t.calExpand} — ${MONTHS[month]} ${year}`);
+      expand.addEventListener('click', async () => {
+        const { openCalShare } = await import('./cal-share.js');
+        openCalShare(year, month);
+      });
+      const head = document.createElement('div');
+      head.className = 'cal__month-head';
+      title.replaceWith(head);
+      head.append(title, expand);
+    }
     return wrap;
   }
 
@@ -202,20 +222,7 @@ export function initCalendar(container) {
         </div>`;
       root.appendChild(box);
 
-      root.querySelector('#cal-cta').addEventListener('click', () => {
-        // Pre-fill the contact form
-        const fromEl    = document.getElementById('f-from');
-        const toEl      = document.getElementById('f-to');
-        const msgEl     = document.getElementById('f-msg');
-        if (fromEl) fromEl.value = selStart;
-        if (toEl)   toEl.value   = selEnd;
-        if (msgEl && !msgEl.value) {
-          msgEl.value =
-            `Dolazak: ${selStart}\nOdlazak: ${selEnd}\nBroj noći: ${nights}`;
-        }
-        const form = document.getElementById('reserve-form');
-        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      root.querySelector('#cal-cta').addEventListener('click', toForm);
 
       root.querySelector('#cal-clear').addEventListener('click', () => {
         selStart = selEnd = null;
@@ -239,20 +246,6 @@ export function initCalendar(container) {
       <div class="cal__legend-item">
         <span class="cal__legend-dot cal__legend-dot--sel"></span>${t.calLegendSelected}
       </div>`;
-    // Full-screen month that doubles as a shareable image. Not offered when the
-    // data has not been read (yet, or at all): the image would show a fake
-    // all-free month.
-    if (loaded && !offline) {
-      const expand = document.createElement('button');
-      expand.type = 'button';
-      expand.className = 'cal__expand';
-      expand.textContent = `⤢ ${t.calExpand}`;
-      expand.addEventListener('click', async () => {
-        const { openCalShare } = await import('./cal-share.js');
-        openCalShare(viewYear, viewMonth);
-      });
-      legend.appendChild(expand);
-    }
     root.appendChild(legend);
 
     if (offline) {
@@ -311,6 +304,26 @@ export function initCalendar(container) {
       }
     }
     renderKeepingFocus(ymd);
+    // A finished range is the whole point of the calendar: take the guest
+    // straight to the form instead of waiting for "Pošalji upit".
+    if (selEnd) toForm();
+  }
+
+  // Copy the selection into the contact form and scroll there. The message is
+  // filled only while it still holds our own text, so re-picking dates updates
+  // it but never overwrites what the guest typed.
+  let autoMsg = '';
+  function toForm() {
+    const fromEl = document.getElementById('f-from');
+    const toEl   = document.getElementById('f-to');
+    const msgEl  = document.getElementById('f-msg');
+    if (fromEl) fromEl.value = selStart;
+    if (toEl)   toEl.value   = selEnd;
+    if (msgEl && (!msgEl.value || msgEl.value === autoMsg)) {
+      autoMsg = `Dolazak: ${selStart}\nOdlazak: ${selEnd}\nBroj noći: ${diffDays(selStart, selEnd)}`;
+      msgEl.value = autoMsg;
+    }
+    document.getElementById('reserve-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   render();

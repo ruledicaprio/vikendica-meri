@@ -9,16 +9,16 @@ export const bs = {
   ogLocale: 'bs_BA',
   path: '/',
 
-  title: 'Vikendica Meri — A-frame vikendica na Vlašiću, Babanovac',
+  title: 'Vikendica Meri — vikendica na Vlašiću, Babanovac',
   description:
-    'Vikendica Meri — klasična A-frame planinska vikendica u Dolini Panjeva, Babanovac, Vlašić. Smještaj za ~10 osoba, blizu ski-centra i grada Travnika.',
-  ogTitle: 'Vikendica Meri — A-frame vikendica na Vlašiću, Babanovac',
+    'Vikendica Meri — vikendica na Vlašiću, u Dolini Panjeva na Babanovcu. Smještaj za ~10 osoba, blizu ski-centra i grada Travnika.',
+  ogTitle: 'Vikendica Meri — vikendica na Vlašiću, Babanovac',
   ogDescription:
-    'Klasična A-frame planinska vikendica u Dolini Panjeva na Babanovcu. Smještaj za do 10 osoba, blizu ski-centra Vlašić.',
-  ogImageAlt: 'A-frame vikendica Meri zimi, pod snijegom, Babanovac, Vlašić',
+    'Vikendica na Vlašiću, u Dolini Panjeva na Babanovcu. Smještaj za do 10 osoba, blizu ski-centra.',
+  ogImageAlt: 'Vikendica Meri zimi, pod snijegom, Babanovac, Vlašić',
 
   ldDescription:
-    'Klasična A-frame planinska vikendica sa strmim drvenim krovom i prostranim balkonima, u mirnoj Dolini Panjeva na Babanovcu, Vlašić. Smještaj za do 10 osoba.',
+    'Vikendica na Vlašiću sa strmim drvenim krovom i prostranim balkonima, u mirnoj Dolini Panjeva na Babanovcu. Smještaj za do 10 osoba.',
   ldOccupancyUnit: 'osoba',
   ldVideoName: 'Babanovac iz zraka — Vlašić',
   ldVideoDescription: 'Snimak iz zraka naselja Babanovac na planini Vlašić.',
@@ -34,16 +34,14 @@ export const bs = {
   langSwitchLabel: 'English',
   langSwitchAria: 'Switch to English',
 
-  heroSubtitle: 'Planina Vlašić · Babanovac',
-  heroLocation: 'Dolina Panjeva · Babanovac · Vlašić',
+  heroSubtitle: 'Planina Vlašić',
+  heroLocation: 'Dolina Panjeva · Babanovac',
   heroCtaPrimary: 'Pogledaj smještaj',
   heroCtaSecondary: 'Provjeri dostupnost',
   scrollHint: 'Istraži ↓',
 
   aboutKicker: 'O vikendici',
   aboutTitle: 'Topli planinski dom sa dušom',
-  aboutP1:
-    'Klasična A-frame vikendica sa strmim drvenim krovom, prostranim balkonima i pogledom na borovu šumu. Generacijama je ovo mjesto okupljanja porodice i prijatelja, gdje miris drveta i toplina peći stvaraju nezaboravan ugođaj.',
   aboutP2Before: 'Smještena u mirnoj Dolini Panjeva na Babanovcu, nudi udoban prostor za',
   aboutP2Strong: 'do 10 osoba',
   aboutP2After:
@@ -149,7 +147,7 @@ export const bs = {
   faqA6:
     'Gotovinom, bankovnim transferom ili PayPalom. Rezervacija se potvrđuje uplatom avansa od 30% ukupnog iznosa.',
   faqQ7: 'Šta je uključeno u cijenu?',
-  faqA7: 'Posteljina, pelet za grijanje i završno čišćenje.',
+  faqA7: 'Posteljina i pelet za grijanje.',
   faqQ8: 'Koliko je do Travnika i do sarajevskog aerodroma?',
   faqA8:
     'Do Travnika je 30 kilometara, oko pola sata vožnje. Do aerodroma u Sarajevu oko 130 kilometara, oko dva sata: sat vremena autoputem do Lašve, pola sata do Travnika i još pola sata do Babanovca. Ako dolazite tim putem, vrijedi stati na ćevape kod Harija u Travniku.',
@@ -189,16 +187,16 @@ export const en = {
   ogLocale: 'en_US',
   path: '/en/',
 
-  title: 'Vikendica Meri — A-frame chalet on Vlašić mountain, Babanovac',
+  title: 'Vikendica Meri — Babanovac mountain cabin, Vlašić',
   description:
-    'Vikendica Meri — a classic A-frame mountain chalet in Dolina Panjeva, Babanovac, Vlašić. Sleeps around 10, close to the ski centre and the town of Travnik.',
-  ogTitle: 'Vikendica Meri — A-frame chalet on Vlašić mountain, Babanovac',
+    'Vikendica Meri — a Babanovac mountain cabin in Dolina Panjeva, Vlašić. Sleeps around 10, close to the ski centre and the town of Travnik.',
+  ogTitle: 'Vikendica Meri — Babanovac mountain cabin, Vlašić',
   ogDescription:
-    'A classic A-frame mountain chalet in Dolina Panjeva, Babanovac. Sleeps up to 10, close to the Vlašić ski centre.',
-  ogImageAlt: 'Vikendica Meri A-frame chalet in winter, under snow, Babanovac, Vlašić',
+    'A Babanovac mountain cabin in Dolina Panjeva. Sleeps up to 10, close to the Vlašić ski centre.',
+  ogImageAlt: 'Vikendica Meri mountain cabin in winter, under snow, Babanovac, Vlašić',
 
   ldDescription:
-    'A classic A-frame mountain chalet with a steep timber roof and generous balconies, in the quiet Dolina Panjeva valley at Babanovac, Vlašić. Sleeps up to 10.',
+    'A Babanovac mountain cabin with a steep timber roof and generous balconies, in the quiet Dolina Panjeva valley on Vlašić. Sleeps up to 10.',
   ldOccupancyUnit: 'guests',
   ldVideoName: 'Babanovac from the air — Vlašić',
   ldVideoDescription: 'Aerial footage of the Babanovac settlement on Vlašić mountain.',
@@ -214,16 +212,14 @@ export const en = {
   langSwitchLabel: 'Bosanski',
   langSwitchAria: 'Prebaci na bosanski',
 
-  heroSubtitle: 'Vlašić mountain · Babanovac',
-  heroLocation: 'Dolina Panjeva · Babanovac · Vlašić',
+  heroSubtitle: 'Vlašić mountain',
+  heroLocation: 'Dolina Panjeva · Babanovac',
   heroCtaPrimary: 'See the chalet',
   heroCtaSecondary: 'Check availability',
   scrollHint: 'Explore ↓',
 
   aboutKicker: 'About the chalet',
   aboutTitle: 'A warm mountain home with a soul',
-  aboutP1:
-    'A classic A-frame chalet with a steep timber roof, generous balconies and a view over the pine forest. For generations this has been where family and friends gather, where the scent of wood and the warmth of the stove make a stay memorable.',
   aboutP2Before: 'Set in the quiet Dolina Panjeva valley at Babanovac, it offers comfortable space for',
   aboutP2Strong: 'up to 10 people',
   aboutP2After:
@@ -322,7 +318,7 @@ export const en = {
   faqA6:
     'Cash, bank transfer or PayPal. A 30% deposit, paid in advance, confirms the booking.',
   faqQ7: 'What is included in the price?',
-  faqA7: 'Bedding, heating pellets and the final cleaning.',
+  faqA7: 'Bedding and heating pellets.',
   faqQ8: 'How far is Travnik, and Sarajevo airport?',
   faqA8:
     'Travnik is 30 kilometres away, about half an hour by car. Sarajevo airport is roughly 130 kilometres, about two hours: an hour on the motorway to Lasva, half an hour to Travnik and another half hour up to Babanovac. If you come that way, it is worth stopping for cevapi at Hari in Travnik.',
