@@ -19,7 +19,7 @@ const MONTHS = t.months;
 const DAYS = t.days;
 
 /* ── helpers ───────────────────────────────────────────────── */
-function toYMD(y, m, d) {
+export function toYMD(y, m, d) {
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 function parseDate(s) { return new Date(s + 'T12:00:00'); }
@@ -31,7 +31,7 @@ function fmtDate(s) {
 // both branches, so it never did anything.)
 function nightLabel(n) { return t.nights(n); }
 
-function dayStatus(ymd) {
+export function dayStatus(ymd) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   if (parseDate(ymd) < today) return 'past';
   for (const b of BOOKED) {
@@ -48,8 +48,8 @@ function rangeConflicts(from, to) {
 /**
  * Mount the availability calendar into `container`.
  *
- * Returns a small handle so the compact check in the hero can query and drive
- * this calendar instead of fetching and interpreting availability a second time.
+ * Returns a small handle so the hero's mini calendar can read and drive this
+ * calendar instead of fetching and interpreting availability a second time.
  */
 export function initCalendar(container) {
   let viewYear  = new Date().getFullYear();
@@ -300,33 +300,20 @@ export function initCalendar(container) {
   render();
   const ready = loadAvailability();
 
-  // The compact hero panel drives this calendar rather than keeping its own copy
-  // of the availability data: one fetch, and one definition of what "free" means.
+  // The hero's mini calendar reads BOOKED through dayStatus() and starts a
+  // selection here: one fetch, and one definition of what "free" means.
   return {
     /** Resolves once /api/availability has been read (or has failed). */
     ready,
-    /** True when the data could not be read — a verdict would be a guess. */
+    /** True when the data could not be read — showing statuses would be a guess. */
     get offline() {
       return offline;
     },
-    /**
-     * Is every night from `from` up to `to` bookable? Returns the blocking
-     * status ('booked' | 'pending' | 'past') or null when the range is free.
-     */
-    checkRange(from, to) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (parseDate(from) < today) return 'past';
-      for (const b of BOOKED) {
-        if (from <= b.to && to >= b.from) return b.status;
-      }
-      return null;
-    },
-    /** Show `from`–`to` as the selection, and move the view to that month. */
-    setRange(from, to) {
-      selStart = from;
-      selEnd = to;
-      const d = parseDate(from);
+    /** Start a selection at `ymd` and move the view to its month. */
+    setStart(ymd) {
+      selStart = ymd;
+      selEnd = null;
+      const d = parseDate(ymd);
       viewYear = d.getFullYear();
       viewMonth = d.getMonth();
       render();

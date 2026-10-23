@@ -354,21 +354,12 @@
         <p class="hero-overlay__location">{{heroLocation}}</p>
         <div class="hero-overlay__cta">
           <a class="btn btn--primary" href="#smjestaj">{{heroCtaPrimary}}</a>
-          <!-- Opens the compact check rather than jumping to the form: dates first,
-               then a prefilled form, is the better order. A free range selects
-               itself in the full calendar at #dostupnost. -->
-          <button
-            class="btn btn--secondary"
-            type="button"
-            id="hero-check"
-            aria-expanded="false"
-            aria-controls="hero-check-panel"
-          >
-            {{heroCtaSecondary}}
-          </button>
+          <a class="btn btn--secondary" href="#dostupnost">{{heroCtaSecondary}}</a>
         </div>
-        <!-- Filled in by initQuickCheck(); empty (and hidden) without JS. -->
-        <div class="quick-check" id="hero-check-panel" hidden></div>
+        <!-- Compact availability, filled by initMiniCal() from the full calendar's
+             data. Rendered invisible first so the hero does not jump when it
+             fills; removed if the feed cannot be read. -->
+        <div class="mini-cal" id="hero-cal"></div>
       </div>
     </div>
     <div class="scroll-hint">{{scrollHint}}</div>
@@ -511,7 +502,7 @@
             <p class="kicker">{{destKicker}}</p>
             <h2>{{destTitle}}</h2>
           </div>
-          <div class="dest-grid">
+          <div class="dest-grid dest-grid--single">
             <article class="dest-card" data-cat="vlasic">
               <!-- A button, not a div: the photo swap used to be hover-only, so on a
                    phone this card was one frozen image. The label and the count come
@@ -525,16 +516,6 @@
                   <a class="dest-link" href="https://ski.srednjabosna.ba/" target="_blank" rel="noopener">{{destSkiCentre}}</a>
                   <a class="dest-link dest-link--live" href="https://ski.srednjabosna.ba/live-kamere/" target="_blank" rel="noopener">{{destLiveCams}}</a>
                   <a class="dest-link dest-link--live" href="https://www.ozon.ba/en/live/" target="_blank" rel="noopener">{{destLiveLift}}</a>
-                </div>
-              </div>
-            </article>
-            <article class="dest-card" data-cat="travnik">
-              <button class="dest-card__media" type="button" data-cat="travnik"></button>
-              <div class="dest-card__body">
-                <h3>{{destTravnikTitle}}</h3>
-                <p>{{destTravnikBody}}</p>
-                <div class="dest-links">
-                  <a class="dest-link" href="https://muzejtravnik.ba/" target="_blank" rel="noopener">{{destTravnikMuseum}}</a>
                 </div>
               </div>
             </article>
@@ -554,6 +535,24 @@
                it, so the photos are in the served HTML for crawlers that do not
                run JavaScript. -->
           <div class="segments" id="gallery-segments">{{gallerySegments}}</div>
+        </div>
+      </section>
+
+      <!-- TRAVNIK — after the gallery: the house first, the day trip after. -->
+      <section class="section section--destinacije" id="travnik" aria-label="{{destTravnikTitle}}">
+        <div class="wrap">
+          <div class="dest-grid dest-grid--single">
+            <article class="dest-card" data-cat="travnik">
+              <button class="dest-card__media" type="button" data-cat="travnik"></button>
+              <div class="dest-card__body">
+                <h3>{{destTravnikTitle}}</h3>
+                <p>{{destTravnikBody}}</p>
+                <div class="dest-links">
+                  <a class="dest-link" href="https://muzejtravnik.ba/" target="_blank" rel="noopener">{{destTravnikMuseum}}</a>
+                </div>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
