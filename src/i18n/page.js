@@ -9,16 +9,16 @@ export const bs = {
   ogLocale: 'bs_BA',
   path: '/',
 
-  title: 'Vikendica Meri — planinska vikendica na Vlašiću, Babanovac',
+  title: 'Vikendica Meri — planinska vikendica na Babanovcu, Vlašić',
   description:
-    'Vikendica Meri — klasična A-frame planinska vikendica u Dolini Panjeva, Babanovac, Vlašić. Smještaj za ~10 osoba, blizu ski-centra i grada Travnika.',
-  ogTitle: 'Vikendica Meri — planinska vikendica na Vlašiću, Babanovac',
+    'Vikendica Meri — planinska vikendica na Babanovcu, u Dolini Panjeva na Vlašiću. Smještaj za ~10 osoba, blizu ski-centra i grada Travnika.',
+  ogTitle: 'Vikendica Meri — planinska vikendica na Babanovcu, Vlašić',
   ogDescription:
-    'Klasična A-frame planinska vikendica u Dolini Panjeva na Babanovcu. Smještaj za do 10 osoba, blizu ski-centra Vlašić.',
-  ogImageAlt: 'A-frame vikendica Meri zimi, pod snijegom, Babanovac, Vlašić',
+    'Planinska vikendica na Babanovcu, u Dolini Panjeva. Smještaj za do 10 osoba, blizu ski-centra Vlašić.',
+  ogImageAlt: 'Vikendica Meri zimi, pod snijegom, Babanovac, Vlašić',
 
   ldDescription:
-    'Klasična A-frame planinska vikendica sa strmim drvenim krovom i prostranim balkonima, u mirnoj Dolini Panjeva na Babanovcu, Vlašić. Smještaj za do 10 osoba.',
+    'Planinska vikendica na Babanovcu sa strmim drvenim krovom i prostranim balkonima, u mirnoj Dolini Panjeva na Vlašiću. Smještaj za do 10 osoba.',
   ldOccupancyUnit: 'osoba',
   ldVideoName: 'Babanovac iz zraka — Vlašić',
   ldVideoDescription: 'Snimak iz zraka naselja Babanovac na planini Vlašić.',
@@ -187,16 +187,16 @@ export const en = {
   ogLocale: 'en_US',
   path: '/en/',
 
-  title: 'Vikendica Meri — mountain chalet on Vlašić, Babanovac',
+  title: 'Vikendica Meri — Babanovac mountain cabin, Vlašić',
   description:
-    'Vikendica Meri — a classic A-frame mountain chalet in Dolina Panjeva, Babanovac, Vlašić. Sleeps around 10, close to the ski centre and the town of Travnik.',
-  ogTitle: 'Vikendica Meri — mountain chalet on Vlašić, Babanovac',
+    'Vikendica Meri — a Babanovac mountain cabin in Dolina Panjeva, Vlašić. Sleeps around 10, close to the ski centre and the town of Travnik.',
+  ogTitle: 'Vikendica Meri — Babanovac mountain cabin, Vlašić',
   ogDescription:
-    'A classic A-frame mountain chalet in Dolina Panjeva, Babanovac. Sleeps up to 10, close to the Vlašić ski centre.',
-  ogImageAlt: 'Vikendica Meri A-frame chalet in winter, under snow, Babanovac, Vlašić',
+    'A Babanovac mountain cabin in Dolina Panjeva. Sleeps up to 10, close to the Vlašić ski centre.',
+  ogImageAlt: 'Vikendica Meri mountain cabin in winter, under snow, Babanovac, Vlašić',
 
   ldDescription:
-    'A classic A-frame mountain chalet with a steep timber roof and generous balconies, in the quiet Dolina Panjeva valley at Babanovac, Vlašić. Sleeps up to 10.',
+    'A Babanovac mountain cabin with a steep timber roof and generous balconies, in the quiet Dolina Panjeva valley on Vlašić. Sleeps up to 10.',
   ldOccupancyUnit: 'guests',
   ldVideoName: 'Babanovac from the air — Vlašić',
   ldVideoDescription: 'Aerial footage of the Babanovac settlement on Vlašić mountain.',
