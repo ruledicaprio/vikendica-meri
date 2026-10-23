@@ -520,6 +520,14 @@ picture {
   background-position: center 30%;
   padding-block: clamp(4rem, 9vw, 7rem);
 }
+/* Same media query as the hero's <picture>, so it stays the image already loaded. */
+@media (orientation: portrait) {
+  .section--dostupnost {
+    background-image:
+      linear-gradient(rgba(10, 14, 26, 0.9), rgba(10, 14, 26, 0.94)),
+      url('/hero-poster-portrait.jpg');
+  }
+}
 /* Parallax only where it behaves: iOS Safari sizes a fixed background to the
    viewport and judders, and a parallax is motion, so reduced-motion opts out. */
 @media (min-width: 901px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
