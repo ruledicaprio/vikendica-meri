@@ -91,17 +91,22 @@ function draw(canvas, year, month) {
   const gap = 10;
   const cw = (W - 2 * x0 - 6 * gap) / 7;
   const ch = 112;
-  ctx.fillStyle = C.muted;
-  ctx.font = `600 28px ${SANS}`;
-  t.days.forEach((d, i) => ctx.fillText(d.toUpperCase(), x0 + i * (cw + gap) + cw / 2, 418));
-
   const firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
   const days = new Date(year, month + 1, 0).getDate();
+  // Laid out for six rows; a shorter month is centred so the space it does not
+  // use is split above and below instead of left as one band over the legend.
+  const rows = Math.ceil((firstDow + days) / 7);
+  const top = 440 + ((6 - rows) * (ch + gap)) / 2;
+  const bottom = top + rows * (ch + gap) - gap;
+  ctx.fillStyle = C.muted;
+  ctx.font = `600 28px ${SANS}`;
+  t.days.forEach((d, i) => ctx.fillText(d.toUpperCase(), x0 + i * (cw + gap) + cw / 2, top - 22));
+
   const seen = new Set();
   for (let d = 1; d <= days; d++) {
     const idx = firstDow + d - 1;
     const x = x0 + (idx % 7) * (cw + gap);
-    const y = 440 + Math.floor(idx / 7) * (ch + gap);
+    const y = top + Math.floor(idx / 7) * (ch + gap);
     const status = dayStatus(toYMD(year, month, d));
     seen.add(status);
 
@@ -122,7 +127,7 @@ function draw(canvas, year, month) {
     }
     ctx.textAlign = 'left';
     ctx.fillStyle = status === 'past' ? 'rgba(245, 240, 232, 0.28)' : C.cream;
-    ctx.font = `700 32px ${SANS}`;
+    ctx.font = `600 32px ${SANS}`;
     ctx.fillText(String(d), x + 14, y + 42);
     ctx.textAlign = 'center';
   }
@@ -136,9 +141,9 @@ function draw(canvas, year, month) {
   let lx = (W - widths.reduce((a, b) => a + b, 0) - sep * (items.length - 1)) / 2;
   ctx.textAlign = 'left';
   items.forEach((s, i) => {
-    mark(ctx, s, lx + 18, 1196, 22, C[s][2]);
+    mark(ctx, s, lx + 18, bottom + 34, 22, C[s][2]);
     ctx.fillStyle = C.cream;
-    ctx.fillText(label[s].toUpperCase(), lx + 52, 1207);
+    ctx.fillText(label[s].toUpperCase(), lx + 52, bottom + 45);
     lx += widths[i] + sep;
   });
 
@@ -197,12 +202,28 @@ export async function openCalShare(year, month) {
 
   const canvas = dialog.querySelector('canvas');
   const prev = dialog.querySelector('[data-step="-1"]');
+  const encode = (k) =>
+    new Promise((r) =>
+      canvas.toBlob((blob) => {
+        const name = `vikendica-meri-${t.months[k % 12].toLowerCase()}-${Math.floor(k / 12)}.png`;
+        r(new File([blob], name, { type: 'image/png' }));
+      }, 'image/png'),
+    );
+  // The PNG is encoded as soon as the month is drawn, not on the tap: Safari
+  // opens the share sheet only straight from a gesture, and awaiting toBlob in
+  // the click handler can use that gesture up.
+  let file = null;
   const render = () => {
     const y = Math.floor(key / 12);
     const m = key % 12;
     draw(canvas, y, m);
     canvas.setAttribute('aria-label', `${t.months[m]} ${y} — ${t.calShareSubtitle}`);
     prev.disabled = key <= minKey;
+    const k = key;
+    file = null;
+    encode(k).then((f) => {
+      if (k === key) file = f;
+    });
   };
   dialog.querySelectorAll('[data-step]').forEach((b) => {
     b.onclick = () => {
@@ -211,22 +232,21 @@ export async function openCalShare(year, month) {
     };
   });
   dialog.querySelector('.cal-share__share').onclick = async () => {
-    const name = `vikendica-meri-${t.months[key % 12].toLowerCase()}-${Math.floor(key / 12)}.png`;
-    const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
-    const file = new File([blob], name, { type: 'image/png' });
+    const f = file ?? (await encode(key));
     // Phones: the system share sheet (Facebook, Viber, WhatsApp…). Desktop
-    // browsers mostly cannot share files, so the image is downloaded instead.
-    if (navigator.canShare?.({ files: [file] })) {
+    // browsers mostly cannot share files, so the image is downloaded instead,
+    // as it is when the share sheet refuses for any reason but a cancel.
+    if (navigator.canShare?.({ files: [f] })) {
       try {
-        await navigator.share({ files: [file] });
-      } catch {
-        /* cancelled from the share sheet */
+        await navigator.share({ files: [f] });
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return;
       }
-      return;
     }
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
+    a.href = URL.createObjectURL(f);
+    a.download = f.name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
