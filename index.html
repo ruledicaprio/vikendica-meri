@@ -389,12 +389,13 @@
 
           <h3 class="subhead">{{floorsSubhead}}</h3>
           <!-- A-frame cross-section (src/aframe-floors.js): with JS and motion,
-               the house draws itself as it scrolls in, then stays pinned while
-               scrolling lights one floor at a time, ground floor up, with that
-               floor's card beside it. Without either, the drawing sits above the
-               three cards as a plain diagram. -->
+               the stage pins and scrolling moves a zoomed-in view down through
+               the cabin from the roof, lighting each floor as it passes, with
+               that floor's card beside it. Without either, the drawing sits
+               above the three cards as a plain diagram. -->
           <div class="aframe" data-aframe>
           <div class="aframe__stage">
+          <div class="aframe__view">
           <svg class="aframe__house" viewBox="0 0 320 300" aria-hidden="true">
             <polygon class="aframe__band" data-floor="2" points="160,8 215.3,110 104.7,110" />
             <polygon class="aframe__band" data-floor="1" points="104.7,110 215.3,110 264.1,200 55.9,200" />
@@ -408,6 +409,7 @@
             <text class="aframe__label" data-floor="1" x="160" y="161">{{floorFirst}}</text>
             <text class="aframe__label" data-floor="0" x="160" y="242">{{floorGround}}</text>
           </svg>
+          </div>
           <div class="floors">
             <!-- The card holds a heading and a list, which a <button> may not
                  contain, so the control is a stretched overlay instead. -->

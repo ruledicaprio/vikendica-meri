@@ -872,20 +872,21 @@ picture {
   transition: fill 0.45s ease;
 }
 .aframe__slab {
-  stroke: rgba(229, 168, 77, 0.45);
-  stroke-width: 1.5;
+  stroke: rgba(143, 59, 46, 0.85);
+  stroke-width: 1.8;
 }
 .aframe__window {
   fill: var(--amber2);
   opacity: 0.85;
 }
 .aframe__door {
-  fill: rgba(229, 168, 77, 0.35);
+  fill: #6b2c24;
 }
 .aframe__outline {
+  /* Bordeaux-brown, like the cabin's own beams; amber stays for the light. */
   fill: none;
-  stroke: var(--amber2);
-  stroke-width: 2.5;
+  stroke: #8f3b2e;
+  stroke-width: 3.5;
   stroke-linejoin: round;
   stroke-dasharray: 1;
   stroke-dashoffset: calc(1 - var(--enter, 1));
@@ -906,7 +907,7 @@ picture {
 }
 
 .aframe.is-scene {
-  /* One stage height, plus a stretch of scroll per floor. */
+  /* One stage height, plus a stretch of scroll for the trip through the house. */
   height: calc(100svh - var(--nav, 64px) + 150svh);
 }
 .aframe.is-scene .aframe__stage {
@@ -915,22 +916,44 @@ picture {
   height: calc(100svh - var(--nav, 64px));
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1.2rem;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  /* Edge to edge on phones, where .wrap is the screen. */
+  margin-inline: calc(-1 * var(--pad));
 }
+/* The window the house slides through. The house is larger than it on purpose
+   and is clipped here, so it never widens the page (a wider-than-screen layer
+   lets Android Chrome zoom out). The cut edges fade into the page. */
+.aframe.is-scene .aframe__view {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: clip;
+  -webkit-mask-image: linear-gradient(transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(transparent, #000 7%, #000 93%, transparent);
+}
+/* Size and position come from aframe-floors.js. */
 .aframe.is-scene .aframe__house {
-  max-height: 42svh;
-  margin-bottom: 0;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  max-width: none;
+  margin: 0;
+  transform-origin: 50% 0;
   opacity: calc(0.25 + 0.75 * var(--enter, 1));
-  transform: scale(calc(0.8 + 0.2 * var(--enter, 1)));
-  transform-origin: 50% 100%;
+  will-change: transform;
 }
 .aframe.is-scene .aframe__band {
   fill: rgba(255, 255, 255, 0.035);
   cursor: pointer;
 }
+/* The drawing is zoomed about 2–3×; labels shrink to match. */
 .aframe.is-scene .aframe__label {
   fill: var(--muted);
+  font-size: 9px;
+}
+.aframe.is-scene .aframe__label[data-floor='2'] {
+  font-size: 8px;
 }
 .aframe[data-active='0'] .aframe__band[data-floor='0'],
 .aframe[data-active='1'] .aframe__band[data-floor='1'],
@@ -944,8 +967,9 @@ picture {
 }
 /* The three cards share one cell; the lit floor's card fades in. */
 .aframe.is-scene .floors {
+  flex: none;
   grid-template-columns: minmax(0, 1fr);
-  width: min(100%, 30rem);
+  width: min(calc(100% - 2 * var(--pad)), 30rem);
   margin: 0 auto;
 }
 .aframe.is-scene .floor {
@@ -962,20 +986,21 @@ picture {
   transform: none;
   pointer-events: auto;
 }
-/* Wide screens: house left, card right. */
+/* Wide screens: the window on the left, the card on the right. */
 @media (min-width: 901px) {
   .aframe.is-scene .aframe__stage {
     flex-direction: row;
     align-items: center;
     gap: clamp(2rem, 5vw, 4rem);
+    padding-block: 1.5rem;
+    margin-inline: 0;
   }
-  .aframe.is-scene .aframe__house {
-    width: min(46%, 440px);
-    max-height: 70svh;
-    margin: 0;
+  .aframe.is-scene .aframe__view {
+    align-self: stretch;
   }
   .aframe.is-scene .floors {
-    flex: 1;
+    flex: 0 1 26rem;
+    width: auto;
   }
 }
 .amenities {
