@@ -23,7 +23,7 @@ const ON_LIGHT = {
   pending: ['rgba(200, 120, 20, 0.16)', 'rgba(200, 120, 20, 0.65)', '#b06a0c'],
 };
 
-/* ── season presets: winter, spring, summer, autumn (t.seasons order) ── */
+/* ── season presets: winter, spring, summer, autumn ── */
 function snowflake(ctx, s) {
   ctx.lineWidth = s * 0.1;
   for (let i = 0; i < 6; i++) {
@@ -251,20 +251,12 @@ export async function openCalShare(year, month) {
   const now = new Date();
   const minKey = now.getFullYear() * 12 + now.getMonth();
   let key = Math.max(minKey, year * 12 + month);
-  // null = the shown month's own season; a tapped preset lasts until the month
-  // is changed.
-  let season = null;
 
   if (!dialog) {
     dialog = document.createElement('dialog');
     dialog.className = 'cal-share';
     dialog.innerHTML = `
       <canvas class="cal-share__canvas" width="${W}" height="${H}" role="img"></canvas>
-      <div class="cal-share__seasons" role="group" aria-label="${t.calSeason}">
-        ${t.seasons
-          .map((name, i) => `<button class="cal-share__season" type="button" data-season="${i}">${['❄️', '🌸', '☀️', '🍂'][i]} ${name}</button>`)
-          .join('')}
-      </div>
       <div class="cal-share__bar">
         <button class="cal__nav-btn" type="button" data-step="-1" aria-label="${t.calPrev}">&#8249;</button>
         <button class="btn btn--primary cal-share__share" type="button">${t.calShare}</button>
@@ -297,11 +289,8 @@ export async function openCalShare(year, month) {
     const m = key % 12;
     // The current month takes the season of the day it is shared on; a later
     // month takes the season of its 1st (the one most of the month falls in).
-    const si = season ?? seasonOn(key === minKey ? now : new Date(y, m, 1));
+    const si = seasonOn(key === minKey ? now : new Date(y, m, 1));
     draw(canvas, y, m, SEASONS[si]);
-    dialog.querySelectorAll('[data-season]').forEach((b) => {
-      b.setAttribute('aria-pressed', String(Number(b.dataset.season) === si));
-    });
     canvas.setAttribute('aria-label', `${t.months[m]} ${y} — ${t.calShareSubtitle}`);
     prev.disabled = key <= minKey;
     const k = key;
@@ -313,13 +302,6 @@ export async function openCalShare(year, month) {
   dialog.querySelectorAll('[data-step]').forEach((b) => {
     b.onclick = () => {
       key += Number(b.dataset.step);
-      season = null;
-      render();
-    };
-  });
-  dialog.querySelectorAll('[data-season]').forEach((b) => {
-    b.onclick = () => {
-      season = Number(b.dataset.season);
       render();
     };
   });

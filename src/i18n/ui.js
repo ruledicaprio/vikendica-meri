@@ -160,8 +160,6 @@ const bs = {
   calExpand: 'Cijeli ekran',
   calShare: 'Podijeli sliku',
   calShareSubtitle: 'Slobodni termini',
-  calSeason: 'Sezona',
-  seasons: ['Zima', 'Proljeće', 'Ljeto', 'Jesen'],
   nights: (n) => (n === 1 ? '1 noć' : `${n} noći`),
   formatDate: (d, months) => `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}.`,
 };
@@ -309,8 +307,6 @@ const en = {
   calExpand: 'Full screen',
   calShare: 'Share image',
   calShareSubtitle: 'Available dates',
-  calSeason: 'Season',
-  seasons: ['Winter', 'Spring', 'Summer', 'Autumn'],
   nights: (n) => `${n} ${n === 1 ? 'night' : 'nights'}`,
   formatDate: (d, months) => `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
 };
