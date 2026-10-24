@@ -9,6 +9,7 @@
     "photo": "node scripts/process-photo.js",
     "video": "node scripts/process-video.js",
     "icons": "node scripts/make-icons.js",
+    "vapid": "node scripts/make-vapid.js",
     "worker": "wrangler dev",
     "db:migrate:local": "wrangler d1 migrations apply vikendica-meri --local",
     "db:migrate": "wrangler d1 migrations apply vikendica-meri --remote"

@@ -130,6 +130,7 @@ body {
     grid-template-areas:
       'alert alert'
       'today today'
+      'push push'
       'main rail';
     column-gap: 1.5rem;
     /* Zero, because the alert and today carry their own bottom margins: an
@@ -143,6 +144,10 @@ body {
   }
   .mgr-today {
     grid-area: today;
+    margin-bottom: 2rem;
+  }
+  .mgr-push {
+    grid-area: push;
     margin-bottom: 2rem;
   }
   .mgr-main {
@@ -284,6 +289,65 @@ body {
   border-color: var(--red);
   color: var(--red);
   background: linear-gradient(var(--red-soft), var(--red-soft)), var(--surface);
+}
+
+/* ---------- Phone notifications ---------- */
+.mgr-push {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+}
+.mgr-push[hidden] {
+  display: none;
+}
+.mgr-push.is-off {
+  border: 2px dashed var(--blue);
+}
+.mgr-push p,
+.mgr-push ol {
+  margin: 0;
+}
+.mgr-push__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.mgr-push__text {
+  margin-top: 0.25rem !important;
+  font-size: 1rem;
+}
+.mgr-push__steps {
+  margin-top: 0.5rem !important;
+  padding-left: 1.3rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.mgr-push__note {
+  margin-top: 0.6rem !important;
+  font-size: 0.95rem;
+  color: var(--green);
+}
+.mgr-push__actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+.mgr-push__actions .mgr-btn {
+  flex: 1 1 0;
+  padding: 0 0.6rem;
+  white-space: nowrap;
+}
+.mgr-push .mgr-push__on {
+  width: 100%;
+  margin-top: 0.8rem;
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+  font-weight: 700;
+}
+/* The request a tapped notification opened. */
+.req.is-flash {
+  box-shadow: 0 0 0 3px var(--blue);
 }
 
 /* ---------- Alert ---------- */

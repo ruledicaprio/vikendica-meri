@@ -10,6 +10,12 @@
     <meta name="theme-color" content="#e3ded3" />
     <title>Manager — Vikendica Meri</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- Installable as a phone app (needed for push on iPhone). The manifest
+         lives outside /manager* on purpose: Access covers that whole prefix,
+         and a manifest behind a login is one the phone cannot read. -->
+    <link rel="manifest" href="/vm-manager.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Manager" />
   </head>
   <body>
     <header class="mgr-bar">
@@ -29,6 +35,10 @@
       <!-- What the owner opens the panel for: who is in the house now and who
            comes next. First in the DOM, so it is the first screen on a phone. -->
       <section class="mgr-today" id="summary" aria-label="Danas"></section>
+
+      <!-- Phone notifications for new requests (src/manager-push.js). Empty and
+           hidden until it knows what this browser can do. -->
+      <section class="mgr-push" id="push" aria-label="Obavještenja" hidden></section>
 
       <div class="mgr-main">
         <section class="mgr-section" id="pending">
@@ -77,5 +87,6 @@
     </main>
 
     <script type="module" src="/src/manager.js"></script>
+    <script type="module" src="/src/manager-push.js"></script>
   </body>
 </html>

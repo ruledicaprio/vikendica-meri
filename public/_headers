@@ -70,6 +70,11 @@
 /404.html
   Cache-Control: no-cache
 
+# Manager app manifest: public, harmless, rarely changes.
+/vm-manager.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: public, max-age=3600
+
 # Manager panel: guest personal data on screen. Never cached anywhere, and kept
 # out of search results even if a crawler somehow reached it.
 /manager/*

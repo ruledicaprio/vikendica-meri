@@ -43,12 +43,13 @@ local machine runs Node 24, so this class of failure is invisible outside CI.
 | D1 database | `vikendica-meri`, binding `DB` |
 | Schema | [`migrations/`](migrations) |
 | Owner panel | `/manager/`, behind Cloudflare Access |
+| Phone push | [`worker/push.js`](worker/push.js), [`public/manager/sw.js`](public/manager/sw.js) |
 | Public site | `/` (Bosnian) and `/en/`, rendered per locale at build time |
 
 ### Routes the Worker owns
 
 `POST /api/requests` · `GET /api/availability` · `GET /calendar.ics` ·
-`/api/admin/*` and `/manager*` (both owner-only). Everything else falls through
+`/api/admin/*` (incl. `/api/admin/push/*`) and `/manager*` (both owner-only). Everything else falls through
 to the asset router.
 
 Each of those is listed in `assets.run_worker_first`. **A route added to
@@ -84,6 +85,46 @@ Traps, each of which cost a real deploy cycle:
 Diagnose authorization from **Zero Trust → Insights & Logs → Access**. It names
 the email, the verdict and the matching policy — far faster than reading config
 screens.
+
+## Phone notifications (manager app)
+
+The manager can be added to a phone's home screen and push a notification for
+every new enquiry (`worker/push.js` sends, `public/manager/sw.js` shows,
+`src/manager-push.js` is the card in the panel). The lock-screen text carries
+dates, nights and guests only — no name, phone or email.
+
+One-time setup, in this order:
+
+1. **Table.** D1 dashboard → `vikendica-meri` → **Console**, run the contents of
+   [`migrations/0003_push.sql`](migrations/0003_push.sql) (the API token is
+   read-only, so `npm run db:migrate` cannot do it).
+2. **Key.** `npm run vapid` prints one JSON line. Store it as the secret
+   `VAPID_PRIVATE_JWK`: Workers → `vikendica-meri` → Settings → Variables and
+   Secrets → Add → type *Secret*, or `npx wrangler secret put VAPID_PRIVATE_JWK`.
+   The public key is derived from it; there is nothing else to set. A new key
+   disconnects every phone (each turns notifications on again in the panel).
+
+Until both exist, push is off: no notification is sent, and the panel hides the
+card (no key) or says the table is missing.
+
+On the phones:
+
+- **Android (Chrome):** open `/manager/`, tap **Uključi obavještenja**, allow.
+  Adding it to the home screen is optional but gives it an app icon.
+- **iPhone (iOS 16.4+):** push only works from the home-screen app. Safari →
+  **Dijeli → Dodaj na početni ekran**, open **Manager** from the home screen,
+  sign in (the home-screen app keeps its own login, separate from Safari), then
+  **Uključi obavještenja**. The panel shows these steps itself in Safari.
+- **Pošalji probnu** sends a test to that phone only. Phones that uninstall
+  the app or revoke permission are dropped automatically (push service 404/410).
+
+Traps:
+
+- The manifest is `/vm-manager.webmanifest`, **outside** `/manager*` on
+  purpose: the Access application covers that whole prefix, and a manifest
+  behind a login cannot be read by the phone.
+- `sw.js` lives under `/manager/` (behind Access) so its scope is the panel.
+  It caches nothing and never answers a fetch; the panel stays network-only.
 
 ## Secrets and vars
 
