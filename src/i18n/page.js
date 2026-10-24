@@ -145,7 +145,7 @@ export const bs = {
     'Tri noći.',
   faqQ6: 'Kako se plaća i treba li avans?',
   faqA6:
-    'Gotovinom, bankovnim transferom ili PayPalom. Rezervacija se potvrđuje uplatom avansa od 30% ukupnog iznosa.',
+    'Gotovinom ili bankovnim transferom. Rezervacija se potvrđuje uplatom avansa od 30% ukupnog iznosa.',
   faqQ7: 'Šta je uključeno u cijenu?',
   faqA7: 'Posteljina i pelet za grijanje.',
   faqQ8: 'Koliko je do Travnika i do sarajevskog aerodroma?',
@@ -317,7 +317,7 @@ export const en = {
     'Three nights.',
   faqQ6: 'How do I pay, and is a deposit required?',
   faqA6:
-    'Cash, bank transfer or PayPal. A 30% deposit, paid in advance, confirms the booking.',
+    'Cash or bank transfer. A 30% deposit, paid in advance, confirms the booking.',
   faqQ7: 'What is included in the price?',
   faqA7: 'Bedding and heating pellets.',
   faqQ8: 'How far is Travnik, and Sarajevo airport?',
