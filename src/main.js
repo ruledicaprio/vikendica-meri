@@ -2,7 +2,7 @@ import './style.css';
 import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews } from './gallery.js';
 import { initCalendar } from './calendar.js';
 import { initMiniCal } from './mini-cal.js';
-import { t } from './i18n/ui.js';
+import { t, lang } from './i18n/ui.js';
 
 // Three.js and GSAP are ~600 KB and ~70 KB of the bundle and neither is needed
 // for first paint, so both load after it. Everything below runs immediately.
@@ -209,8 +209,8 @@ function mailtoFallback(d) {
     `${L.name}: ${d.name || ''}`,
     `${L.email}: ${d.email || ''}`,
     `${L.phone}: ${d.phone || ''}`,
-    `${L.checkin}: ${d.checkin || ''}`,
-    `${L.checkout}: ${d.checkout || ''}`,
+    `${L.checkin}: ${d.checkin ? t.fieldDate(d.checkin) : ''}`,
+    `${L.checkout}: ${d.checkout ? t.fieldDate(d.checkout) : ''}`,
     `${L.guests}: ${d.guests || ''}`,
     '',
     d.message || '',
@@ -218,6 +218,43 @@ function mailtoFallback(d) {
   window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
     t.mailSubject
   )}&body=${encodeURIComponent(body)}`;
+}
+
+// Bosnian page: arrival/departure read 06.11.2026. whatever language the
+// browser itself is in (an English Windows prints 11/06/2026). The native date
+// input stays underneath for its picker and its ISO value; only its own text
+// is hidden behind the formatted copy.
+if (form && lang === 'bs') {
+  const syncs = [];
+  for (const input of form.querySelectorAll('input[type="date"]')) {
+    const wrap = document.createElement('span');
+    wrap.className = 'date-bs';
+    const text = document.createElement('span');
+    text.className = 'date-bs__text';
+    text.setAttribute('aria-hidden', 'true');
+    input.replaceWith(wrap);
+    wrap.append(input, text);
+    const sync = () => {
+      text.textContent = input.value ? t.fieldDate(input.value) : t.fieldDatePlaceholder;
+      text.classList.toggle('is-empty', !input.value);
+    };
+    input.addEventListener('input', sync);
+    input.addEventListener('change', sync);
+    // With a mouse, a click anywhere on the field opens the picker, not only
+    // the small icon; the hidden text is not something to click into.
+    input.addEventListener('click', () => {
+      if (matchMedia('(pointer: coarse)').matches) return;
+      try {
+        input.showPicker();
+      } catch {
+        /* older browser: the icon still opens it */
+      }
+    });
+    syncs.push(sync);
+    sync();
+  }
+  // reset() clears the values without an input event.
+  form.addEventListener('reset', () => setTimeout(() => syncs.forEach((s) => s())));
 }
 
 if (form) {

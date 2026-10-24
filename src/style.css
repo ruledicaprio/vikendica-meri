@@ -1622,6 +1622,41 @@ summary:focus-visible {
 .field textarea {
   resize: vertical;
 }
+/* Bosnian date fields (main.js): the native text is hidden and a dd.mm.gggg.
+   copy is drawn over it. The input, its picker and its icon stay native. */
+.date-bs {
+  position: relative;
+  display: block;
+}
+.date-bs input {
+  color: transparent;
+  cursor: pointer;
+}
+.date-bs input::-webkit-datetime-edit {
+  color: transparent;
+}
+/* Chrome paints the focused day/month/year segment in the selection colours,
+   which would show through. Its :focus is internal and an author :focus rule
+   does not match it, so the segments are styled outright. */
+.date-bs input::-webkit-datetime-edit-day-field,
+.date-bs input::-webkit-datetime-edit-month-field,
+.date-bs input::-webkit-datetime-edit-year-field,
+.date-bs input::-webkit-datetime-edit-text {
+  color: transparent;
+  background: transparent;
+}
+.date-bs__text {
+  position: absolute;
+  left: calc(0.9rem + 1px);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--cream);
+  font-size: 0.95rem;
+}
+.date-bs__text.is-empty {
+  color: var(--muted);
+}
 .contact-form .cf-turnstile {
   margin-bottom: 1rem;
   /* Reserves the widget's height before the script loads, so the submit button
@@ -1896,6 +1931,16 @@ summary:focus-visible {
   .navbar__links a {
     font-size: 1.1rem;
     padding: 0.5rem 0;
+  }
+  /* The rule above is for the plain links. It outranks .navbar__lang and
+     .navbar__cta, and zeroed their side padding: the text ran into the edge
+     of its pill. */
+  .navbar__links .navbar__lang {
+    padding: 0.4rem 1.2rem;
+  }
+  .navbar__links .navbar__cta {
+    padding: 0.6rem 1.4rem;
+    margin-top: 0.4rem;
   }
   .navbar__burger {
     display: flex;
