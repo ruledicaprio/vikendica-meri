@@ -571,59 +571,64 @@ picture {
 .seasons__tabs {
   display: none;
 }
-/* Tab cards (main.js adds .is-tabs): three cards in a row choose the text shown
-   in one panel underneath. The panel's own heading would repeat the card. */
+/* Connected tabs (main.js adds .is-tabs): a row of three text tabs joined to
+   the panel underneath into one card. The selected tab takes the panel's colour
+   and drops its bottom edge, so it reads as the panel's open folder tab. The
+   panel's own heading would repeat the tab. */
 .seasons.is-tabs {
   display: block;
+  --panel: #151b2c; /* --bg2 with 3% white, opaque so the tab can cover the seam */
 }
 .seasons.is-tabs .seasons__tabs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.7rem;
-  margin-bottom: 1rem;
 }
 .seasons__tab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  min-height: 5.5rem;
-  padding: 0.8rem 0.5rem;
+  min-height: 3.3rem;
+  margin-bottom: -1px; /* sit on the panel's top border */
+  padding: 0.7rem 0.4rem;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
   color: var(--muted);
   font: inherit;
   font-size: 0.98rem;
   font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 }
-.seasons__icon {
-  font-size: 1.6rem;
-  line-height: 1;
+.seasons__tab + .seasons__tab {
+  margin-left: -1px;
+}
+.seasons__tab:first-child {
+  border-top-left-radius: 16px;
+}
+.seasons__tab:last-child {
+  border-top-right-radius: 16px;
 }
 .seasons__tab:hover {
   color: var(--cream);
-  border-color: rgba(229, 168, 77, 0.5);
 }
 .seasons__tab[aria-selected='true'] {
+  position: relative;
+  z-index: 1;
+  border-bottom-color: var(--panel);
+  background: var(--panel);
   color: var(--cream);
-  border-color: var(--amber);
-  background: linear-gradient(160deg, rgba(212, 148, 58, 0.22), rgba(212, 148, 58, 0.06));
-  transform: translateY(-2px);
+  box-shadow: inset 0 2px 0 var(--amber);
 }
 .seasons__tab:focus-visible {
+  position: relative;
+  z-index: 2;
   outline: 2px solid var(--amber);
-  outline-offset: 3px;
+  outline-offset: -2px;
 }
 .seasons.is-tabs .seasons__item {
   padding: 1.3rem 1.4rem;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0 0 16px 16px;
+  background: var(--panel);
   animation: seasons-in 0.35s ease;
 }
 .seasons.is-tabs .seasons__item[hidden] {
@@ -648,20 +653,26 @@ picture {
     transition: none;
     animation: none;
   }
-  .seasons__tab[aria-selected='true'] {
-    transform: none;
-  }
 }
 
 /* ---------- Teleport veil (teleport.js) ----------
    Night sky with a warm glow, over everything but the open menu and lightbox.
    Fast in, slower out, so the destination appears rather than snaps. */
 .teleport {
+  /* The box itself never scales: a fixed layer wider than the screen lets
+     Android Chrome zoom the page out, and the fixed hero then shows beside
+     the content. The zoom happens on ::before, clipped here. */
   position: fixed;
   inset: 0;
   z-index: 90;
+  overflow: hidden;
   pointer-events: none;
   opacity: 0;
+}
+.teleport::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background:
     radial-gradient(circle at 50% 55%, rgba(229, 168, 77, 0.32), rgba(229, 168, 77, 0) 45%),
     radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.5) 0 1px, transparent 2px),
@@ -673,13 +684,19 @@ picture {
 }
 .teleport.is-in {
   opacity: 1;
+  transition: opacity 0.26s ease-in;
+}
+.teleport.is-in::before {
   transform: scale(1);
-  transition: opacity 0.26s ease-in, transform 0.26s ease-in;
+  transition: transform 0.26s ease-in;
 }
 .teleport.is-out {
   opacity: 0;
+  transition: opacity 0.55s ease-out;
+}
+.teleport.is-out::before {
   transform: scale(1.06);
-  transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+  transition: transform 0.55s ease-out;
 }
 
 /* ---------- Česta pitanja ----------
