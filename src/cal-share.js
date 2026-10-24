@@ -231,7 +231,7 @@ function draw(canvas, year, month) {
       ctx.strokeStyle = stroke;
       ctx.lineWidth = 3;
       ctx.stroke();
-      mark(ctx, status, x + cw * 0.62, y + ch * 0.6, 26, ink);
+      mark(ctx, status, x + cw * 0.58, y + ch * 0.66, 42, ink);
     }
     if (next && d >= turn) {
       // White on the solid booked/pending tiles, where the season colour vanishes.
@@ -254,7 +254,7 @@ function draw(canvas, year, month) {
   let lx = (W - widths.reduce((a, b) => a + b, 0) - sep * (items.length - 1)) / 2;
   ctx.textAlign = 'left';
   items.forEach((s, i) => {
-    mark(ctx, s, lx + 18, bottom + 34, 22, STATUS[s].key);
+    mark(ctx, s, lx + 18, bottom + 34, 30, STATUS[s].key);
     ctx.fillStyle = S.ink;
     ctx.fillText(label[s].toUpperCase(), lx + 52, bottom + 45);
     lx += widths[i] + sep;
