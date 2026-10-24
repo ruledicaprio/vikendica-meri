@@ -168,6 +168,8 @@ const bs = {
   // Arrival/departure as shown in the form and its prefilled text: 2026-11-06 → 06.11.2026.
   fieldDate: (ymd) => ymd.split('-').reverse().join('.') + '.',
   fieldDatePlaceholder: 'dd.mm.gggg.',
+  // Message prefilled when dates are picked in the calendar.
+  calAutoMsg: (from, to, n) => `Dolazak: ${from}\nOdlazak: ${to}\nBroj noći: ${n}`,
 };
 
 const en = {
@@ -319,6 +321,7 @@ const en = {
   formatDate: (d, months) => `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
   // English keeps the dates exactly as before.
   fieldDate: (ymd) => ymd,
+  calAutoMsg: (from, to, n) => `Check-in: ${from}\nCheck-out: ${to}\nNights: ${n}`,
 };
 
 // Exported because the build imports these too: plugins/gallery-manifest.js

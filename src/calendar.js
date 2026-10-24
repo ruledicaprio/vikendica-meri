@@ -322,7 +322,7 @@ export function initCalendar(container) {
     if (fromEl) { fromEl.value = selStart; fromEl.dispatchEvent(new Event('input')); }
     if (toEl)   { toEl.value   = selEnd;   toEl.dispatchEvent(new Event('input')); }
     if (msgEl && (!msgEl.value || msgEl.value === autoMsg)) {
-      autoMsg = `Dolazak: ${t.fieldDate(selStart)}\nOdlazak: ${t.fieldDate(selEnd)}\nBroj noći: ${diffDays(selStart, selEnd)}`;
+      autoMsg = t.calAutoMsg(t.fieldDate(selStart), t.fieldDate(selEnd), diffDays(selStart, selEnd));
       msgEl.value = autoMsg;
     }
     document.getElementById('reserve-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
