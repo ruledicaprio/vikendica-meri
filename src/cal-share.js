@@ -86,8 +86,15 @@ const SEASONS = [
   { bg: ['#4a2716', '#1f120a'], ink: '#fbefe2', muted: 'rgba(251, 239, 226, 0.68)', faint: 'rgba(251, 239, 226, 0.28)',
     line: 'rgba(251, 239, 226, 0.16)', accent: '#f0a04b', status: ON_DARK, motif: leaf, motifColor: '#d9692c' },
 ];
-/** Dec–Feb winter, Mar–May spring, Jun–Aug summer, Sep–Nov autumn. */
-const seasonOf = (month) => Math.floor(((month + 1) % 12) / 3);
+// Calendar seasons by start day (inclusive): spring 21 Mar, summer 21 Jun,
+// autumn 22 Sep, winter 22 Dec. [month index, day, SEASONS index].
+const SEASON_STARTS = [[2, 21, 1], [5, 21, 2], [8, 22, 3], [11, 22, 0]];
+function seasonOn(date) {
+  const md = date.getMonth() * 100 + date.getDate();
+  let si = 0; // 1 Jan – 20 Mar is still winter
+  for (const [m, d, s] of SEASON_STARTS) if (md >= m * 100 + d) si = s;
+  return si;
+}
 // Motifs sit in the header's side margins: [x, y, size, rotation].
 const MOTIFS = [
   [78, 82, 34, 0.2], [148, 196, 20, -0.5], [72, 312, 26, 0.7],
@@ -244,7 +251,8 @@ export async function openCalShare(year, month) {
   const now = new Date();
   const minKey = now.getFullYear() * 12 + now.getMonth();
   let key = Math.max(minKey, year * 12 + month);
-  // null = follow the shown month's season; a tapped preset sticks until closed.
+  // null = the shown month's own season; a tapped preset lasts until the month
+  // is changed.
   let season = null;
 
   if (!dialog) {
@@ -287,7 +295,9 @@ export async function openCalShare(year, month) {
   const render = () => {
     const y = Math.floor(key / 12);
     const m = key % 12;
-    const si = season ?? seasonOf(m);
+    // The current month takes the season of the day it is shared on; a later
+    // month takes the season of its 1st (the one most of the month falls in).
+    const si = season ?? seasonOn(key === minKey ? now : new Date(y, m, 1));
     draw(canvas, y, m, SEASONS[si]);
     dialog.querySelectorAll('[data-season]').forEach((b) => {
       b.setAttribute('aria-pressed', String(Number(b.dataset.season) === si));
@@ -303,6 +313,7 @@ export async function openCalShare(year, month) {
   dialog.querySelectorAll('[data-step]').forEach((b) => {
     b.onclick = () => {
       key += Number(b.dataset.step);
+      season = null;
       render();
     };
   });
