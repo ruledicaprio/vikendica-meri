@@ -245,7 +245,8 @@ body {
 }
 /* Scoped under .mgr-today__actions: .mgr-btn is declared later in the file
    and would otherwise win on background. */
-.mgr-today__actions .mgr-btn--call {
+.mgr-today__actions .mgr-btn--call,
+.req__status.is-answered {
   border-color: var(--blue);
   background: var(--blue-soft);
   color: var(--ink);
@@ -521,6 +522,14 @@ body {
 }
 .req__who a {
   color: var(--ink);
+}
+.req__hint {
+  margin: 0.7rem 0 0;
+  font-size: 0.95rem;
+  color: var(--ink-muted);
+}
+.req__contact {
+  margin-top: 0.7rem;
 }
 .req__msg {
   margin: 0.7rem 0 0;

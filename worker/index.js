@@ -405,7 +405,9 @@ async function listRequests(env) {
   return json({ requests: results ?? [] }, 200, { 'Cache-Control': 'no-store' });
 }
 
-const STATUSES = new Set(['pending', 'confirmed', 'declined', 'cancelled']);
+// 'answered' closes a general enquiry (no dates): the owner replied, nothing was
+// booked. It never reaches /api/availability, which only reads pending/confirmed.
+const STATUSES = new Set(['pending', 'confirmed', 'declined', 'cancelled', 'answered']);
 
 async function updateRequest(request, env, id) {
   let body;
