@@ -164,7 +164,8 @@ export const bs = {
   // Also stated as checkinTime/checkoutTime in the JSON-LD; the two must agree.
   contactCheckin: '🕓 Prijava od 15:00 · Odjava do 10:00',
   mapTitle: 'Lokacija — Vikendica Meri',
-  mapButton: 'Otvori u Google Maps',
+  // Map tabs: "Otvori u" + Google Maps / OpenStreetMap (the names stay as they are).
+  mapOpen: 'Otvori u',
 
   formTitle: 'Pošaljite upit',
   formName: 'Ime i prezime',
@@ -334,7 +335,7 @@ export const en = {
   contactDeposit: '💳 30% deposit to confirm the booking',
   contactCheckin: '🕓 Check-in from 15:00 · Check-out by 10:00',
   mapTitle: 'Location — Vikendica Meri',
-  mapButton: 'Open in Google Maps',
+  mapOpen: 'Open in',
 
   formTitle: 'Send an enquiry',
   formName: 'Full name',
