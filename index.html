@@ -388,10 +388,30 @@
           </div>
 
           <h3 class="subhead">{{floorsSubhead}}</h3>
+          <!-- A-frame cross-section (src/aframe-floors.js): with JS and motion,
+               the house draws itself as it scrolls in, then stays pinned while
+               scrolling lights one floor at a time, ground floor up, with that
+               floor's card beside it. Without either, the drawing sits above the
+               three cards as a plain diagram. -->
+          <div class="aframe" data-aframe>
+          <div class="aframe__stage">
+          <svg class="aframe__house" viewBox="0 0 320 300" aria-hidden="true">
+            <polygon class="aframe__band" data-floor="2" points="160,8 215.3,110 104.7,110" />
+            <polygon class="aframe__band" data-floor="1" points="104.7,110 215.3,110 264.1,200 55.9,200" />
+            <polygon class="aframe__band" data-floor="0" points="55.9,200 264.1,200 314,292 6,292" />
+            <line class="aframe__slab" x1="104.7" y1="110" x2="215.3" y2="110" />
+            <line class="aframe__slab" x1="55.9" y1="200" x2="264.1" y2="200" />
+            <circle class="aframe__window" cx="160" cy="48" r="8" />
+            <rect class="aframe__door" x="148" y="262" width="24" height="30" rx="2" />
+            <path class="aframe__outline" pathLength="1" d="M160 8 L314 292 L6 292 Z" />
+            <text class="aframe__label" data-floor="2" x="160" y="103">{{floorSecond}}</text>
+            <text class="aframe__label" data-floor="1" x="160" y="161">{{floorFirst}}</text>
+            <text class="aframe__label" data-floor="0" x="160" y="242">{{floorGround}}</text>
+          </svg>
           <div class="floors">
             <!-- The card holds a heading and a list, which a <button> may not
                  contain, so the control is a stretched overlay instead. -->
-            <article class="floor">
+            <article class="floor" data-floor="0">
               <h4>{{floorGround}}</h4>
               <ul>
                 <li>{{roomHallway}}</li><li>{{roomBathroom}}</li><li>{{roomLiving}}</li><li>{{roomKitchen}}</li>
@@ -399,7 +419,7 @@
               <button class="floor__view" type="button" data-photo="dnevni/00-dnevni-boravak.jpg"
                       aria-label="{{floorGround}} — {{floorViewPhoto}}"></button>
             </article>
-            <article class="floor">
+            <article class="floor" data-floor="1">
               <h4>{{floorFirst}}</h4>
               <ul>
                 <li>{{roomMaster}}</li>
@@ -408,7 +428,7 @@
               <button class="floor__view" type="button" data-photo="sobe/00-soba-bracna-sprat-1.jpg"
                       aria-label="{{floorFirst}} — {{floorViewPhoto}}"></button>
             </article>
-            <article class="floor">
+            <article class="floor" data-floor="2">
               <h4>{{floorSecond}}</h4>
               <ul>
                 <li>{{roomTwoSingle}}</li><li>{{roomThreeSingle}}</li>
@@ -416,6 +436,8 @@
               <button class="floor__view" type="button" data-photo="sobe/04-soba-sprat-2-prva.jpg"
                       aria-label="{{floorSecond}} — {{floorViewPhoto}}"></button>
             </article>
+          </div>
+          </div>
           </div>
 
           <h3 class="subhead">{{amenitiesSubhead}}</h3>
