@@ -797,6 +797,29 @@ els.archiveQ.addEventListener('input', () => {
 
 document.getElementById('refresh').addEventListener('click', load);
 
+// First visit: a short note on what the page is for. Remembered per browser;
+// if storage is unavailable it is simply not shown, rather than every time.
+const WELCOME_KEY = 'vm-manager-welcome-v1';
+const welcome = document.getElementById('welcome');
+welcome.addEventListener('close', () => {
+  try {
+    localStorage.setItem(WELCOME_KEY, '1');
+  } catch {
+    /* private mode: it shows again next time, nothing worse */
+  }
+});
+// A tap outside the card closes it too.
+welcome.addEventListener('click', (e) => {
+  if (e.target === welcome) welcome.close();
+});
+// The "i" in the header brings it back any time.
+document.getElementById('info').addEventListener('click', () => welcome.showModal());
+try {
+  if (!localStorage.getItem(WELCOME_KEY)) welcome.showModal();
+} catch {
+  /* storage blocked: skip the note */
+}
+
 // The block form sits folded on a phone (rare job, long form); a desktop has
 // the room to show it in the side column.
 if (matchMedia('(min-width: 900px)').matches) document.getElementById('blockbox').open = true;

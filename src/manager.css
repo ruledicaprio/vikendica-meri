@@ -71,6 +71,95 @@ body {
   font-weight: 600;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  color: inherit;
+  text-decoration: none;
+}
+.mgr-info {
+  /* 44px to tap, a 26px ring to see: present, not loud. */
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mgr-info span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  color: var(--ink-muted);
+  font: italic 600 15px/1 Georgia, 'Times New Roman', serif;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.mgr-info:hover span,
+.mgr-info:focus-visible span {
+  color: var(--blue);
+}
+.mgr-info:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 0;
+  border-radius: 50%;
+}
+.mgr-logo:hover {
+  text-decoration: underline;
+}
+.mgr-logo:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- First-visit note ---------- */
+.mgr-welcome {
+  width: min(34rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: 1.3rem 1.3rem 1.2rem;
+  border: 0;
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.35);
+}
+.mgr-welcome::backdrop {
+  background: rgba(34, 31, 26, 0.45);
+}
+.mgr-welcome h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1.35rem;
+}
+.mgr-welcome h2:focus {
+  outline: none;
+}
+.mgr-welcome p {
+  margin: 0 0 0.6rem;
+}
+.mgr-welcome ul {
+  margin: 0 0 0.8rem;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.4rem;
+  line-height: 1.4;
+}
+.mgr-welcome__note {
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  background: var(--brown-soft);
+}
+.mgr-welcome .mgr-welcome__ok {
+  width: 100%;
+  margin-top: 0.4rem;
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+  font-weight: 700;
 }
 /* With the 18px phone root there is not room for name, badge and "Osvježi"
    on one row; the badge is only a label, so it goes first. */
