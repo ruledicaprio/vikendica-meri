@@ -165,6 +165,9 @@ const bs = {
     `${['Zima', 'Proljeće', 'Ljeto', 'Jesen'][si]} od ${d}. ${['marta', 'juna', 'septembra', 'decembra'][(m - 2) / 3]}`,
   nights: (n) => (n === 1 ? '1 noć' : `${n} noći`),
   formatDate: (d, months) => `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}.`,
+  // Arrival/departure as shown in the form and its prefilled text: 2026-11-06 → 06.11.2026.
+  fieldDate: (ymd) => ymd.split('-').reverse().join('.') + '.',
+  fieldDatePlaceholder: 'dd.mm.gggg.',
 };
 
 const en = {
@@ -314,6 +317,8 @@ const en = {
   seasonFrom: (si, d, m) => `${['Winter', 'Spring', 'Summer', 'Autumn'][si]} from ${d} ${['March', 'June', 'September', 'December'][(m - 2) / 3]}`,
   nights: (n) => `${n} ${n === 1 ? 'night' : 'nights'}`,
   formatDate: (d, months) => `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
+  // English keeps the dates exactly as before.
+  fieldDate: (ymd) => ymd,
 };
 
 // Exported because the build imports these too: plugins/gallery-manifest.js

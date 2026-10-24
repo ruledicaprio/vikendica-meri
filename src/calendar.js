@@ -318,10 +318,11 @@ export function initCalendar(container) {
     const fromEl = document.getElementById('f-from');
     const toEl   = document.getElementById('f-to');
     const msgEl  = document.getElementById('f-msg');
-    if (fromEl) fromEl.value = selStart;
-    if (toEl)   toEl.value   = selEnd;
+    // The input events let the Bosnian page's formatted date text follow.
+    if (fromEl) { fromEl.value = selStart; fromEl.dispatchEvent(new Event('input')); }
+    if (toEl)   { toEl.value   = selEnd;   toEl.dispatchEvent(new Event('input')); }
     if (msgEl && (!msgEl.value || msgEl.value === autoMsg)) {
-      autoMsg = `Dolazak: ${selStart}\nOdlazak: ${selEnd}\nBroj noći: ${diffDays(selStart, selEnd)}`;
+      autoMsg = `Dolazak: ${t.fieldDate(selStart)}\nOdlazak: ${t.fieldDate(selEnd)}\nBroj noći: ${diffDays(selStart, selEnd)}`;
       msgEl.value = autoMsg;
     }
     document.getElementById('reserve-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
