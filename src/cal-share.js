@@ -11,12 +11,14 @@ import { dayStatus, toYMD } from './calendar.js';
 
 const W = 1080;
 const H = 1350;
-// Status colours as [fill, stroke, mark]. Every season is a light background:
-// it reads better on a phone feed than the dark versions did.
+// Status tiles on the light season backgrounds. Free days are near-white
+// tiles that lift off the background; booked and pending are solid, so they
+// stand out at a glance. `ink` is the day number and mark on the tile, `key`
+// the legend mark drawn on the background.
 const STATUS = {
-  available: ['rgba(60, 150, 85, 0.14)', 'rgba(60, 150, 85, 0.6)', '#2e8b4a'],
-  booked: ['rgba(200, 55, 55, 0.13)', 'rgba(200, 55, 55, 0.6)', '#c53030'],
-  pending: ['rgba(200, 120, 20, 0.16)', 'rgba(200, 120, 20, 0.65)', '#b06a0c'],
+  available: { fill: 'rgba(255, 255, 255, 0.88)', stroke: '#3f9a5c', ink: '#1f6b38', key: '#2e8b4a' },
+  booked: { fill: '#d64545', stroke: '#b02f2f', ink: '#ffffff', key: '#c53030' },
+  pending: { fill: '#f2a93b', stroke: '#cf8418', ink: '#3d2400', key: '#c27410' },
 };
 
 /* ── season presets: winter, spring, summer, autumn ── */
@@ -217,18 +219,27 @@ function draw(canvas, year, month) {
       ctx.lineWidth = 2;
       ctx.stroke();
     } else {
-      const [fill, stroke, ink] = STATUS[status];
+      const { fill, stroke, ink } = STATUS[status];
       roundRect(ctx, x, y, cw, ch, 14);
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.14)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 3;
       ctx.fillStyle = fill;
       ctx.fill();
+      ctx.restore();
       ctx.strokeStyle = stroke;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 3;
       ctx.stroke();
       mark(ctx, status, x + cw * 0.62, y + ch * 0.6, 26, ink);
     }
-    if (next && d >= turn) motifAt(ctx, next, x + cw - 24, y + 26, 13, 0, status === 'past' ? 0.4 : 1);
+    if (next && d >= turn) {
+      // White on the solid booked/pending tiles, where the season colour vanishes.
+      const T = status === 'booked' || status === 'pending' ? { ...next, motifColor: '#ffffff' } : next;
+      motifAt(ctx, T, x + cw - 24, y + 26, 13, 0, status === 'past' ? 0.4 : 1);
+    }
     ctx.textAlign = 'left';
-    ctx.fillStyle = status === 'past' ? S.faint : S.ink;
+    ctx.fillStyle = status === 'past' ? S.faint : status === 'available' ? S.ink : STATUS[status].ink;
     ctx.font = `600 32px ${SANS}`;
     ctx.fillText(String(d), x + 14, y + 42);
     ctx.textAlign = 'center';
@@ -243,7 +254,7 @@ function draw(canvas, year, month) {
   let lx = (W - widths.reduce((a, b) => a + b, 0) - sep * (items.length - 1)) / 2;
   ctx.textAlign = 'left';
   items.forEach((s, i) => {
-    mark(ctx, s, lx + 18, bottom + 34, 22, STATUS[s][2]);
+    mark(ctx, s, lx + 18, bottom + 34, 22, STATUS[s].key);
     ctx.fillStyle = S.ink;
     ctx.fillText(label[s].toUpperCase(), lx + 52, bottom + 45);
     lx += widths[i] + sep;
