@@ -70,6 +70,15 @@
 /404.html
   Cache-Control: no-cache
 
+# Public share link for the manager (preview card, then on to /manager/).
+# Nothing private on it; kept out of search results and always fresh.
+/upiti/
+  Cache-Control: no-cache
+  X-Robots-Tag: noindex, nofollow
+/upiti/index.html
+  Cache-Control: no-cache
+  X-Robots-Tag: noindex, nofollow
+
 # Manager panel: guest personal data on screen. Never cached anywhere, and kept
 # out of search results even if a crawler somehow reached it.
 /manager/*
