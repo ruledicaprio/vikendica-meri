@@ -104,8 +104,50 @@
         <li><strong>Vikendica Meri</strong> (gore lijevo): stranica za goste.</li>
       </ul>
       <p class="mgr-welcome__note"><strong>Interna bilješka</strong> je samo za vas — gost je ne dobija. Gostu odgovarate Viberom, pozivom ili mailom.</p>
+      <!-- Small way into the changelog (#news). -->
+      <button class="mgr-news-link" id="news-open" type="button">✨ Šta je novo <span aria-hidden="true">›</span></button>
       <form method="dialog">
         <button class="mgr-btn mgr-welcome__ok" type="submit">Razumijem</button>
+      </form>
+    </dialog>
+
+    <!-- Changelog, newest first. Plain words for whoever runs the panel; add a
+         line here when something they would notice changes. ✨ new, 🔧 fix. -->
+    <dialog class="mgr-welcome mgr-news" id="news" aria-labelledby="news-title">
+      <h2 id="news-title" tabindex="-1" autofocus>Šta je novo</h2>
+      <h3>24.10.2026.</h3>
+      <ul>
+        <li>✨ Manager kao aplikacija na telefonu: 🔔 javi čim stigne novi upit.</li>
+        <li>✨ Gore: ko je sada u kući i ko sljedeći dolazi, s dugmadima Viber i Nazovi.</li>
+        <li>✨ Viber je glavni; ako je gost pisao na WhatsApp, nudi se WhatsApp.</li>
+        <li>✨ Pitanje bez datuma može se označiti kao <em>Odgovoreno</em>.</li>
+        <li>✨ Link <strong>/upiti/</strong> za Viber i Messenger, s lijepom sličicom.</li>
+        <li>✨ „Vikendica Meri“ gore lijevo otvara stranicu za goste; „i“ otvara uputstvo.</li>
+        <li>✨ Stranica: kalendar se dijeli kao slika s godišnjim dobom (i Ctrl+V na računaru).</li>
+        <li>✨ Stranica: mapa s Google Maps i OpenStreetMap; meni na telefonu kao 4 pločice.</li>
+        <li>✨ Stranica: „Dodatne informacije:“ ispod datuma u poruci.</li>
+        <li>🔧 Blokirani termini (gosti s telefona) sada se računaju kao gosti.</li>
+        <li>🔧 Mail o upitu: datumi kao 02.11.2026.</li>
+        <li>🔧 Stranica: datumi u formularu po našem formatu.</li>
+        <li>🔧 Stranica: dolazak od 15:00, odlazak do 10:00; plaćanje gotovinom ili transferom.</li>
+      </ul>
+      <h3>23.10.2026.</h3>
+      <ul>
+        <li>✨ Dugme <em>Podijeli</em> uz svaki mjesec kalendara.</li>
+        <li>🔧 Na telefonu izbor datuma vodi pravo na formular.</li>
+        <li>🔧 Kraći tekstovi, bez ponavljanja.</li>
+      </ul>
+      <h3>22.10.2026.</h3>
+      <ul>
+        <li>✨ Mali kalendar na početku stranice.</li>
+      </ul>
+      <h3>16.10.2026.</h3>
+      <ul>
+        <li>✨ Izmjene iz oglasa prenesene na stranicu; avans 30% za potvrdu.</li>
+        <li>🔧 Cijena skinuta sa stranice.</li>
+      </ul>
+      <form method="dialog">
+        <button class="mgr-btn mgr-welcome__ok" type="submit">Zatvori</button>
       </form>
     </dialog>
 

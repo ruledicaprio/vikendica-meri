@@ -814,6 +814,15 @@ welcome.addEventListener('click', (e) => {
 });
 // The "i" in the header brings it back any time.
 document.getElementById('info').addEventListener('click', () => welcome.showModal());
+// "Šta je novo" in the note opens the changelog; it closes the same ways.
+const news = document.getElementById('news');
+news.addEventListener('click', (e) => {
+  if (e.target === news) news.close();
+});
+document.getElementById('news-open').addEventListener('click', () => {
+  welcome.close();
+  news.showModal();
+});
 try {
   if (!localStorage.getItem(WELCOME_KEY)) welcome.showModal();
 } catch {
