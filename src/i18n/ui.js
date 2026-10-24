@@ -160,6 +160,9 @@ const bs = {
   calShareMonth: 'Podijeli',
   calShare: 'Podijeli sliku',
   calShareSubtitle: 'Slobodni termini',
+  // Share image, transition months: "Zima od 22. decembra".
+  seasonFrom: (si, d, m) =>
+    `${['Zima', 'Proljeće', 'Ljeto', 'Jesen'][si]} od ${d}. ${['marta', 'juna', 'septembra', 'decembra'][(m - 2) / 3]}`,
   nights: (n) => (n === 1 ? '1 noć' : `${n} noći`),
   formatDate: (d, months) => `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}.`,
 };
@@ -307,6 +310,8 @@ const en = {
   calShareMonth: 'Share',
   calShare: 'Share image',
   calShareSubtitle: 'Available dates',
+  // Share image, transition months: "Winter from 22 December".
+  seasonFrom: (si, d, m) => `${['Winter', 'Spring', 'Summer', 'Autumn'][si]} from ${d} ${['March', 'June', 'September', 'December'][(m - 2) / 3]}`,
   nights: (n) => `${n} ${n === 1 ? 'night' : 'nights'}`,
   formatDate: (d, months) => `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
 };

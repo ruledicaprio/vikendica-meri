@@ -86,16 +86,41 @@ const SEASONS = [
   { bg: ['#4a2716', '#1f120a'], ink: '#fbefe2', muted: 'rgba(251, 239, 226, 0.68)', faint: 'rgba(251, 239, 226, 0.28)',
     line: 'rgba(251, 239, 226, 0.16)', accent: '#f0a04b', status: ON_DARK, motif: leaf, motifColor: '#d9692c' },
 ];
-// Calendar seasons by start day (inclusive): spring 21 Mar, summer 21 Jun,
-// autumn 22 Sep, winter 22 Dec. [month index, day, SEASONS index].
-const SEASON_STARTS = [[2, 21, 1], [5, 21, 2], [8, 22, 3], [11, 22, 0]];
-function seasonOn(date) {
-  const md = date.getMonth() * 100 + date.getDate();
-  let si = 0; // 1 Jan – 20 Mar is still winter
-  for (const [m, d, s] of SEASON_STARTS) if (md >= m * 100 + d) si = s;
-  return si;
+// Each season's background tone for a transition month that keeps the outgoing
+// season's brightness: [on a dark theme, on a light theme].
+const TINT = [['#0c1a2c', '#dbe8f5'], ['#173a26', '#d9eacb'], ['#4a3410', '#ffe0a3'], ['#1f120a', '#f5cfa8']];
+// The next season starts on this day of Mar, Jun, Sep, Dec (SEASONS index of
+// the outgoing season): spring 21 Mar, summer 21 Jun, autumn 22 Sep, winter 22 Dec.
+const TURN_DAY = [21, 21, 22, 22];
+
+/**
+ * Jan–Feb, Apr–May, Jul–Aug, Oct–Nov are one season. Mar, Jun, Sep, Dec are
+ * transition months: the outgoing season's colours (the 1st falls in it) with
+ * the background shading into the incoming season, the right-hand motifs and
+ * every day from the turn day on marked in the incoming season.
+ */
+function themeOf(month) {
+  const from = Math.floor(month / 3);
+  const S = SEASONS[from];
+  if (month % 3 !== 2) return { S };
+  const next = SEASONS[(from + 1) % 4];
+  const tint = TINT[(from + 1) % 4][S.status === ON_DARK ? 0 : 1];
+  return { S: { ...S, bg: [S.bg[0], tint] }, next, nextIdx: (from + 1) % 4, turn: TURN_DAY[from] };
 }
-// Motifs sit in the header's side margins: [x, y, size, rotation].
+
+function motifAt(ctx, T, x, y, size, rot = 0, alpha = 1) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = ctx.strokeStyle = T.motifColor;
+  ctx.lineCap = 'round';
+  T.motif(ctx, size);
+  ctx.restore();
+}
+
+// Motifs sit in the header's side margins: [x, y, size, rotation]. Left three,
+// then right three — in a transition month the right side is the next season.
 const MOTIFS = [
   [78, 82, 34, 0.2], [148, 196, 20, -0.5], [72, 312, 26, 0.7],
   [1002, 82, 34, -0.3], [932, 196, 20, 0.6], [1008, 312, 26, 0.1],
@@ -140,22 +165,18 @@ function mark(ctx, kind, cx, cy, s, color) {
   ctx.restore();
 }
 
-function draw(canvas, year, month, S) {
+function draw(canvas, year, month) {
+  const { S, next, nextIdx, turn } = themeOf(month);
   const ctx = canvas.getContext('2d');
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  // A transition month shades diagonally, from the outgoing season top-left to
+  // the incoming one bottom-right.
+  const grad = next ? ctx.createLinearGradient(0, 0, W, H) : ctx.createLinearGradient(0, 0, 0, H);
   grad.addColorStop(0, S.bg[0]);
+  grad.addColorStop(next ? 0.35 : 0, S.bg[0]);
   grad.addColorStop(1, S.bg[1]);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
-  for (const [x, y, size, rot] of MOTIFS) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rot);
-    ctx.fillStyle = ctx.strokeStyle = S.motifColor;
-    ctx.lineCap = 'round';
-    S.motif(ctx, size);
-    ctx.restore();
-  }
+  MOTIFS.forEach(([x, y, size, rot], i) => motifAt(ctx, next && i >= 3 ? next : S, x, y, size, rot));
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
 
@@ -184,7 +205,7 @@ function draw(canvas, year, month, S) {
   // Laid out for six rows; a shorter month is centred so the space it does not
   // use is split above and below instead of left as one band over the legend.
   const rows = Math.ceil((firstDow + days) / 7);
-  const top = 440 + ((6 - rows) * (ch + gap)) / 2;
+  const top = 440 - (next ? 22 : 0) + ((6 - rows) * (ch + gap)) / 2;
   const bottom = top + rows * (ch + gap) - gap;
   ctx.fillStyle = S.muted;
   ctx.font = `600 28px ${SANS}`;
@@ -213,6 +234,7 @@ function draw(canvas, year, month, S) {
       ctx.stroke();
       mark(ctx, status, x + cw * 0.62, y + ch * 0.6, 26, ink);
     }
+    if (next && d >= turn) motifAt(ctx, next, x + cw - 24, y + 26, 13, 0, status === 'past' ? 0.4 : 1);
     ctx.textAlign = 'left';
     ctx.fillStyle = status === 'past' ? S.faint : S.ink;
     ctx.font = `600 32px ${SANS}`;
@@ -234,6 +256,16 @@ function draw(canvas, year, month, S) {
     ctx.fillText(label[s].toUpperCase(), lx + 52, bottom + 45);
     lx += widths[i] + sep;
   });
+
+  // ── transition: what the corner marks mean ──
+  if (next) {
+    const text = t.seasonFrom(nextIdx, turn, month).toUpperCase();
+    ctx.font = `600 28px ${SANS}`;
+    const tw = 40 + ctx.measureText(text).width;
+    motifAt(ctx, next, (W - tw) / 2 + 13, bottom + 86, 15);
+    ctx.fillStyle = S.muted;
+    ctx.fillText(text, (W - tw) / 2 + 40, bottom + 96);
+  }
 
 }
 
@@ -287,10 +319,7 @@ export async function openCalShare(year, month) {
   const render = () => {
     const y = Math.floor(key / 12);
     const m = key % 12;
-    // The current month takes the season of the day it is shared on; a later
-    // month takes the season of its 1st (the one most of the month falls in).
-    const si = seasonOn(key === minKey ? now : new Date(y, m, 1));
-    draw(canvas, y, m, SEASONS[si]);
+    draw(canvas, y, m);
     canvas.setAttribute('aria-label', `${t.months[m]} ${y} — ${t.calShareSubtitle}`);
     prev.disabled = key <= minKey;
     const k = key;
