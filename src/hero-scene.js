@@ -301,9 +301,13 @@ export class CabinHeroScene {
 
     // Widths/positions kept within the A-frame triangle (half-width = 5*(1 - y/9))
     // so the railings sit on the gable, not jutting out past the silhouette.
-    cabin.add(this._createBalcony(5.2, 1.0, 0.9, 0, 3.4, 5.0));
-    cabin.add(this._createBalcony(3.7, 0.9, 0.8, 0, 5.4, 4.8));
-    cabin.add(this._createBalcony(2.0, 0.7, 0.6, 0, 7.0, 4.5));
+    // As on the real cabin: a raised porch at ground level with a lattice skirt,
+    // the 1st-floor balcony on the white slab over it, and the 2nd-floor one
+    // set into the gable. The attic has none.
+    cabin.add(this._createBalcony(7.0, 0.95, 1.6, 0, 0.6, 5.4, { skirt: true }));
+    cabin.add(this._createBalcony(5.4, 0.95, 0.9, 0, 3.5, 5.0, { fascia: true }));
+    // z: the railing must clear the snow-roof shell's front face (z = 5.2).
+    cabin.add(this._createBalcony(3.4, 0.9, 0.8, 0, 5.6, 5.0));
 
     // Exposed timber frame on the front gable — the "A" shape (two legs + tie beam).
     this._createAframeTimber();
@@ -357,25 +361,104 @@ export class CabinHeroScene {
     this.scene.add(cabin);
   }
 
-  _createBalcony(width, height, depth, x, y, z) {
+  // A balcony like the cabin's: closely spaced flat balusters with a waisted,
+  // sawn profile, a thick handrail and a bottom rail, square end posts, on all
+  // three open sides. (x, y, z) is the centre of the deck's top surface.
+  // opts.fascia: white slab under the deck front; opts.skirt: lattice under a
+  // raised deck, down to the ground.
+  _createBalcony(width, height, depth, x, y, z, opts = {}) {
     const group = new THREE.Group();
-    const woodMat = new THREE.MeshStandardMaterial({ color: VN.balcony, roughness: 0.8 });
-    const postMat = new THREE.MeshStandardMaterial({ color: VN.balconyPost, roughness: 0.7 });
+    // Faint self-glow, as on the beams: unlit at night they read as black.
+    const wood = (color, glow, roughness) =>
+      new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: glow, roughness });
+    const woodMat = wood(VN.balcony, 0.3, 0.8);
+    const postMat = wood(VN.balconyPost, 0.3, 0.7);
+    const box = (w, h, d, px, py, pz, mat) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+      m.position.set(px, py, pz);
+      m.castShadow = true;
+      group.add(m);
+      return m;
+    };
 
-    const floor = new THREE.Mesh(new THREE.BoxGeometry(width, 0.15, depth), woodMat);
-    floor.castShadow = true;
-    group.add(floor);
-
-    const postGeo = new THREE.CylinderGeometry(0.06, 0.06, height, 8);
-    const numPosts = Math.floor(width / 0.5);
-    for (let i = 0; i <= numPosts; i++) {
-      const post = new THREE.Mesh(postGeo, postMat);
-      post.position.set(-width / 2 + (i * width) / numPosts, height / 2, depth / 2);
-      group.add(post);
+    const deck = 0.18;
+    box(width, deck, depth, 0, -deck / 2, 0, woodMat);
+    if (opts.fascia) {
+      box(width + 0.1, 0.32, 0.14, 0, -deck - 0.16, depth / 2 - 0.05,
+        new THREE.MeshStandardMaterial({ color: 0xf0ece4, roughness: 0.7 }));
     }
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(width, 0.08, 0.08), postMat);
-    rail.position.set(0, height, depth / 2);
-    group.add(rail);
+
+    // Rails: handrail on top, a thinner one near the deck, front and both sides.
+    const front = depth / 2 - 0.05;
+    const top = height - 0.05;
+    box(width + 0.1, 0.1, 0.13, 0, top, front, postMat);
+    box(width, 0.06, 0.06, 0, 0.1, front, postMat);
+    for (const sx of [-1, 1]) {
+      const px = sx * (width / 2 - 0.05);
+      box(0.13, 0.1, depth, px, top, 0, postMat);
+      box(0.06, 0.06, depth, px, 0.1, 0, postMat);
+      box(0.13, height + 0.05, 0.13, px, (height + 0.05) / 2, front, postMat);
+    }
+
+    // Balusters: one sawn-board profile, instanced along the three sides.
+    const bh = top - 0.05 - 0.13; // between the rails
+    const bw = 0.11;
+    const prof = new THREE.Shape();
+    const half = [
+      [bw / 2, 0], [bw / 2, 0.07], [bw * 0.22, 0.16], [bw * 0.22, bh * 0.3],
+      [bw * 0.48, bh * 0.52], [bw * 0.22, bh * 0.74], [bw * 0.22, bh - 0.16],
+      [bw / 2, bh - 0.07], [bw / 2, bh],
+    ];
+    prof.moveTo(-half[0][0], 0);
+    half.forEach(([px, py]) => prof.lineTo(-px, py));
+    [...half].reverse().forEach(([px, py]) => prof.lineTo(px, py));
+    const balGeo = new THREE.ExtrudeGeometry(prof, { depth: 0.035, bevelEnabled: false });
+    balGeo.translate(0, 0.13, -0.0175);
+
+    const pitch = 0.15; // centre to centre: board, gap, board, as on the cabin
+    const spots = [];
+    const nFront = Math.floor((width - 0.3) / pitch);
+    for (let i = 0; i <= nFront; i++) {
+      spots.push([-(nFront * pitch) / 2 + i * pitch, front, 0]);
+    }
+    const nSide = Math.floor((depth - 0.2) / pitch);
+    for (const sx of [-1, 1]) {
+      for (let i = 0; i < nSide; i++) {
+        spots.push([sx * (width / 2 - 0.05), front - 0.12 - i * pitch, Math.PI / 2]);
+      }
+    }
+    const bal = new THREE.InstancedMesh(balGeo, woodMat, spots.length);
+    const m = new THREE.Matrix4();
+    const q = new THREE.Quaternion();
+    const up = new THREE.Vector3(0, 1, 0);
+    const one = new THREE.Vector3(1, 1, 1);
+    spots.forEach(([px, pz, rot], i) => {
+      q.setFromAxisAngle(up, rot);
+      bal.setMatrixAt(i, m.compose(new THREE.Vector3(px, 0, pz), q, one));
+    });
+    bal.castShadow = true;
+    group.add(bal);
+
+    // Lattice under a raised deck: crossed slats, as under the cabin's porch.
+    if (opts.skirt && y > 0.1) {
+      const lat = wood(VN.balcony, 0.25, 0.85);
+      const h = y - deck;
+      const len = Math.hypot(h, h);
+      const n = Math.floor(width / 0.28);
+      const slats = new THREE.InstancedMesh(new THREE.BoxGeometry(0.04, len, 0.03), lat, (n + 1) * 2);
+      const zAxis = new THREE.Vector3(0, 0, 1);
+      let k = 0;
+      for (let i = 0; i <= n; i++) {
+        const px = -width / 2 + 0.14 + i * ((width - 0.28) / n);
+        for (const sgn of [-1, 1]) {
+          q.setFromAxisAngle(zAxis, (sgn * Math.PI) / 4);
+          slats.setMatrixAt(k++, m.compose(new THREE.Vector3(px, -deck - h / 2, depth / 2 - 0.02), q, one));
+        }
+      }
+      group.add(slats);
+      box(width, h, 0.02, 0, -deck - h / 2, depth / 2 - 0.08,
+        new THREE.MeshStandardMaterial({ color: 0x2a1a16, roughness: 1 }));
+    }
 
     group.position.set(x, y, z);
     return group;
@@ -409,8 +492,9 @@ export class CabinHeroScene {
     beam(4.7, 0.2, 0.16, 8.6, 0.36);
     // The tie beam — the crossbar of the letter "A" (between the two balconies).
     beam(-2.35, 4.75, 2.35, 4.75, 0.46);
-    // Short king-post detail from the tie beam up toward the apex.
-    beam(0, 4.95, 0, 8.4, 0.26);
+    // Short king-post in the attic, above the 2nd-floor balcony (it used to run
+    // down through it, which the cabin does not).
+    beam(0, 6.8, 0, 8.4, 0.26);
   }
 
   // ----------------------------------------------------------
@@ -566,9 +650,9 @@ export class CabinHeroScene {
   _createStringLights() {
     // Sized to sit just above each (now narrower) balcony, within the silhouette.
     const lightPositions = [
-      { y: 4.4, z: 5.5, width: 5.0, count: 10 },
-      { y: 6.3, z: 5.3, width: 3.5, count: 8 },
-      { y: 7.8, z: 5.0, width: 1.9, count: 5 },
+      // Along the 1st- and 2nd-floor handrails, as on the cabin at night.
+      { y: 4.55, z: 5.5, width: 5.2, count: 11 },
+      { y: 6.6, z: 5.45, width: 3.2, count: 8 },
     ];
     const haloTex = this._haloTexture();
 
