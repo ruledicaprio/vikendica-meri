@@ -45,7 +45,7 @@ export const bs = {
   aboutP2Before: 'Smještena u mirnoj Dolini Panjeva na Babanovcu, nudi udoban prostor za',
   aboutP2Strong: 'do 10 osoba',
   aboutP2After:
-    '— idealno za zimske dane na snijegu i ljetne večeri uz roštilj. Centralno grijanje na pelet čuva toplinu doma u svako doba godine.',
+    '— za zimske dane na snijegu i ljetne večeri uz roštilj. Centralno grijanje na pelet grije kuću u svako doba godine.',
   factCapacity: '🛏️ Kapacitet ~10 osoba',
   factHeating: '🔥 Centralno grijanje',
   factLocation: '📍 Babanovac · 200 m od hotela Blanca',
@@ -92,14 +92,14 @@ export const bs = {
   destTitle: 'Planina Vlašić &amp; Grad Travnik',
   destVlasicTitle: 'Planina Vlašić',
   destVlasicBody:
-    'Vlašić je planina u centralnoj Bosni, poznat po ski-stazama Babanovca, borovim šumama i kristalnom zraku. Dolina Panjeva, gdje se nalazi Vikendica Meri, pruža mir i prirodu u svako godišnje doba.',
+    'Vlašić, planina u centralnoj Bosni, poznat je po ski-stazama Babanovca, borovim šumama i kristalnom zraku. Dolina Panjeva, gdje je Vikendica Meri, nudi mir i prirodu cijele godine.',
   destVlasicOnline: 'Vlašić online ↗',
   destSkiCentre: 'Ski-centar ↗',
   destLiveCams: '● Live kamere ↗',
   destLiveLift: '● Live: Lift Babanovac ↗',
   destTravnikTitle: 'Grad Travnik',
   destTravnikBody:
-    'Travnik — bivša prijestolnica Bosanskog ejaleta — krasi se historijskim utvrđenjem, šarenom čaršijom i legendom o Ivi Andriću. Udaljen je 30 minuta od Vlašića i savršen za kulturni izlet.',
+    'Travnik, bivša prijestolnica Bosanskog ejaleta, poznat je po starom utvrđenju, šarenoj čaršiji i Ivi Andriću. 30 minuta od Vlašića — savršen kulturni izlet.',
   destTravnikMuseum: 'Muzej Travnik ↗',
 
   // Location prose. Every number here traces to something the owner stated on
@@ -110,13 +110,13 @@ export const bs = {
   locTitle: 'Vlašić kroz godinu',
   locWinterTitle: 'Zimi',
   locWinterBody:
-    'Sve je na dohvat ruke: ski-liftovi Babanovac I i II su par minuta pješke preko platoa, a hotel Blanca 200 metara od kuće. Nazad se može i na skijama: staza Markovac spušta se prema naselju, oko dva kilometra do kuće. Vikendica ima centralno grijanje na pelet, uključeno u cijenu, pa se poslije dana na snijegu vraćate u već toplu kuću.',
+    'Ski-liftovi Babanovac I i II su par minuta pješke preko platoa, a hotel Blanca 200 metara od kuće. Nazad se može i na skijama: staza Markovac spušta se prema naselju, oko dva kilometra do kuće. Grijanje na pelet je uključeno u cijenu, pa se poslije snijega vraćate u toplu kuću.',
   locSummerTitle: 'Ljeti',
   locSummerBody:
-    'Dolina Panjeva je mirna strana Babanovca — borova šuma, pašnjaci i zrak zbog kojeg se na Vlašić i dolazi. Dvorište sa roštiljem gleda u šumu, a plato počinje nadomak kuće. Unutra ima mjesta za deset osoba na tri etaže, dovoljno za dvije porodice ili veće društvo.',
+    'Dolina Panjeva je mirna strana Babanovca — borova šuma, pašnjaci i zrak zbog kojeg se na Vlašić i dolazi. Dvorište sa roštiljem gleda u šumu, a plato počinje nadomak kuće. Deset osoba na tri etaže: dovoljno za dvije porodice ili veće društvo.',
   locRouteTitle: 'Kako doći',
   locRouteBody:
-    'Iz Sarajeva je oko 130 kilometara, oko dva sata vožnje: sat vremena autoputem do Lašve, pola sata do Travnika i još pola sata uzbrdo do Babanovca. Travnik je 30 kilometara od kuće, oko pola sata — i pravo mjesto da se stane na ćevape kod Harija prije nego se krene na planinu.',
+    'Iz Sarajeva je oko 130 kilometara, dva sata vožnje: sat autoputem do Lašve, pola sata do Travnika i pola sata uzbrdo do Babanovca. Travnik je 30 kilometara od kuće — pravo mjesto da se stane na ćevape kod Harija prije planine.',
 
   galleryKicker: 'Galerija',
   galleryTitle: 'Pogledajte smještaj',
@@ -131,7 +131,7 @@ export const bs = {
   faqTitle: 'Prije nego rezervišete',
   faqQ1: 'Šta je u blizini vikendice?',
   faqA1:
-    'Sve što treba za odmor je blizu: ski-liftovi Babanovac I i II su par minuta pješke preko platoa, hotel Blanca 200 metara, a sa staze Markovac do vikendice se može i na skijama. Travnik je oko pola sata vožnje.',
+    'Ski-liftovi Babanovac I i II su par minuta pješke preko platoa, hotel Blanca 200 metara, a sa staze Markovac do vikendice se može i na skijama. Travnik je oko pola sata vožnje.',
   faqQ2: 'Ima li parkinga?',
   faqA2:
     'Ispred kuće su garantovana tri parking mjesta, na otvorenom.',
@@ -139,7 +139,7 @@ export const bs = {
   faqA3: 'Nažalost ne — vikendica ne prima kućne ljubimce.',
   faqQ4: 'Kako se kuća grije i plaća li se grijanje posebno?',
   faqA4:
-    'Centralno grijanje na pelet. Pelet je uključen u cijenu, a u kući vas čekaju kratke upute za potpalu i održavanje.',
+    'Centralno grijanje na pelet, uključeno u cijenu. U kući vas čekaju kratke upute za potpalu i održavanje.',
   faqQ5: 'Koliko je najmanji boravak?',
   faqA5:
     'Tri noći.',
@@ -150,7 +150,7 @@ export const bs = {
   faqA7: 'Posteljina i pelet za grijanje.',
   faqQ8: 'Koliko je do Travnika i do sarajevskog aerodroma?',
   faqA8:
-    'Do Travnika je 30 kilometara, oko pola sata vožnje. Do aerodroma u Sarajevu oko 130 kilometara, oko dva sata: sat vremena autoputem do Lašve, pola sata do Travnika i još pola sata do Babanovca. Ako dolazite tim putem, vrijedi stati na ćevape kod Harija u Travniku.',
+    'Do Travnika je 30 kilometara, oko pola sata vožnje. Do aerodroma u Sarajevu oko 130 kilometara, dva sata: sat autoputem do Lašve, pola sata do Travnika i pola sata do Babanovca. Usput vrijedi stati na ćevape kod Harija u Travniku.',
   floorViewPhoto: 'pogledaj fotografiju',
   contactKicker: 'Kontakt',
   contactTitle: 'Rezervišite svoj boravak',
@@ -223,7 +223,7 @@ export const en = {
   aboutP2Before: 'Set in the quiet Dolina Panjeva valley at Babanovac, it offers comfortable space for',
   aboutP2Strong: 'up to 10 people',
   aboutP2After:
-    '— ideal for winter days in the snow and summer evenings around the grill. Pellet central heating keeps the house warm in every season.',
+    '— for winter days in the snow and summer evenings around the grill. Pellet central heating keeps the house warm all year.',
   factCapacity: '🛏️ Sleeps around 10',
   factHeating: '🔥 Central heating',
   factLocation: '📍 Babanovac · 200 m from Hotel Blanca',
@@ -270,14 +270,14 @@ export const en = {
   destTitle: 'Vlašić Mountain &amp; the Town of Travnik',
   destVlasicTitle: 'Vlašić Mountain',
   destVlasicBody:
-    'Vlašić is a mountain in central Bosnia, known for the ski runs at Babanovac, its pine forests and its clear air. Dolina Panjeva, where Vikendica Meri sits, offers quiet and nature in every season.',
+    'Vlašić, a mountain in central Bosnia, is known for the Babanovac ski runs, pine forests and clear air. Dolina Panjeva, home to Vikendica Meri, offers quiet and nature all year round.',
   destVlasicOnline: 'Vlašić online ↗',
   destSkiCentre: 'Ski centre ↗',
   destLiveCams: '● Live cameras ↗',
   destLiveLift: '● Live: Babanovac lift ↗',
   destTravnikTitle: 'Town of Travnik',
   destTravnikBody:
-    'Travnik — once the capital of the Bosnian eyalet — is known for its historic fortress, its colourful old bazaar and its association with the writer Ivo Andrić. It is 30 minutes from Vlašić and makes a perfect day out.',
+    'Travnik, once capital of the Bosnian eyalet, is known for its historic fortress, colourful old bazaar and the writer Ivo Andrić. 30 minutes from Vlašić — a perfect day out.',
   destTravnikMuseum: 'Travnik Museum ↗',
 
   // See the Bosnian block for provenance.
@@ -285,13 +285,13 @@ export const en = {
   locTitle: 'Vlašić through the year',
   locWinterTitle: 'In winter',
   locWinterBody:
-    'Everything is within easy reach: the Babanovac I and II lifts are a few minutes on foot across the plateau, and Hotel Blanca is 200 metres from the house. You can come back on them too: the Markovac piste runs down towards the village, about two kilometres to the house. Pellet central heating is included, so after a day in the snow you come back to a house that is already warm.',
+    'The Babanovac I and II lifts are a few minutes on foot across the plateau, and Hotel Blanca is 200 metres from the house. You can ski back too: the Markovac piste runs down towards the village, about two kilometres to the house. Pellet heating is included, so after a day in the snow you come back to a warm house.',
   locSummerTitle: 'In summer',
   locSummerBody:
-    'Dolina Panjeva is the quiet side of Babanovac — pine forest, pasture, and the air people come to Vlašić for. The yard and its grill look into the trees, and the plateau starts a short walk from the door. Inside there is room for ten across three floors, enough for two families or a large group.',
+    'Dolina Panjeva is the quiet side of Babanovac — pine forest, pasture, and the air people come to Vlašić for. The yard and its grill look into the trees, and the plateau starts a short walk from the door. Room for ten across three floors: enough for two families or a large group.',
   locRouteTitle: 'Getting here',
   locRouteBody:
-    'Sarajevo is roughly 130 kilometres away, about two hours: an hour on the motorway to Lasva, half an hour to Travnik, then another half hour up to Babanovac. Travnik itself is 30 kilometres from the house, about half an hour — and the right place to stop for cevapi at Hari before heading up the mountain.',
+    'Sarajevo is roughly 130 kilometres away, about two hours: an hour on the motorway to Lasva, half an hour to Travnik, then half an hour up to Babanovac. Travnik is 30 kilometres from the house — the right place to stop for cevapi at Hari before heading up.',
 
   galleryKicker: 'Gallery',
   galleryTitle: 'Take a look inside',
@@ -302,7 +302,7 @@ export const en = {
   faqTitle: 'Before you book',
   faqQ1: 'What is near the chalet?',
   faqA1:
-    'Everything you need is close by: the Babanovac I and II lifts are a few minutes on foot across the plateau, Hotel Blanca is 200 metres away, and you can ski back to the door from the Markovac piste. Travnik is about half an hour by car.',
+    'The Babanovac I and II lifts are a few minutes on foot across the plateau, Hotel Blanca is 200 metres away, and you can ski back to the door from the Markovac piste. Travnik is about half an hour by car.',
   faqQ2: 'Is there parking?',
   faqA2:
     'There are three guaranteed open-air parking spaces in front of the house.',
@@ -310,7 +310,7 @@ export const en = {
   faqA3: 'Unfortunately not — the chalet does not accept pets.',
   faqQ4: 'How is the house heated, and is heating charged separately?',
   faqA4:
-    'Pellet central heating. The pellets are included in the price, and short instructions for lighting and upkeep are waiting for you in the house.',
+    'Pellet central heating, included in the price. Short instructions for lighting and upkeep are waiting in the house.',
   faqQ5: 'What is the minimum stay?',
   faqA5:
     'Three nights.',
@@ -321,7 +321,7 @@ export const en = {
   faqA7: 'Bedding and heating pellets.',
   faqQ8: 'How far is Travnik, and Sarajevo airport?',
   faqA8:
-    'Travnik is 30 kilometres away, about half an hour by car. Sarajevo airport is roughly 130 kilometres, about two hours: an hour on the motorway to Lasva, half an hour to Travnik and another half hour up to Babanovac. If you come that way, it is worth stopping for cevapi at Hari in Travnik.',
+    'Travnik is 30 kilometres away, about half an hour by car. Sarajevo airport is roughly 130 kilometres, about two hours: an hour on the motorway to Lasva, half an hour to Travnik and half an hour up to Babanovac. On the way, stop for cevapi at Hari in Travnik.',
   floorViewPhoto: 'view photo',
   contactKicker: 'Contact',
   contactTitle: 'Book your stay',
