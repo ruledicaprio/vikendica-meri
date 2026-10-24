@@ -159,6 +159,8 @@ const bs = {
   calOffline: 'Trenutnu dostupnost nije moguće učitati — potvrdit ćemo termin na vaš upit.',
   calShareMonth: 'Podijeli',
   calShare: 'Podijeli sliku',
+  calCopiedInfo: '✓ Slika je kopirana — zalijepite je sa Ctrl+V u objavu ili poruku.',
+  calDownloadedInfo: '✓ Slika je preuzeta — dodajte je iz mape Preuzimanja.',
   calShareSubtitle: 'Slobodni termini',
   // Share image, transition months: "Zima od 22. decembra".
   seasonFrom: (si, d, m) =>
@@ -309,6 +311,8 @@ const en = {
   calOffline: 'Live availability could not be loaded — we will confirm your dates by reply.',
   calShareMonth: 'Share',
   calShare: 'Share image',
+  calCopiedInfo: '✓ Image copied — paste it with Ctrl+V into a post or message.',
+  calDownloadedInfo: '✓ Image downloaded — add it from your Downloads folder.',
   calShareSubtitle: 'Available dates',
   // Share image, transition months: "Winter from 22 December".
   seasonFrom: (si, d, m) => `${['Winter', 'Spring', 'Summer', 'Autumn'][si]} from ${d} ${['March', 'June', 'September', 'December'][(m - 2) / 3]}`,
