@@ -16,6 +16,17 @@ const MONTHS = [
   'januar', 'februar', 'mart', 'april', 'maj', 'juni',
   'juli', 'august', 'septembar', 'oktobar', 'novembar', 'decembar',
 ];
+/** "6. novembra" — the form a date takes in a sentence. */
+const MONTHS_GEN = [
+  'januara', 'februara', 'marta', 'aprila', 'maja', 'juna',
+  'jula', 'augusta', 'septembra', 'oktobra', 'novembra', 'decembra',
+];
+/** Accusative, for "u petak" / "u subotu". */
+const WEEKDAYS_ACC = ['nedjelju', 'ponedjeljak', 'utorak', 'srijedu', 'četvrtak', 'petak', 'subotu'];
+
+/** House times, as the site states them to guests. */
+const CHECKIN_TIME = '15:00';
+const CHECKOUT_TIME = '10:00';
 
 /** A pending request older than this is called out as waiting too long. */
 const STALE_DAYS = 2;
@@ -42,7 +53,12 @@ const els = {
 const esc = (s) =>
   String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
-const todayYmd = () => new Date().toISOString().slice(0, 10);
+// Local, not toISOString(): that is UTC, so between midnight and 02:00 in
+// Sarajevo it returned yesterday and the "in the house now" status was a day old.
+const todayYmd = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 // Every date here is a plain YYYY-MM-DD with no time zone. Anchoring at 12:00
 // local keeps a DST transition from turning a whole-day difference into 23 or
@@ -60,6 +76,12 @@ function fmtShort(ymd) {
   if (!ymd) return '';
   const d = at(ymd);
   return `${d.getDate()}. ${MONTHS[d.getMonth()]}`;
+}
+
+/** "u petak, 6. novembra" */
+function fmtDay(ymd) {
+  const d = at(ymd);
+  return `u ${WEEKDAYS_ACC[d.getDay()]}, ${d.getDate()}. ${MONTHS_GEN[d.getMonth()]}`;
 }
 
 function daysBetween(from, to) {
@@ -88,6 +110,9 @@ const plural = (n, one, few, many) =>
 
 const nightsLabel = (n) => `${n} ${plural(n, 'noć', 'noći', 'noći')}`;
 const daysLabel = (n) => `${n} ${plural(n, 'dan', 'dana', 'dana')}`;
+const guestsLabel = (n) => `${n} ${plural(n, 'gost', 'gosta', 'gostiju')}`;
+/** "danas" / "sutra" / "prekosutra" / "za 13 dana" */
+const whenLabel = (n) => (n === 0 ? 'danas' : n === 1 ? 'sutra' : n === 2 ? 'prekosutra' : `za ${daysLabel(n)}`);
 
 function say(text, kind = '') {
   els.status.textContent = text;
@@ -163,10 +188,14 @@ export function summarise(list, today) {
     confirmed.some((o) => o.id !== r.id && overlaps(r, o))
   );
 
+  // Who sleeps in the house tonight (arrived on or before today, leaves after
+  // it), who leaves today, and the next guests after today. Owner blocks count
+  // as occupancy but are not "guests arriving".
+  const inHouse = confirmed.find((r) => r.checkin <= today && r.checkout > today) || null;
+  const leavingToday = confirmed.find((r) => r.checkout === today) || null;
   const upcoming = confirmed
-    .filter((r) => r.checkin >= today)
+    .filter((r) => r.checkin > today && r.source !== 'manual')
     .sort((a, b) => a.checkin.localeCompare(b.checkin));
-  const inHouse = confirmed.find((r) => r.checkin <= today && r.checkout >= today) || null;
 
   // Nights occupied in the next 30 days, each stay clipped to the window so a
   // long booking that starts inside it does not overstate the total.
@@ -187,57 +216,112 @@ export function summarise(list, today) {
     nextArrival: upcoming[0] || null,
     daysToArrival: upcoming[0] ? daysBetween(today, upcoming[0].checkin) : null,
     inHouse,
+    leavingToday,
     nights30,
     oldestPendingDays: ages.length ? Math.max(...ages) : null,
   };
 }
 
-function statHtml({ value, label, sub, tone }) {
-  return `<div class="mgr-stat${tone ? ` is-${tone}` : ''}">
-      <span class="mgr-stat__value">${esc(value)}</span>
-      <span class="mgr-stat__label">${esc(label)}</span>
-      <span class="mgr-stat__sub">${esc(sub || '')}</span>
-    </div>`;
+/** Call and WhatsApp buttons for a guest, or mail when there is no phone. */
+function contactHtml(r) {
+  if (r.phone) {
+    const digits = r.phone.replace(/[^\d+]/g, '');
+    return `<div class="mgr-today__actions">
+        <a class="mgr-btn mgr-btn--call" href="tel:${esc(digits)}">📞 Nazovi</a>
+        <a class="mgr-btn mgr-btn--wa" href="https://wa.me/${esc(digits.replace(/\D/g, ''))}" target="_blank" rel="noopener">💬 WhatsApp</a>
+      </div>`;
+  }
+  if (r.email) {
+    return `<div class="mgr-today__actions">
+        <a class="mgr-btn mgr-btn--call" href="mailto:${esc(r.email)}">✉️ Pošalji mail</a>
+      </div>`;
+  }
+  return '';
 }
 
-function renderSummary(s) {
-  const arrival = s.nextArrival
-    ? s.daysToArrival === 0
-      ? 'danas'
-      : `za ${daysLabel(s.daysToArrival)}`
-    : '—';
+function stayLine(r) {
+  return [nightsLabel(nights(r.checkin, r.checkout)), r.guests ? guestsLabel(Number(r.guests)) : '']
+    .filter(Boolean)
+    .join(' · ');
+}
 
-  els.summary.innerHTML = [
-    statHtml({
-      value: String(s.pending),
-      label: 'Na čekanju',
-      sub:
-        s.oldestPendingDays === null
-          ? 'sve riješeno'
-          : `najstariji čeka ${daysLabel(s.oldestPendingDays)}`,
-      tone: s.conflicts ? 'red' : s.pending ? 'brown' : '',
-    }),
-    statHtml({
-      value: arrival,
-      label: 'Sljedeći dolazak',
-      sub: s.nextArrival
-        ? `${s.nextArrival.name} · ${fmtShort(s.nextArrival.checkin)}`
-        : 'nema potvrđenih termina',
-      tone: s.nextArrival ? 'green' : '',
-    }),
-    statHtml({
-      value: String(s.nights30),
-      label: `Noći / ${HORIZON_DAYS} dana`,
-      sub: `od mogućih ${HORIZON_DAYS}`,
-      tone: s.nights30 ? 'blue' : '',
-    }),
-    statHtml({
-      value: s.inHouse ? s.inHouse.name : 'prazno',
-      label: 'Trenutno u kući',
-      sub: s.inHouse ? `do ${fmtShort(s.inHouse.checkout)}` : '—',
-      tone: s.inHouse ? 'green' : '',
-    }),
-  ].join('');
+/**
+ * The top of the panel, written to be read at a glance on a phone: who is in
+ * the house now, who comes next, and whether anything is waiting for an answer.
+ */
+function renderSummary(s, today) {
+  // ── now ──
+  let now;
+  const h = s.inHouse;
+  // On checkout morning the departing guests are still in the house until
+  // CHECKOUT_TIME; only after that is it free (or the next guests' turn).
+  const clock = new Date();
+  const hhmm = `${String(clock.getHours()).padStart(2, '0')}:${String(clock.getMinutes()).padStart(2, '0')}`;
+  const stillLeaving = !h && s.leavingToday && hhmm < CHECKOUT_TIME ? s.leavingToday : null;
+  if (stillLeaving) {
+    const title = stillLeaving.source === 'manual' ? `Blokirano: ${stillLeaving.name}` : stillLeaving.name;
+    now = `<article class="mgr-card is-busy">
+        <p class="mgr-card__kicker">Trenutno · kuća je zauzeta</p>
+        <p class="mgr-card__title">${esc(title)}</p>
+        <p class="mgr-card__line"><strong>Odlaze danas</strong> do ${CHECKOUT_TIME}</p>
+        <p class="mgr-card__line">Večeras je kuća slobodna.</p>
+        ${stillLeaving.source === 'manual' ? '' : contactHtml(stillLeaving)}
+      </article>`;
+  } else if (h) {
+    const left = daysBetween(today, h.checkout);
+    const title = h.source === 'manual' ? `Blokirano: ${h.name}` : h.name;
+    const lines = [
+      h.checkin === today && h.source !== 'manual'
+        ? `<strong>Dolaze danas</strong> od ${CHECKIN_TIME}`
+        : `Stigli su ${esc(fmtDay(h.checkin))}`,
+      `Odlaze <strong>${esc(fmtDay(h.checkout))}</strong> do ${CHECKOUT_TIME}`,
+      `Još ${esc(nightsLabel(left))}${h.guests ? ` · ${esc(guestsLabel(Number(h.guests)))}` : ''}`,
+    ];
+    now = `<article class="mgr-card is-busy">
+        <p class="mgr-card__kicker">Trenutno · kuća je zauzeta</p>
+        <p class="mgr-card__title">${esc(title)}</p>
+        ${lines.map((l) => `<p class="mgr-card__line">${l}</p>`).join('')}
+        ${h.source === 'manual' ? '' : contactHtml(h)}
+      </article>`;
+  } else {
+    now = `<article class="mgr-card is-free">
+        <p class="mgr-card__kicker">Trenutno</p>
+        <p class="mgr-card__title">Kuća je slobodna</p>
+        <p class="mgr-card__line">Večeras nema gostiju.</p>
+      </article>`;
+  }
+  // Same-day turnover: the guests leaving this morning are worth a line of
+  // their own, whatever else is going on.
+  const leaving =
+    s.leavingToday && s.leavingToday !== h && !stillLeaving
+      ? `<p class="mgr-card__note">${hhmm < CHECKOUT_TIME ? `Danas odlaze do ${CHECKOUT_TIME}` : 'Danas su otišli'}: <strong>${esc(s.leavingToday.name)}</strong></p>`
+      : '';
+
+  // ── next ──
+  const n = s.nextArrival;
+  const next = n
+    ? `<article class="mgr-card is-next">
+        <p class="mgr-card__kicker">Sljedeći dolazak · ${esc(whenLabel(s.daysToArrival))}</p>
+        <p class="mgr-card__title">${esc(n.name)}</p>
+        <p class="mgr-card__line">Dolaze <strong>${esc(fmtDay(n.checkin))}</strong> od ${CHECKIN_TIME}</p>
+        <p class="mgr-card__line">Odlaze ${esc(fmtDay(n.checkout))} · ${esc(stayLine(n))}</p>
+        ${contactHtml(n)}
+      </article>`
+    : `<article class="mgr-card">
+        <p class="mgr-card__kicker">Sljedeći dolazak</p>
+        <p class="mgr-card__title">Nema potvrđenih gostiju</p>
+      </article>`;
+
+  // ── the rest, one line each ──
+  const waiting = s.pending
+    ? `<a class="mgr-line ${s.conflicts ? 'is-red' : 'is-brown'}" href="#pending">
+        <span><strong>${s.pending}</strong> ${s.pending === 1 ? 'zahtjev čeka' : s.pending <= 4 ? 'zahtjeva čekaju' : 'zahtjeva čeka'} odgovor${
+          s.oldestPendingDays ? ` · najstariji ${esc(daysLabel(s.oldestPendingDays))}` : ''
+        }</span> <span class="mgr-line__go" aria-hidden="true">›</span></a>`
+    : `<p class="mgr-line">Svi zahtjevi su odgovoreni.</p>`;
+  const busy = `<p class="mgr-line"><span>Zauzeto <strong>${s.nights30}</strong> od ${HORIZON_DAYS} noći u narednih ${HORIZON_DAYS} dana</span></p>`;
+
+  els.summary.innerHTML = `${now}${leaving}${next}${waiting}${busy}`;
 }
 
 function renderAlert(s) {
@@ -510,7 +594,7 @@ function renderArchive(rows) {
 function render() {
   const today = todayYmd();
   const s = summarise(all, today);
-  renderSummary(s);
+  renderSummary(s, today);
   renderAlert(s);
 
   // Longest wait first. The API orders by check-in, which is the wrong axis for
@@ -635,6 +719,10 @@ els.archiveQ.addEventListener('input', () => {
 });
 
 document.getElementById('refresh').addEventListener('click', load);
+
+// The block form sits folded on a phone (rare job, long form); a desktop has
+// the room to show it in the side column.
+if (matchMedia('(min-width: 900px)').matches) document.getElementById('blockbox').open = true;
 
 document.getElementById('block-form').addEventListener('submit', async (e) => {
   e.preventDefault();

@@ -12,7 +12,9 @@
   --surface: #faf8f4;
   --line: rgba(48, 42, 32, 0.16);
   --ink: #221f1a;
-  --ink-muted: rgba(34, 31, 26, 0.62);
+  /* 0.62 read as faint grey on a phone at arm's length; still clearly
+     secondary at 0.74, and far above 4.5:1. */
+  --ink-muted: rgba(34, 31, 26, 0.74);
   /* Each status has a text/border tone and a fill: the fills are too pale to
      read as text, and the text tones too dark to sit behind it. The text tones
      stay dark enough to clear 4.5:1 on --surface — "lighter" is the hue, not
@@ -35,11 +37,21 @@
 * {
   box-sizing: border-box;
 }
+/* Phones (the panel's main screen) get an 18px root. Everything below is in
+   rem, so text, padding and touch targets all grow together. */
+html {
+  font-size: 16px;
+}
+@media (max-width: 600px) {
+  html {
+    font-size: 18px;
+  }
+}
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font: 1rem/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif;
   padding-bottom: 4rem;
 }
 
@@ -58,6 +70,14 @@ body {
 .mgr-logo {
   font-weight: 600;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+/* With the 18px phone root there is not room for name, badge and "Osvježi"
+   on one row; the badge is only a label, so it goes first. */
+@media (max-width: 420px) {
+  .mgr-tag {
+    display: none;
+  }
 }
 .mgr-tag {
   font-size: 0.75rem;
@@ -74,7 +94,7 @@ body {
   margin: 0 0 0 auto;
   text-align: right;
   color: var(--ink-muted);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
 .mgr-status.is-err {
   color: var(--red);
@@ -101,91 +121,168 @@ body {
   min-width: 0;
 }
 
+/* Phone: one column in DOM order — alert, today, lists, block form. Desktop:
+   today across the top, the lists on the left, the block form in a sticky
+   column on the right. */
 @media (min-width: 900px) {
   .mgr-wrap {
     grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-areas:
+      'alert alert'
+      'today today'
+      'main rail';
     column-gap: 1.5rem;
-    /* Zero, because the alert carries its own bottom margin: an empty alert is
-       display:none and must not leave a gap behind it. */
+    /* Zero, because the alert and today carry their own bottom margins: an
+       empty alert is display:none and must not leave a gap behind it. */
     row-gap: 0;
     align-items: start;
   }
   #alert {
-    grid-column: 1 / -1;
-    grid-row: 1;
+    grid-area: alert;
     margin-bottom: 1.5rem;
   }
+  .mgr-today {
+    grid-area: today;
+    margin-bottom: 2rem;
+  }
   .mgr-main {
-    grid-column: 1;
-    grid-row: 2;
+    grid-area: main;
   }
   .mgr-rail {
-    grid-column: 2;
-    grid-row: 2;
+    grid-area: rail;
     position: sticky;
     top: calc(var(--bar-h) + 1rem);
   }
 }
 
-/* ---------- Summary strip ---------- */
-.mgr-summary {
+/* ---------- Today ---------- */
+/* Big, plain sentences: who is in the house, who comes next. Read at arm's
+   length, so the names are large and nothing important is grey or capitals. */
+.mgr-today {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.7rem;
+  gap: 0.8rem;
 }
-.mgr-stat {
+@media (min-width: 900px) {
+  .mgr-today {
+    grid-template-columns: 1fr 1fr;
+  }
+  .mgr-today > .mgr-line,
+  .mgr-today > .mgr-card__note {
+    grid-column: 1 / -1;
+  }
+}
+.mgr-card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-left: 3px solid var(--line);
-  border-radius: 12px;
-  padding: 0.8rem 0.9rem;
-  display: grid;
-  gap: 0.1rem;
+  border-left: 6px solid var(--line);
+  border-radius: 14px;
+  padding: 1rem 1.1rem 1.1rem;
   min-width: 0;
 }
-.mgr-stat__value {
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 1.2;
-  /* A guest name lands here as often as a number does. */
-  overflow-wrap: anywhere;
-}
-.mgr-stat__label {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink-muted);
-}
-.mgr-stat__sub {
-  font-size: 0.8rem;
-  color: var(--ink-muted);
-  overflow-wrap: anywhere;
-}
-.mgr-stat.is-brown {
+.mgr-card.is-busy {
   border-left-color: var(--brown);
-  background: linear-gradient(var(--brown-soft), var(--brown-soft)), var(--surface);
 }
-.mgr-stat.is-brown .mgr-stat__value {
-  color: var(--brown);
-}
-.mgr-stat.is-blue {
-  border-left-color: var(--blue);
-}
-.mgr-stat.is-blue .mgr-stat__value {
-  color: var(--blue);
-}
-.mgr-stat.is-green {
+.mgr-card.is-free {
   border-left-color: var(--green);
 }
-.mgr-stat.is-green .mgr-stat__value {
+.mgr-card.is-next {
+  border-left-color: var(--blue);
+}
+.mgr-card p {
+  margin: 0;
+}
+.mgr-card__kicker {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.mgr-card.is-busy .mgr-card__kicker {
+  color: var(--brown);
+}
+.mgr-card.is-free .mgr-card__kicker,
+.mgr-card.is-free .mgr-card__title {
   color: var(--green);
 }
-.mgr-stat.is-red {
-  border-left-color: var(--red);
-  background: linear-gradient(var(--red-soft), var(--red-soft)), var(--surface);
+.mgr-card.is-next .mgr-card__kicker {
+  color: var(--blue);
 }
-.mgr-stat.is-red .mgr-stat__value {
+.mgr-card__title {
+  margin: 0.15rem 0 0.4rem !important;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.mgr-card__line {
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+.mgr-card__line + .mgr-card__line {
+  margin-top: 0.15rem;
+}
+.mgr-card__note {
+  margin: 0;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  background: var(--brown-soft);
+  font-size: 1.05rem;
+}
+.mgr-today__actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+.mgr-today__actions .mgr-btn {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0 0.6rem;
+  white-space: nowrap;
+  text-decoration: none;
+  font-weight: 600;
+}
+/* Scoped under .mgr-today__actions: .mgr-btn is declared later in the file
+   and would otherwise win on background. */
+.mgr-today__actions .mgr-btn--call {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+  color: var(--ink);
+}
+.mgr-today__actions .mgr-btn--wa {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--ink);
+}
+/* "1 zahtjev čeka odgovor" and the 30-day occupancy: one readable line each. */
+.mgr-line {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 3rem;
+  margin: 0;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1rem;
+  text-decoration: none;
+}
+.mgr-line__go {
+  margin-left: auto;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.mgr-line.is-brown {
+  border-color: var(--brown);
+  background: linear-gradient(var(--brown-soft), var(--brown-soft)), var(--surface);
+}
+.mgr-line.is-red {
+  border-color: var(--red);
   color: var(--red);
+  background: linear-gradient(var(--red-soft), var(--red-soft)), var(--surface);
 }
 
 /* ---------- Alert ---------- */
@@ -217,24 +314,24 @@ body {
 /* ---------- Sections ---------- */
 .mgr-section {
   margin-top: 2.2rem;
+  /* Cleared by the sticky bar when "zahtjev čeka odgovor" jumps here. */
+  scroll-margin-top: calc(var(--bar-h) + 1rem);
 }
 .mgr-rail .mgr-section:first-child,
 .mgr-main .mgr-section:first-child {
   margin-top: 0;
 }
 .mgr-section h2 {
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
   display: flex;
   align-items: center;
   gap: 0.6rem;
   margin: 0 0 0.9rem;
 }
 .mgr-pill {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   background: rgba(48, 42, 32, 0.08);
   border-radius: 999px;
   padding: 0.1rem 0.55rem;
@@ -246,7 +343,7 @@ body {
 }
 .mgr-empty {
   color: var(--ink-muted);
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-style: italic;
 }
 
@@ -260,7 +357,7 @@ body {
   align-items: baseline;
   gap: 0.6rem;
   margin: 0 0 0.6rem;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 600;
   text-transform: capitalize;
   border-bottom: 1px solid var(--line);
@@ -269,32 +366,41 @@ body {
 .mgr-group__sum {
   margin-left: auto;
   font-weight: 400;
-  font-size: 0.82rem;
+  font-size: 0.92rem;
   color: var(--ink-muted);
   text-transform: none;
 }
 
 /* ---------- Archive ---------- */
-.mgr-archive > summary {
+.mgr-archive > summary,
+.mgr-blockbox > summary {
+  min-height: 3rem;
   cursor: pointer;
   list-style: none;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-.mgr-archive > summary::-webkit-details-marker {
+.mgr-archive > summary::-webkit-details-marker,
+.mgr-blockbox > summary::-webkit-details-marker {
   display: none;
 }
-.mgr-archive > summary::before {
+.mgr-archive > summary::before,
+.mgr-blockbox > summary::before {
   content: '▸';
   color: var(--ink-muted);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 }
-.mgr-archive[open] > summary::before {
+.mgr-archive[open] > summary::before,
+.mgr-blockbox[open] > summary::before {
   content: '▾';
 }
-.mgr-archive > summary h2 {
+.mgr-archive > summary h2,
+.mgr-blockbox > summary h2 {
   margin: 0;
+}
+.mgr-blockbox[open] > summary {
+  margin-bottom: 0.9rem;
 }
 .mgr-filters {
   display: grid;
@@ -307,14 +413,14 @@ body {
   gap: 0.4rem;
 }
 .mgr-chip {
-  min-height: 36px;
+  min-height: 2.75rem;
   padding: 0 0.8rem;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--ink-muted);
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.92rem;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -354,20 +460,20 @@ body {
   gap: 0.5rem 0.8rem;
 }
 .req__dates {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 .req__nights,
 .req__meta {
   color: var(--ink-muted);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
 .req__meta {
   margin: 0.4rem 0 0;
 }
 .req__badge,
 .req__status {
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   border-radius: 999px;
@@ -399,7 +505,7 @@ body {
 }
 .req__warn {
   margin: 0.7rem 0 0;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--red);
   background: var(--red-soft);
   border: 1px solid var(--red);
@@ -411,7 +517,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem 1rem;
-  font-size: 0.92rem;
+  font-size: 1rem;
 }
 .req__who a {
   color: var(--ink);
@@ -419,7 +525,7 @@ body {
 .req__msg {
   margin: 0.7rem 0 0;
   white-space: pre-wrap;
-  font-size: 0.92rem;
+  font-size: 1rem;
   color: var(--ink);
   border-left: 2px solid var(--line);
   padding-left: 0.8rem;
@@ -445,9 +551,9 @@ body {
 .req__more > summary {
   cursor: pointer;
   list-style: none;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--ink-muted);
-  min-height: 44px;
+  min-height: 3rem;
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -488,7 +594,7 @@ body {
 }
 .req__reply-label {
   flex: 1 1 100%;
-  font-size: 0.82rem;
+  font-size: 0.92rem;
   color: var(--ink-muted);
 }
 .mgr-btn--reply {
@@ -514,7 +620,7 @@ body {
 .req__edit label {
   display: grid;
   gap: 0.25rem;
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   color: var(--ink-muted);
   flex: 1 1 140px;
 }
@@ -527,7 +633,7 @@ body {
 }
 .req__note-label {
   flex: 1 1 100%;
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   color: var(--ink-muted);
 }
 .req__note {
@@ -550,14 +656,14 @@ body {
 
 /* ---------- Controls ---------- */
 .mgr-btn {
-  min-height: 44px;
+  min-height: 2.9rem;
   padding: 0 1rem;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--line);
   background: var(--bg);
   color: var(--ink);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 1rem;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -584,15 +690,16 @@ input[type='text'],
 input[type='search'],
 input[type='number'],
 input[type='date'] {
-  min-height: 44px;
+  min-height: 2.9rem;
   width: 100%;
   padding: 0 0.7rem;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--line);
   background: var(--bg);
   color: var(--ink);
   font: inherit;
-  font-size: 0.9rem;
+  /* At least 16px: iOS zooms the page into any smaller input on focus. */
+  font-size: 1rem;
 }
 input:focus-visible,
 .mgr-btn:focus-visible {
@@ -613,7 +720,7 @@ input:focus-visible,
 .mgr-block label {
   display: grid;
   gap: 0.3rem;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--ink-muted);
   flex: 1 1 140px;
 }
