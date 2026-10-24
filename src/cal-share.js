@@ -11,17 +11,121 @@ import { dayStatus, toYMD } from './calendar.js';
 
 const W = 1080;
 const H = 1350;
-const C = {
-  bg: '#0a0e1a',
-  bg2: '#0e1426',
-  cream: '#f5f0e8',
-  muted: 'rgba(245, 240, 232, 0.66)',
-  amber: '#e5a84d',
-  line: 'rgba(245, 240, 232, 0.14)',
+// Status colours as [fill, stroke, mark], one set per background brightness.
+const ON_DARK = {
   available: ['rgba(90, 170, 110, 0.22)', 'rgba(90, 170, 110, 0.55)', '#6fd08a'],
   booked: ['rgba(186, 62, 62, 0.38)', 'rgba(186, 62, 62, 0.75)', '#ff6b6b'],
   pending: ['rgba(212, 148, 58, 0.32)', 'rgba(212, 148, 58, 0.7)', '#f0b25a'],
 };
+const ON_LIGHT = {
+  available: ['rgba(60, 150, 85, 0.14)', 'rgba(60, 150, 85, 0.6)', '#2e8b4a'],
+  booked: ['rgba(200, 55, 55, 0.13)', 'rgba(200, 55, 55, 0.6)', '#c53030'],
+  pending: ['rgba(200, 120, 20, 0.16)', 'rgba(200, 120, 20, 0.65)', '#b06a0c'],
+};
+
+/* ── season presets: winter, spring, summer, autumn ── */
+function snowflake(ctx, s) {
+  ctx.lineWidth = s * 0.1;
+  for (let i = 0; i < 6; i++) {
+    ctx.rotate(Math.PI / 3);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -s);
+    ctx.moveTo(-s * 0.28, -s * 0.78);
+    ctx.lineTo(0, -s * 0.5);
+    ctx.lineTo(s * 0.28, -s * 0.78);
+    ctx.stroke();
+  }
+}
+function blossom(ctx, s) {
+  for (let i = 0; i < 5; i++) {
+    ctx.rotate((Math.PI * 2) / 5);
+    ctx.beginPath();
+    ctx.ellipse(0, -s * 0.5, s * 0.32, s * 0.48, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#f2c94c';
+  ctx.beginPath();
+  ctx.arc(0, 0, s * 0.22, 0, Math.PI * 2);
+  ctx.fill();
+}
+function sun(ctx, s) {
+  ctx.beginPath();
+  ctx.arc(0, 0, s * 0.45, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.lineWidth = s * 0.12;
+  for (let i = 0; i < 8; i++) {
+    ctx.rotate(Math.PI / 4);
+    ctx.beginPath();
+    ctx.moveTo(0, -s * 0.62);
+    ctx.lineTo(0, -s);
+    ctx.stroke();
+  }
+}
+function leaf(ctx, s) {
+  ctx.beginPath();
+  ctx.moveTo(0, -s);
+  ctx.quadraticCurveTo(s * 0.8, 0, 0, s * 0.8);
+  ctx.quadraticCurveTo(-s * 0.8, 0, 0, -s);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+  ctx.lineWidth = s * 0.08;
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 0.7);
+  ctx.lineTo(0, s * 1.15);
+  ctx.stroke();
+}
+
+const SEASONS = [
+  { bg: ['#1d3b5e', '#0c1a2c'], ink: '#f4f8fc', muted: 'rgba(244, 248, 252, 0.68)', faint: 'rgba(244, 248, 252, 0.28)',
+    line: 'rgba(244, 248, 252, 0.16)', accent: '#a8d8ff', status: ON_DARK, motif: snowflake, motifColor: 'rgba(214, 236, 255, 0.75)' },
+  { bg: ['#f5f9f0', '#d9eacb'], ink: '#1f3320', muted: 'rgba(31, 51, 32, 0.66)', faint: 'rgba(31, 51, 32, 0.3)',
+    line: 'rgba(31, 51, 32, 0.16)', accent: '#4a8a36', status: ON_LIGHT, motif: blossom, motifColor: '#f3a6c4' },
+  { bg: ['#fff8e6', '#ffe0a3'], ink: '#3a2a12', muted: 'rgba(58, 42, 18, 0.66)', faint: 'rgba(58, 42, 18, 0.3)',
+    line: 'rgba(58, 42, 18, 0.16)', accent: '#d26f12', status: ON_LIGHT, motif: sun, motifColor: '#f5b52e' },
+  { bg: ['#4a2716', '#1f120a'], ink: '#fbefe2', muted: 'rgba(251, 239, 226, 0.68)', faint: 'rgba(251, 239, 226, 0.28)',
+    line: 'rgba(251, 239, 226, 0.16)', accent: '#f0a04b', status: ON_DARK, motif: leaf, motifColor: '#d9692c' },
+];
+// Each season's background tone for a transition month that keeps the outgoing
+// season's brightness: [on a dark theme, on a light theme].
+const TINT = [['#0c1a2c', '#dbe8f5'], ['#173a26', '#d9eacb'], ['#4a3410', '#ffe0a3'], ['#1f120a', '#f5cfa8']];
+// The next season starts on this day of Mar, Jun, Sep, Dec (SEASONS index of
+// the outgoing season): spring 21 Mar, summer 21 Jun, autumn 22 Sep, winter 22 Dec.
+const TURN_DAY = [21, 21, 22, 22];
+
+/**
+ * Jan–Feb, Apr–May, Jul–Aug, Oct–Nov are one season. Mar, Jun, Sep, Dec are
+ * transition months: the outgoing season's colours (the 1st falls in it) with
+ * the background shading into the incoming season, the right-hand motifs and
+ * every day from the turn day on marked in the incoming season.
+ */
+function themeOf(month) {
+  const from = Math.floor(month / 3);
+  const S = SEASONS[from];
+  if (month % 3 !== 2) return { S };
+  const next = SEASONS[(from + 1) % 4];
+  const tint = TINT[(from + 1) % 4][S.status === ON_DARK ? 0 : 1];
+  return { S: { ...S, bg: [S.bg[0], tint] }, next, nextIdx: (from + 1) % 4, turn: TURN_DAY[from] };
+}
+
+function motifAt(ctx, T, x, y, size, rot = 0, alpha = 1) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = ctx.strokeStyle = T.motifColor;
+  ctx.lineCap = 'round';
+  T.motif(ctx, size);
+  ctx.restore();
+}
+
+// Motifs sit in the header's side margins: [x, y, size, rotation]. Left three,
+// then right three — in a transition month the right side is the next season.
+const MOTIFS = [
+  [78, 82, 34, 0.2], [148, 196, 20, -0.5], [72, 312, 26, 0.7],
+  [1002, 82, 34, -0.3], [932, 196, 20, 0.6], [1008, 312, 26, 0.1],
+];
+
 const SERIF = "'Playfair Display', Georgia, serif";
 const SANS = "'Inter', system-ui, sans-serif";
 
@@ -62,27 +166,32 @@ function mark(ctx, kind, cx, cy, s, color) {
 }
 
 function draw(canvas, year, month) {
+  const { S, next, nextIdx, turn } = themeOf(month);
   const ctx = canvas.getContext('2d');
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, C.bg2);
-  grad.addColorStop(1, C.bg);
+  // A transition month shades diagonally, from the outgoing season top-left to
+  // the incoming one bottom-right.
+  const grad = next ? ctx.createLinearGradient(0, 0, W, H) : ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, S.bg[0]);
+  grad.addColorStop(next ? 0.35 : 0, S.bg[0]);
+  grad.addColorStop(1, S.bg[1]);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
+  MOTIFS.forEach(([x, y, size, rot], i) => motifAt(ctx, next && i >= 3 ? next : S, x, y, size, rot));
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
 
   // ── header ──
-  ctx.fillStyle = C.amber;
+  ctx.fillStyle = S.accent;
   ctx.font = `italic 500 64px ${SERIF}`;
   ctx.fillText('Vikendica Meri', W / 2, 112);
-  ctx.fillStyle = C.muted;
+  ctx.fillStyle = S.muted;
   ctx.font = `500 30px ${SANS}`;
   ctx.fillText('Babanovac · Vlašić', W / 2, 160);
 
-  ctx.fillStyle = C.cream;
+  ctx.fillStyle = S.ink;
   ctx.font = `700 112px ${SERIF}`;
   ctx.fillText(t.months[month].toUpperCase(), W / 2, 290);
-  ctx.fillStyle = C.amber;
+  ctx.fillStyle = S.accent;
   ctx.font = `600 38px ${SANS}`;
   ctx.fillText(`${t.calShareSubtitle} · ${year}`, W / 2, 348);
 
@@ -90,15 +199,15 @@ function draw(canvas, year, month) {
   const x0 = 54;
   const gap = 10;
   const cw = (W - 2 * x0 - 6 * gap) / 7;
-  const ch = 112;
+  const ch = 124;
   const firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
   const days = new Date(year, month + 1, 0).getDate();
   // Laid out for six rows; a shorter month is centred so the space it does not
   // use is split above and below instead of left as one band over the legend.
   const rows = Math.ceil((firstDow + days) / 7);
-  const top = 440 + ((6 - rows) * (ch + gap)) / 2;
+  const top = 440 - (next ? 22 : 0) + ((6 - rows) * (ch + gap)) / 2;
   const bottom = top + rows * (ch + gap) - gap;
-  ctx.fillStyle = C.muted;
+  ctx.fillStyle = S.muted;
   ctx.font = `600 28px ${SANS}`;
   t.days.forEach((d, i) => ctx.fillText(d.toUpperCase(), x0 + i * (cw + gap) + cw / 2, top - 22));
 
@@ -112,11 +221,11 @@ function draw(canvas, year, month) {
 
     if (status === 'past') {
       roundRect(ctx, x, y, cw, ch, 14);
-      ctx.strokeStyle = C.line;
+      ctx.strokeStyle = S.line;
       ctx.lineWidth = 2;
       ctx.stroke();
     } else {
-      const [fill, stroke, ink] = C[status];
+      const [fill, stroke, ink] = S.status[status];
       roundRect(ctx, x, y, cw, ch, 14);
       ctx.fillStyle = fill;
       ctx.fill();
@@ -125,8 +234,9 @@ function draw(canvas, year, month) {
       ctx.stroke();
       mark(ctx, status, x + cw * 0.62, y + ch * 0.6, 26, ink);
     }
+    if (next && d >= turn) motifAt(ctx, next, x + cw - 24, y + 26, 13, 0, status === 'past' ? 0.4 : 1);
     ctx.textAlign = 'left';
-    ctx.fillStyle = status === 'past' ? 'rgba(245, 240, 232, 0.28)' : C.cream;
+    ctx.fillStyle = status === 'past' ? S.faint : S.ink;
     ctx.font = `600 32px ${SANS}`;
     ctx.fillText(String(d), x + 14, y + 42);
     ctx.textAlign = 'center';
@@ -141,29 +251,22 @@ function draw(canvas, year, month) {
   let lx = (W - widths.reduce((a, b) => a + b, 0) - sep * (items.length - 1)) / 2;
   ctx.textAlign = 'left';
   items.forEach((s, i) => {
-    mark(ctx, s, lx + 18, bottom + 34, 22, C[s][2]);
-    ctx.fillStyle = C.cream;
+    mark(ctx, s, lx + 18, bottom + 34, 22, S.status[s][2]);
+    ctx.fillStyle = S.ink;
     ctx.fillText(label[s].toUpperCase(), lx + 52, bottom + 45);
     lx += widths[i] + sep;
   });
 
-  // ── footer ──
-  ctx.textAlign = 'center';
-  ctx.strokeStyle = C.amber;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(140, 1250);
-  ctx.lineTo(W - 140, 1250);
-  ctx.stroke();
-  ctx.fillStyle = C.cream;
-  ctx.font = `600 34px ${SANS}`;
-  ctx.fillText(`${t.calShareContact}  +387 61 833 834`, W / 2, 1300);
-  const canonical = document.querySelector('link[rel="canonical"]')?.href;
-  if (canonical) {
-    ctx.fillStyle = C.muted;
-    ctx.font = `500 26px ${SANS}`;
-    ctx.fillText(new URL(canonical).host, W / 2, 1338);
+  // ── transition: what the corner marks mean ──
+  if (next) {
+    const text = t.seasonFrom(nextIdx, turn, month).toUpperCase();
+    ctx.font = `600 28px ${SANS}`;
+    const tw = 40 + ctx.measureText(text).width;
+    motifAt(ctx, next, (W - tw) / 2 + 13, bottom + 86, 15);
+    ctx.fillStyle = S.muted;
+    ctx.fillText(text, (W - tw) / 2 + 40, bottom + 96);
   }
+
 }
 
 let dialog = null;

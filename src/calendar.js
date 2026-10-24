@@ -132,24 +132,25 @@ export function initCalendar(container) {
 
     wrap.appendChild(grid);
 
-    // This month full screen, as a shareable image. Not offered when the data
+    // Share this month as an image (opens a preview first). Not offered when the data
     // has not been read (yet, or at all): the image would show a fake all-free
     // month. Nor for a past month, which the share view does not show.
     const now = new Date();
     if (loaded && !offline && year * 12 + month >= now.getFullYear() * 12 + now.getMonth()) {
-      const expand = document.createElement('button');
-      expand.type = 'button';
-      expand.className = 'cal__expand';
-      expand.textContent = `⤢ ${t.calExpand}`;
-      expand.setAttribute('aria-label', `${t.calExpand} — ${MONTHS[month]} ${year}`);
-      expand.addEventListener('click', async () => {
+      const share = document.createElement('button');
+      share.type = 'button';
+      share.className = 'cal__share';
+      // Inline SVG, not a glyph: share symbols render differently per platform.
+      share.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>${t.calShareMonth}`;
+      share.setAttribute('aria-label', `${t.calShareMonth} — ${MONTHS[month]} ${year}`);
+      share.addEventListener('click', async () => {
         const { openCalShare } = await import('./cal-share.js');
         openCalShare(year, month);
       });
       const head = document.createElement('div');
       head.className = 'cal__month-head';
       title.replaceWith(head);
-      head.append(title, expand);
+      head.append(title, share);
     }
     return wrap;
   }
