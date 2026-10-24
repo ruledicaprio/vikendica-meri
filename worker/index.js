@@ -5,6 +5,7 @@
 // falls through to env.ASSETS untouched, so the public pages, the 404 handling
 // and the cache headers behave exactly as they did before this file existed.
 import { verifyAccess } from './access.js';
+import { notifyPhones, handlePushAdmin } from './push.js';
 
 /* ---------------------------------------------------------------- helpers -- */
 
@@ -393,7 +394,31 @@ async function postRequest(request, env, ctx) {
     return json({ ok: true, stored: false, reason: String(err.message || err) }, 202);
   }
 
+  // Phones only once the row exists, because the notification opens it.
+  ctx.waitUntil(notifyPhones(env, phoneMessage(data, id)));
+
   return json({ ok: true, id }, 201);
+}
+
+/**
+ * What the owner's phone shows. It lands on a lock screen, so dates, nights and
+ * guests only — no name, phone or email.
+ */
+function phoneMessage(data, id) {
+  let body = 'Novi opći upit (bez datuma)';
+  if (data.checkin && data.checkout) {
+    const d = (ymd) => `${ymd.slice(8, 10)}.${ymd.slice(5, 7)}.`;
+    const n = Math.round((Date.parse(data.checkout) - Date.parse(data.checkin)) / 86400000);
+    const g = Number(data.guests) || 0;
+    body = [
+      `Novi upit · ${d(data.checkin)}–${d(data.checkout)}`,
+      `${n} ${n === 1 ? 'noć' : 'noći'}`,
+      g ? `${g} ${g === 1 ? 'gost' : g <= 4 ? 'gosta' : 'gostiju'}` : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+  }
+  return { title: 'Vikendica Meri', body, url: `/manager/#req-${id}`, tag: id };
 }
 
 async function listRequests(env) {
@@ -530,6 +555,9 @@ export default {
       }
       if (pathname === '/api/admin/block' && request.method === 'POST') {
         return createBlock(request, env);
+      }
+      if (pathname.startsWith('/api/admin/push/')) {
+        return handlePushAdmin(request, env, pathname);
       }
       const match = pathname.match(/^\/api\/admin\/requests\/([0-9a-f-]{36})$/);
       if (match && request.method === 'POST') {

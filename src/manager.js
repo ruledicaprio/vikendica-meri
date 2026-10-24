@@ -122,6 +122,7 @@ function say(text, kind = '') {
 /* ------------------------------------------------------------------- data -- */
 
 let all = [];
+let loadedOnce = false;
 
 /** View state that must survive the full re-render every action triggers. */
 const view = { q: '', chips: new Set() };
@@ -143,6 +144,15 @@ async function load() {
     const { requests } = await api('/api/admin/requests');
     all = requests;
     render();
+    // A tapped phone notification opens /manager/#req-<id>. The browser tried
+    // to jump there before the list existed, so do it now, once.
+    const target = !loadedOnce && location.hash.startsWith('#req-') && document.querySelector(location.hash);
+    loadedOnce = true;
+    if (target) {
+      target.scrollIntoView({ block: 'start' });
+      target.classList.add('is-flash');
+      return;
+    }
     // Re-rendering replaces whole lists, which can change the page height under
     // the viewport. Put the owner back where they were reading.
     window.scrollTo(0, scroll);
