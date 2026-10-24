@@ -162,7 +162,7 @@ export const bs = {
   contactNote: '🕑 Minimalni boravak: 3 noći',
   contactDeposit: '💳 Avans 30% za potvrdu rezervacije',
   // Also stated as checkinTime/checkoutTime in the JSON-LD; the two must agree.
-  contactCheckin: '🕓 Prijava od 14:00 · Odjava do 11:00',
+  contactCheckin: '🕓 Prijava od 15:00 · Odjava do 10:00',
   mapTitle: 'Lokacija — Vikendica Meri',
   mapButton: 'Otvori u Google Maps',
 
@@ -332,7 +332,7 @@ export const en = {
   contactViberAria: 'Message +387 61 833 834 on Viber',
   contactNote: '🕑 Minimum stay: 3 nights',
   contactDeposit: '💳 30% deposit to confirm the booking',
-  contactCheckin: '🕓 Check-in from 14:00 · Check-out by 11:00',
+  contactCheckin: '🕓 Check-in from 15:00 · Check-out by 10:00',
   mapTitle: 'Location — Vikendica Meri',
   mapButton: 'Open in Google Maps',
 
