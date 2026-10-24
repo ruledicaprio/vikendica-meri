@@ -295,6 +295,7 @@ export async function openCalShare(year, month) {
       <div class="cal-share__bar">
         <button class="cal__nav-btn" type="button" data-step="-1" aria-label="${t.calPrev}">&#8249;</button>
         <button class="btn btn--primary cal-share__share" type="button">${t.calShare}</button>
+        <button class="btn btn--secondary cal-share__copy" type="button" aria-live="polite">${t.calCopy}</button>
         <button class="cal__nav-btn" type="button" data-step="1" aria-label="${t.calNext}">&#8250;</button>
       </div>
       <button class="cal-share__close" type="button" aria-label="${t.close}">×</button>`;
@@ -355,6 +356,25 @@ export async function openCalShare(year, month) {
     a.download = f.name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+  // Desktop: the share button opens the system share sheet or downloads a
+  // file, neither of which can be pasted with Ctrl+V into Facebook/Messenger.
+  // Copy puts the PNG itself on the clipboard. Hidden where the browser cannot
+  // write images to it, and on touch screens (CSS), where sharing is the way.
+  const copy = dialog.querySelector('.cal-share__copy');
+  copy.hidden = !(window.ClipboardItem && navigator.clipboard?.write);
+  let copyTimer = 0;
+  copy.onclick = async () => {
+    try {
+      // The PNG (or the promise of it) goes in as-is: Safari allows the write
+      // only from inside the click, so nothing may be awaited before it.
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': file ?? encode(key) })]);
+      copy.textContent = t.calCopied;
+    } catch {
+      copy.textContent = t.calCopyFailed;
+    }
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => (copy.textContent = t.calCopy), 2500);
   };
 
   render();

@@ -1034,6 +1034,16 @@ picture {
   gap: 1rem;
   padding-bottom: env(safe-area-inset-bottom);
 }
+/* .btn sets display, which would beat the hidden attribute. Touch screens get
+   the share sheet instead, so the copy button is left off there. */
+.cal-share__copy[hidden] {
+  display: none;
+}
+@media (pointer: coarse) {
+  .cal-share__copy {
+    display: none;
+  }
+}
 .cal-share__close {
   position: absolute;
   top: 0.6rem;
