@@ -131,7 +131,9 @@ export class CabinHeroScene {
     this.renderer.shadowMap.enabled = this.tier.shadows;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.0;
+    // Starting values are a touch brighter than the night scene used to be, so
+    // the A-frame reads behind the title; the scroll still ends where it did.
+    this.renderer.toneMappingExposure = 1.15;
     this.container.appendChild(this.renderer.domElement);
 
     this.raycaster = new THREE.Raycaster();
@@ -237,10 +239,10 @@ export class CabinHeroScene {
   //  LIGHTS
   // ----------------------------------------------------------
   _createLights() {
-    this.ambientLight = new THREE.AmbientLight(0x404060, 0.4);
+    this.ambientLight = new THREE.AmbientLight(0x404060, 0.6);
     this.scene.add(this.ambientLight);
 
-    this.dirLight = new THREE.DirectionalLight(0x8888cc, 0.6);
+    this.dirLight = new THREE.DirectionalLight(0x8888cc, 0.8);
     this.dirLight.position.set(5, 10, 5);
     this.dirLight.castShadow = true;
     this.dirLight.shadow.mapSize.set(1024, 1024);
@@ -250,7 +252,7 @@ export class CabinHeroScene {
     this.interiorLight.position.set(0, 3, 0);
     this.scene.add(this.interiorLight);
 
-    this.fillLight = new THREE.PointLight(0x4466aa, 0.3, 20);
+    this.fillLight = new THREE.PointLight(0x4466aa, 0.45, 20);
     this.fillLight.position.set(0, -2, 10);
     this.scene.add(this.fillLight);
   }
@@ -776,9 +778,9 @@ export class CabinHeroScene {
 
     // Ambient / directional / interior lighting.
     this.ambientLight.color.lerpColors(C_AMBIENT_WINTER, C_AMBIENT_SUMMER, this.scrollProgress);
-    this.ambientLight.intensity = 0.4 + this.scrollProgress * 0.6;
+    this.ambientLight.intensity = 0.6 + this.scrollProgress * 0.4;
     this.dirLight.color.lerpColors(C_DIR_WINTER, C_DIR_SUMMER, this.scrollProgress);
-    this.dirLight.intensity = 0.6 + this.scrollProgress * 1.2;
+    this.dirLight.intensity = 0.8 + this.scrollProgress * 1.0;
     this.interiorLight.intensity = 1.5 * (1 - this.scrollProgress * 0.5);
 
     // Snow particles — only the active draw range is simulated.
@@ -810,7 +812,7 @@ export class CabinHeroScene {
       this.camera.lookAt(0, this.lookY, 0);
     }
 
-    this.renderer.toneMappingExposure = 1.0 + this.scrollProgress * 0.5;
+    this.renderer.toneMappingExposure = 1.15 + this.scrollProgress * 0.35;
     this.renderer.render(this.scene, this.camera);
 
     // Adaptive downgrade: device hints are a guess, so measure the opening

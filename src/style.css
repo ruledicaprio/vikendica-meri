@@ -513,7 +513,7 @@ picture {
 .section--dostupnost {
   background-color: var(--bg);
   background-image:
-    linear-gradient(rgba(10, 14, 26, 0.9), rgba(10, 14, 26, 0.94)),
+    linear-gradient(rgba(10, 14, 26, 0.78), rgba(10, 14, 26, 0.86)),
     url('/hero-poster.jpg');
   background-size: cover;
   /* Biased up towards the A-frame apex; centred would land on empty sky. */
@@ -524,7 +524,7 @@ picture {
 @media (orientation: portrait) {
   .section--dostupnost {
     background-image:
-      linear-gradient(rgba(10, 14, 26, 0.9), rgba(10, 14, 26, 0.94)),
+      linear-gradient(rgba(10, 14, 26, 0.78), rgba(10, 14, 26, 0.86)),
       url('/hero-poster-portrait.jpg');
   }
 }
@@ -566,6 +566,137 @@ picture {
   .seasons {
     grid-template-columns: 1fr;
   }
+}
+/* Without JavaScript the tab row is meaningless: the three texts show as before. */
+.seasons__tabs {
+  display: none;
+}
+/* Connected tabs (main.js adds .is-tabs): a row of three text tabs joined to
+   the panel underneath into one card. The selected tab takes the panel's colour
+   and drops its bottom edge, so it reads as the panel's open folder tab. The
+   panel's own heading would repeat the tab. */
+.seasons.is-tabs {
+  display: block;
+  --panel: #151b2c; /* --bg2 with 3% white, opaque so the tab can cover the seam */
+}
+.seasons.is-tabs .seasons__tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.seasons__tab {
+  min-height: 3.3rem;
+  margin-bottom: -1px; /* sit on the panel's top border */
+  padding: 0.7rem 0.4rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+.seasons__tab + .seasons__tab {
+  margin-left: -1px;
+}
+.seasons__tab:first-child {
+  border-top-left-radius: 16px;
+}
+.seasons__tab:last-child {
+  border-top-right-radius: 16px;
+}
+.seasons__tab:hover {
+  color: var(--cream);
+}
+.seasons__tab[aria-selected='true'] {
+  position: relative;
+  z-index: 1;
+  border-bottom-color: var(--panel);
+  background: var(--panel);
+  color: var(--cream);
+  box-shadow: inset 0 2px 0 var(--amber);
+}
+.seasons__tab:focus-visible {
+  position: relative;
+  z-index: 2;
+  outline: 2px solid var(--amber);
+  outline-offset: -2px;
+}
+.seasons.is-tabs .seasons__item {
+  padding: 1.3rem 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 0 0 16px 16px;
+  background: var(--panel);
+  animation: seasons-in 0.35s ease;
+}
+.seasons.is-tabs .seasons__item[hidden] {
+  display: none;
+}
+.seasons.is-tabs .seasons__item h3 {
+  display: none;
+}
+.seasons.is-tabs .seasons__item p {
+  max-width: 68ch;
+  font-size: 1.02rem;
+}
+@keyframes seasons-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .seasons__tab,
+  .seasons.is-tabs .seasons__item {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ---------- Teleport veil (teleport.js) ----------
+   Night sky with a warm glow, over everything but the open menu and lightbox.
+   Fast in, slower out, so the destination appears rather than snaps. */
+.teleport {
+  /* The box itself never scales: a fixed layer wider than the screen lets
+     Android Chrome zoom the page out, and the fixed hero then shows beside
+     the content. The zoom happens on ::before, clipped here. */
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+.teleport::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 55%, rgba(229, 168, 77, 0.32), rgba(229, 168, 77, 0) 45%),
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 75% 30%, rgba(255, 255, 255, 0.4) 0 1px, transparent 2px),
+    radial-gradient(circle at 60% 80%, rgba(255, 255, 255, 0.35) 0 1px, transparent 2px),
+    radial-gradient(circle at 35% 70%, rgba(255, 255, 255, 0.3) 0 1px, transparent 2px),
+    linear-gradient(var(--bg2), var(--bg));
+  transform: scale(1.04);
+}
+.teleport.is-in {
+  opacity: 1;
+  transition: opacity 0.26s ease-in;
+}
+.teleport.is-in::before {
+  transform: scale(1);
+  transition: transform 0.26s ease-in;
+}
+.teleport.is-out {
+  opacity: 0;
+  transition: opacity 0.55s ease-out;
+}
+.teleport.is-out::before {
+  transform: scale(1.06);
+  transition: transform 0.55s ease-out;
 }
 
 /* ---------- Česta pitanja ----------

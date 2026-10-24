@@ -483,16 +483,31 @@
             <p class="kicker">{{locKicker}}</p>
             <h2>{{locTitle}}</h2>
           </div>
-          <div class="seasons reveal">
-            <article class="seasons__item">
+          <!-- Three tab cards (initSeasonTabs in main.js). All three texts stay
+               in the HTML for search and for visitors without JavaScript, who
+               see them one under another as before; the script only adds the
+               tab behaviour and hides the panels that are not selected. -->
+          <div class="seasons reveal" data-tabs>
+            <div class="seasons__tabs" role="tablist" aria-label="{{locTitle}}">
+              <button class="seasons__tab" type="button" role="tab" id="tab-winter" aria-controls="panel-winter" aria-selected="true">
+                {{locWinterTitle}}
+              </button>
+              <button class="seasons__tab" type="button" role="tab" id="tab-summer" aria-controls="panel-summer" aria-selected="false" tabindex="-1">
+                {{locSummerTitle}}
+              </button>
+              <button class="seasons__tab" type="button" role="tab" id="tab-route" aria-controls="panel-route" aria-selected="false" tabindex="-1">
+                {{locRouteTitle}}
+              </button>
+            </div>
+            <article class="seasons__item" role="tabpanel" id="panel-winter" aria-labelledby="tab-winter">
               <h3>{{locWinterTitle}}</h3>
               <p>{{locWinterBody}}</p>
             </article>
-            <article class="seasons__item">
+            <article class="seasons__item" role="tabpanel" id="panel-summer" aria-labelledby="tab-summer">
               <h3>{{locSummerTitle}}</h3>
               <p>{{locSummerBody}}</p>
             </article>
-            <article class="seasons__item">
+            <article class="seasons__item" role="tabpanel" id="panel-route" aria-labelledby="tab-route">
               <h3>{{locRouteTitle}}</h3>
               <p>{{locRouteBody}}</p>
             </article>

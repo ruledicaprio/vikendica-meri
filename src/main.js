@@ -3,6 +3,7 @@ import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews } from 
 import { initCalendar } from './calendar.js';
 import { initMiniCal } from './mini-cal.js';
 import { t, lang } from './i18n/ui.js';
+import { teleport } from './teleport.js';
 
 // Three.js and GSAP are ~600 KB and ~70 KB of the bundle and neither is needed
 // for first paint, so both load after it. Everything below runs immediately.
@@ -153,9 +154,38 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
     if (!target) return;
     e.preventDefault();
     setMenu(false);
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // The calendar is far down the page: jump there under a veil rather than
+    // ride a long smooth scroll (see teleport.js).
+    if (id === '#dostupnost') teleport(target);
+    else target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
+
+/* ---------- "Vlašić kroz godinu" tab cards ---------- */
+for (const box of document.querySelectorAll('[data-tabs]')) {
+  const tabs = [...box.querySelectorAll('[role="tab"]')];
+  const select = (tab, focus = false) => {
+    for (const t2 of tabs) {
+      const on = t2 === tab;
+      t2.setAttribute('aria-selected', String(on));
+      t2.tabIndex = on ? 0 : -1;
+      document.getElementById(t2.getAttribute('aria-controls')).hidden = !on;
+    }
+    if (focus) tab.focus();
+  };
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => select(tab));
+    // Arrow keys move between tabs, as the tab pattern expects.
+    tab.addEventListener('keydown', (e) => {
+      const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      select(tabs[(i + step + tabs.length) % tabs.length], true);
+    });
+  });
+  box.classList.add('is-tabs');
+  select(tabs[0]);
+}
 
 /* ---------- Reveal on scroll (lazy) ----------
    .js .reveal is visibility:hidden until GSAP animates it in, so the content
