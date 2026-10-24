@@ -6,13 +6,28 @@ import * as THREE from 'three';
 //  Mouse hover → glowing string lights · gentle float/breathe
 // ============================================================
 
+// "Vlašić noć" — the night palette, shared with the site (style.css): the
+// cabin's timber in bordeaux-brown (as the A-frame section's beams), window
+// light in the site's amber, deep pine, and a bluer night. Day colours below
+// are unchanged.
+const VN = {
+  beam: 0x7a2f26, // A-frame legs and tie beam (the site uses #8f3b2e on dark)
+  frame: 0x6e2a22, // gable body behind them
+  balcony: 0x6b2c24,
+  balconyPost: 0x4f1f19,
+  door: 0x5a241e,
+  amber: 0xe5a84d, // window glow (= --amber2)
+  pine: 0x173a22,
+  night: 0x3e4a72, // ambient light at night
+};
+
 // Season endpoints, allocated once. These used to be constructed inside the
 // render loop, which meant ~65 THREE.Color allocations every single frame.
 const C_GROUND_WINTER = new THREE.Color(0xe8eef5);
 const C_GROUND_SUMMER = new THREE.Color(0x4a8a3a);
-const C_FOLIAGE_WINTER = new THREE.Color(0x1a4a1a);
+const C_FOLIAGE_WINTER = new THREE.Color(VN.pine);
 const C_FOLIAGE_SUMMER = new THREE.Color(0x2d7a2d);
-const C_AMBIENT_WINTER = new THREE.Color(0x404060);
+const C_AMBIENT_WINTER = new THREE.Color(VN.night);
 const C_AMBIENT_SUMMER = new THREE.Color(0x88aacc);
 const C_DIR_WINTER = new THREE.Color(0x8888cc);
 const C_DIR_SUMMER = new THREE.Color(0xffffee);
@@ -239,7 +254,7 @@ export class CabinHeroScene {
   //  LIGHTS
   // ----------------------------------------------------------
   _createLights() {
-    this.ambientLight = new THREE.AmbientLight(0x404060, 0.6);
+    this.ambientLight = new THREE.AmbientLight(VN.night, 0.6);
     this.scene.add(this.ambientLight);
 
     this.dirLight = new THREE.DirectionalLight(0x8888cc, 0.8);
@@ -270,7 +285,7 @@ export class CabinHeroScene {
     frameShape.lineTo(-5, 0);
     const frameGeo = new THREE.ExtrudeGeometry(frameShape, { depth: 10, bevelEnabled: false });
     frameGeo.translate(0, 0, -5);
-    const woodMat = new THREE.MeshStandardMaterial({ color: 0x6b3a2a, roughness: 0.85, metalness: 0.05 });
+    const woodMat = new THREE.MeshStandardMaterial({ color: VN.frame, roughness: 0.85, metalness: 0.05 });
     const frameMesh = new THREE.Mesh(frameGeo, woodMat);
     frameMesh.castShadow = true;
     frameMesh.receiveShadow = true;
@@ -294,7 +309,7 @@ export class CabinHeroScene {
     this._createAframeTimber();
 
     const windowMat = new THREE.MeshStandardMaterial({
-      color: 0x1a1a2e, emissive: 0xffaa44, emissiveIntensity: 0.3, roughness: 0.1, metalness: 0.3,
+      color: 0x1a1a2e, emissive: VN.amber, emissiveIntensity: 0.3, roughness: 0.1, metalness: 0.3,
     });
     this.windowMat = windowMat;
     const mkWin = (w, h, x, y) => {
@@ -310,7 +325,7 @@ export class CabinHeroScene {
 
     const door = new THREE.Mesh(
       new THREE.BoxGeometry(1.4, 2.2, 0.15),
-      new THREE.MeshStandardMaterial({ color: 0x4a2515, roughness: 0.7 })
+      new THREE.MeshStandardMaterial({ color: VN.door, roughness: 0.7 })
     );
     door.position.set(0, 1.1, 4.65);
     cabin.add(door);
@@ -344,8 +359,8 @@ export class CabinHeroScene {
 
   _createBalcony(width, height, depth, x, y, z) {
     const group = new THREE.Group();
-    const woodMat = new THREE.MeshStandardMaterial({ color: 0x5a2d1a, roughness: 0.8 });
-    const postMat = new THREE.MeshStandardMaterial({ color: 0x4a2010, roughness: 0.7 });
+    const woodMat = new THREE.MeshStandardMaterial({ color: VN.balcony, roughness: 0.8 });
+    const postMat = new THREE.MeshStandardMaterial({ color: VN.balconyPost, roughness: 0.7 });
 
     const floor = new THREE.Mesh(new THREE.BoxGeometry(width, 0.15, depth), woodMat);
     floor.castShadow = true;
@@ -372,7 +387,11 @@ export class CabinHeroScene {
   _createAframeTimber() {
     const cabin = this.cabinGroup;
     const z = 5.12; // just proud of the front gable face (front is at z = 5)
-    const mat = new THREE.MeshStandardMaterial({ color: 0x6e4326, roughness: 0.7, metalness: 0.04 });
+    // A faint glow in its own colour: at night the beams catch almost no light
+    // and would read as black, not bordeaux.
+    const mat = new THREE.MeshStandardMaterial({
+      color: VN.beam, emissive: VN.beam, emissiveIntensity: 0.18, roughness: 0.7, metalness: 0.04,
+    });
 
     // Box beam connecting two gable points (a,b) on the front face.
     const beam = (ax, ay, bx, by, thick) => {
