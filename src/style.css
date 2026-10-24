@@ -1924,6 +1924,16 @@ summary:focus-visible {
     font-size: 1.1rem;
     padding: 0.5rem 0;
   }
+  /* The rule above is for the plain links. It outranks .navbar__lang and
+     .navbar__cta, and zeroed their side padding: the text ran into the edge
+     of its pill. */
+  .navbar__links .navbar__lang {
+    padding: 0.4rem 1.2rem;
+  }
+  .navbar__links .navbar__cta {
+    padding: 0.6rem 1.4rem;
+    margin-top: 0.4rem;
+  }
   .navbar__burger {
     display: flex;
     z-index: 60;
