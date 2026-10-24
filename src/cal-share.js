@@ -11,16 +11,14 @@ import { dayStatus, toYMD } from './calendar.js';
 
 const W = 1080;
 const H = 1350;
-// Status colours as [fill, stroke, mark], one set per background brightness.
-const ON_DARK = {
-  available: ['rgba(90, 170, 110, 0.22)', 'rgba(90, 170, 110, 0.55)', '#6fd08a'],
-  booked: ['rgba(186, 62, 62, 0.38)', 'rgba(186, 62, 62, 0.75)', '#ff6b6b'],
-  pending: ['rgba(212, 148, 58, 0.32)', 'rgba(212, 148, 58, 0.7)', '#f0b25a'],
-};
-const ON_LIGHT = {
-  available: ['rgba(60, 150, 85, 0.14)', 'rgba(60, 150, 85, 0.6)', '#2e8b4a'],
-  booked: ['rgba(200, 55, 55, 0.13)', 'rgba(200, 55, 55, 0.6)', '#c53030'],
-  pending: ['rgba(200, 120, 20, 0.16)', 'rgba(200, 120, 20, 0.65)', '#b06a0c'],
+// Status tiles on the light season backgrounds. Free days are near-white
+// tiles that lift off the background; booked and pending are solid, so they
+// stand out at a glance. `ink` is the day number and mark on the tile, `key`
+// the legend mark drawn on the background.
+const STATUS = {
+  available: { fill: 'rgba(255, 255, 255, 0.88)', stroke: '#3f9a5c', ink: '#1f6b38', key: '#2e8b4a' },
+  booked: { fill: '#d64545', stroke: '#b02f2f', ink: '#ffffff', key: '#c53030' },
+  pending: { fill: '#f2a93b', stroke: '#cf8418', ink: '#3d2400', key: '#c27410' },
 };
 
 /* ── season presets: winter, spring, summer, autumn ── */
@@ -77,18 +75,15 @@ function leaf(ctx, s) {
 }
 
 const SEASONS = [
-  { bg: ['#1d3b5e', '#0c1a2c'], ink: '#f4f8fc', muted: 'rgba(244, 248, 252, 0.68)', faint: 'rgba(244, 248, 252, 0.28)',
-    line: 'rgba(244, 248, 252, 0.16)', accent: '#a8d8ff', status: ON_DARK, motif: snowflake, motifColor: 'rgba(214, 236, 255, 0.75)' },
+  { bg: ['#f3f8fd', '#d6e6f5'], ink: '#17324f', muted: 'rgba(23, 50, 79, 0.66)', faint: 'rgba(23, 50, 79, 0.3)',
+    line: 'rgba(23, 50, 79, 0.16)', accent: '#2f6fae', motif: snowflake, motifColor: '#6fa3d6' },
   { bg: ['#f5f9f0', '#d9eacb'], ink: '#1f3320', muted: 'rgba(31, 51, 32, 0.66)', faint: 'rgba(31, 51, 32, 0.3)',
-    line: 'rgba(31, 51, 32, 0.16)', accent: '#4a8a36', status: ON_LIGHT, motif: blossom, motifColor: '#f3a6c4' },
+    line: 'rgba(31, 51, 32, 0.16)', accent: '#4a8a36', motif: blossom, motifColor: '#f3a6c4' },
   { bg: ['#fff8e6', '#ffe0a3'], ink: '#3a2a12', muted: 'rgba(58, 42, 18, 0.66)', faint: 'rgba(58, 42, 18, 0.3)',
-    line: 'rgba(58, 42, 18, 0.16)', accent: '#d26f12', status: ON_LIGHT, motif: sun, motifColor: '#f5b52e' },
-  { bg: ['#4a2716', '#1f120a'], ink: '#fbefe2', muted: 'rgba(251, 239, 226, 0.68)', faint: 'rgba(251, 239, 226, 0.28)',
-    line: 'rgba(251, 239, 226, 0.16)', accent: '#f0a04b', status: ON_DARK, motif: leaf, motifColor: '#d9692c' },
+    line: 'rgba(58, 42, 18, 0.16)', accent: '#d26f12', motif: sun, motifColor: '#f5b52e' },
+  { bg: ['#fdf4ea', '#f5cfa8'], ink: '#4a2410', muted: 'rgba(74, 36, 16, 0.66)', faint: 'rgba(74, 36, 16, 0.3)',
+    line: 'rgba(74, 36, 16, 0.16)', accent: '#c25a14', motif: leaf, motifColor: '#d9692c' },
 ];
-// Each season's background tone for a transition month that keeps the outgoing
-// season's brightness: [on a dark theme, on a light theme].
-const TINT = [['#0c1a2c', '#dbe8f5'], ['#173a26', '#d9eacb'], ['#4a3410', '#ffe0a3'], ['#1f120a', '#f5cfa8']];
 // The next season starts on this day of Mar, Jun, Sep, Dec (SEASONS index of
 // the outgoing season): spring 21 Mar, summer 21 Jun, autumn 22 Sep, winter 22 Dec.
 const TURN_DAY = [21, 21, 22, 22];
@@ -104,8 +99,7 @@ function themeOf(month) {
   const S = SEASONS[from];
   if (month % 3 !== 2) return { S };
   const next = SEASONS[(from + 1) % 4];
-  const tint = TINT[(from + 1) % 4][S.status === ON_DARK ? 0 : 1];
-  return { S: { ...S, bg: [S.bg[0], tint] }, next, nextIdx: (from + 1) % 4, turn: TURN_DAY[from] };
+  return { S: { ...S, bg: [S.bg[0], next.bg[1]] }, next, nextIdx: (from + 1) % 4, turn: TURN_DAY[from] };
 }
 
 function motifAt(ctx, T, x, y, size, rot = 0, alpha = 1) {
@@ -225,18 +219,27 @@ function draw(canvas, year, month) {
       ctx.lineWidth = 2;
       ctx.stroke();
     } else {
-      const [fill, stroke, ink] = S.status[status];
+      const { fill, stroke, ink } = STATUS[status];
       roundRect(ctx, x, y, cw, ch, 14);
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.14)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 3;
       ctx.fillStyle = fill;
       ctx.fill();
+      ctx.restore();
       ctx.strokeStyle = stroke;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 3;
       ctx.stroke();
       mark(ctx, status, x + cw * 0.62, y + ch * 0.6, 26, ink);
     }
-    if (next && d >= turn) motifAt(ctx, next, x + cw - 24, y + 26, 13, 0, status === 'past' ? 0.4 : 1);
+    if (next && d >= turn) {
+      // White on the solid booked/pending tiles, where the season colour vanishes.
+      const T = status === 'booked' || status === 'pending' ? { ...next, motifColor: '#ffffff' } : next;
+      motifAt(ctx, T, x + cw - 24, y + 26, 13, 0, status === 'past' ? 0.4 : 1);
+    }
     ctx.textAlign = 'left';
-    ctx.fillStyle = status === 'past' ? S.faint : S.ink;
+    ctx.fillStyle = status === 'past' ? S.faint : status === 'available' ? S.ink : STATUS[status].ink;
     ctx.font = `600 32px ${SANS}`;
     ctx.fillText(String(d), x + 14, y + 42);
     ctx.textAlign = 'center';
@@ -251,7 +254,7 @@ function draw(canvas, year, month) {
   let lx = (W - widths.reduce((a, b) => a + b, 0) - sep * (items.length - 1)) / 2;
   ctx.textAlign = 'left';
   items.forEach((s, i) => {
-    mark(ctx, s, lx + 18, bottom + 34, 22, S.status[s][2]);
+    mark(ctx, s, lx + 18, bottom + 34, 22, STATUS[s].key);
     ctx.fillStyle = S.ink;
     ctx.fillText(label[s].toUpperCase(), lx + 52, bottom + 45);
     lx += widths[i] + sep;
