@@ -222,13 +222,16 @@ export function summarise(list, today) {
   };
 }
 
-/** Call and WhatsApp buttons for a guest, or mail when there is no phone. */
+/** Viber chat with a number, whatever way it was typed ("+387 61 …", "061…" is left as typed). */
+const viberHref = (phone) => `viber://chat?number=${encodeURIComponent(`+${String(phone).replace(/\D/g, '')}`)}`;
+
+/** Viber (the owner's app, so first) and call buttons for a guest, or mail when there is no phone. */
 function contactHtml(r) {
   if (r.phone) {
     const digits = r.phone.replace(/[^\d+]/g, '');
     return `<div class="mgr-today__actions">
+        <a class="mgr-btn mgr-btn--viber" href="${esc(viberHref(r.phone))}">💬 Viber</a>
         <a class="mgr-btn mgr-btn--call" href="tel:${esc(digits)}">📞 Nazovi</a>
-        <a class="mgr-btn mgr-btn--wa" href="https://wa.me/${esc(digits.replace(/\D/g, ''))}" target="_blank" rel="noopener">💬 WhatsApp</a>
       </div>`;
   }
   if (r.email) {
@@ -369,6 +372,12 @@ function replyHtml(req) {
     links.push(`<a class="mgr-btn mgr-btn--reply" href="${esc(href)}">✉️ Odgovori mailom</a>`);
   }
   if (req.phone) {
+    // Viber cannot open a chat with the text already typed, so this copies the
+    // reply and opens the chat; the owner pastes it (see the click handler).
+    links.unshift(
+      `<button class="mgr-btn mgr-btn--reply mgr-btn--viber-reply" type="button"
+          data-viber="${esc(viberHref(req.phone))}" data-text="${esc(body)}">💬 Odgovori na Viberu</button>`
+    );
     const digits = req.phone.replace(/\D/g, '');
     // WhatsApp has no subject line, so the greeting has to carry it.
     links.push(
@@ -463,6 +472,7 @@ function bookingCardHtml(req) {
     const digits = req.phone.replace(/[^\d+]/g, '');
     who.push(
       `<a href="tel:${esc(digits)}">${esc(req.phone)}</a> · ` +
+        `<a href="${esc(viberHref(req.phone))}">Viber</a> · ` +
         `<a href="https://wa.me/${esc(digits.replace(/\D/g, ''))}" target="_blank" rel="noopener">WhatsApp</a>`
     );
   }
@@ -676,6 +686,18 @@ document.addEventListener('focusout', (e) => {
 });
 
 document.addEventListener('click', (e) => {
+  const viber = e.target.closest('[data-viber]');
+  if (viber) {
+    // The clipboard write is started inside the tap (iOS requires that); the
+    // chat opens once it has gone through, or failed — either way she gets Viber.
+    const open = () => (window.location.href = viber.dataset.viber);
+    (navigator.clipboard?.writeText(viber.dataset.text) ?? Promise.reject())
+      .then(() => say('Poruka je kopirana — u Viberu je zalijepite (dugi pritisak → Zalijepi).', 'ok'))
+      .catch(() => say('Poruku nije moguće kopirati — otvaram Viber.', 'err'))
+      .finally(open);
+    return;
+  }
+
   const act = e.target.closest('[data-act]');
   if (act) {
     const status = act.dataset.act;

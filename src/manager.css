@@ -250,10 +250,10 @@ body {
   background: var(--blue-soft);
   color: var(--ink);
 }
-.mgr-today__actions .mgr-btn--wa {
-  border-color: var(--green);
-  background: var(--green-soft);
-  color: var(--ink);
+.mgr-today__actions .mgr-btn--viber {
+  border-color: #6552d9;
+  background: #6552d9;
+  color: #fff;
 }
 /* "1 zahtjev čeka odgovor" and the 30-day occupancy: one readable line each. */
 .mgr-line {
@@ -596,6 +596,13 @@ body {
   flex: 1 1 100%;
   font-size: 0.92rem;
   color: var(--ink-muted);
+}
+/* Scoped: .mgr-btn is declared later in the file and would win on background. */
+.req__reply .mgr-btn--viber-reply {
+  border-color: #6552d9;
+  background: #6552d9;
+  color: #fff;
+  font-weight: 600;
 }
 .mgr-btn--reply {
   display: inline-flex;
