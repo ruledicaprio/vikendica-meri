@@ -38,7 +38,7 @@ const TEXT = {
       `Poštovani/a ${n},\n\n` +
       `Hvala Vam na upitu. Sa zadovoljstvom potvrđujemo Vašu rezervaciju${dates}.\n\n` +
       `Rezervacija je konačna nakon uplate avansa od 30% ukupnog iznosa.\n\n` +
-      `Dolazak je od 14:00, odlazak do 11:00.\n\n` +
+      `Dolazak je od 15:00, odlazak do 10:00.\n\n` +
       `Javite nam ako imate dodatnih pitanja ili ako Vam trebaju upute za dolazak.\n\n` +
       `Srdačan pozdrav,\nVikendica Meri\nBabanovac, Vlašić`,
     decline: (n, dates) =>
@@ -59,7 +59,7 @@ const TEXT = {
       `Dear ${n},\n\n` +
       `Thank you for your enquiry. We are glad to confirm your booking${dates}.\n\n` +
       `The booking is final once the 30% deposit has been paid.\n\n` +
-      `Check-in is from 14:00, check-out by 11:00.\n\n` +
+      `Check-in is from 15:00, check-out by 10:00.\n\n` +
       `Do let us know if you have any questions, or if you would like directions.\n\n` +
       `Kind regards,\nVikendica Meri\nBabanovac, Vlašić`,
     decline: (n, dates) =>
