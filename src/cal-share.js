@@ -295,9 +295,9 @@ export async function openCalShare(year, month) {
       <div class="cal-share__bar">
         <button class="cal__nav-btn" type="button" data-step="-1" aria-label="${t.calPrev}">&#8249;</button>
         <button class="btn btn--primary cal-share__share" type="button">${t.calShare}</button>
-        <button class="btn btn--secondary cal-share__copy" type="button" aria-live="polite">${t.calCopy}</button>
         <button class="cal__nav-btn" type="button" data-step="1" aria-label="${t.calNext}">&#8250;</button>
       </div>
+      <p class="cal-share__info" role="status"></p>
       <button class="cal-share__close" type="button" aria-label="${t.close}">×</button>`;
     document.body.appendChild(dialog);
     dialog.addEventListener('close', () => (document.body.style.overflow = ''));
@@ -324,6 +324,7 @@ export async function openCalShare(year, month) {
     const y = Math.floor(key / 12);
     const m = key % 12;
     draw(canvas, y, m);
+    dialog.querySelector('.cal-share__info').textContent = '';
     canvas.setAttribute('aria-label', `${t.months[m]} ${y} — ${t.calShareSubtitle}`);
     prev.disabled = key <= minKey;
     const k = key;
@@ -338,11 +339,23 @@ export async function openCalShare(year, month) {
       render();
     };
   });
+  const info = dialog.querySelector('.cal-share__info');
   dialog.querySelector('.cal-share__share').onclick = async () => {
-    const f = file ?? (await encode(key));
-    // Phones: the system share sheet (Facebook, Viber, WhatsApp…). Desktop
-    // browsers mostly cannot share files, so the image is downloaded instead,
-    // as it is when the share sheet refuses for any reason but a cancel.
+    info.textContent = '';
+    const pending = file ? null : encode(key);
+    // Desktop (not a touch screen): the PNG also goes on the clipboard, because
+    // the share sheet and a downloaded file cannot be pasted with Ctrl+V into
+    // Facebook or Messenger. Started before anything is awaited, so it still
+    // counts as part of the click; the PNG or its promise goes in as-is.
+    const copied =
+      !matchMedia('(pointer: coarse)').matches && window.ClipboardItem && navigator.clipboard?.write
+        ? navigator.clipboard.write([new ClipboardItem({ 'image/png': file ?? pending })]).then(() => true, () => false)
+        : null;
+    copied?.then((ok) => ok && (info.textContent = t.calCopiedInfo));
+    const f = file ?? (await pending);
+    // The system share sheet (phones: Facebook, Viber, WhatsApp…; Windows: its
+    // own share window). Where there is none, or it refuses for any reason but
+    // a cancel, the copy is enough — failing that, the image is downloaded.
     if (navigator.canShare?.({ files: [f] })) {
       try {
         await navigator.share({ files: [f] });
@@ -351,30 +364,13 @@ export async function openCalShare(year, month) {
         if (e.name === 'AbortError') return;
       }
     }
+    if (copied && (await copied)) return;
     const a = document.createElement('a');
     a.href = URL.createObjectURL(f);
     a.download = f.name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  };
-  // Desktop: the share button opens the system share sheet or downloads a
-  // file, neither of which can be pasted with Ctrl+V into Facebook/Messenger.
-  // Copy puts the PNG itself on the clipboard. Hidden where the browser cannot
-  // write images to it, and on touch screens (CSS), where sharing is the way.
-  const copy = dialog.querySelector('.cal-share__copy');
-  copy.hidden = !(window.ClipboardItem && navigator.clipboard?.write);
-  let copyTimer = 0;
-  copy.onclick = async () => {
-    try {
-      // The PNG (or the promise of it) goes in as-is: Safari allows the write
-      // only from inside the click, so nothing may be awaited before it.
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': file ?? encode(key) })]);
-      copy.textContent = t.calCopied;
-    } catch {
-      copy.textContent = t.calCopyFailed;
-    }
-    clearTimeout(copyTimer);
-    copyTimer = setTimeout(() => (copy.textContent = t.calCopy), 2500);
+    info.textContent = t.calDownloadedInfo;
   };
 
   render();

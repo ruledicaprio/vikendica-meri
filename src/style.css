@@ -1006,9 +1006,9 @@ picture {
 }
 .cal-share[open] {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto auto;
   place-items: center;
-  gap: 1rem;
+  gap: 0.6rem;
 }
 .cal-share::backdrop {
   background: rgba(6, 9, 16, 0.96);
@@ -1018,7 +1018,7 @@ picture {
   /* A percentage max-height does not resolve against the 1fr row (same trap as
      .lightbox__pic), so the bar's height is subtracted from the viewport. */
   max-width: 100%;
-  max-height: calc(100dvh - 6.5rem);
+  max-height: calc(100dvh - 8.5rem);
   width: auto;
   height: auto;
   aspect-ratio: 4 / 5;
@@ -1034,15 +1034,13 @@ picture {
   gap: 1rem;
   padding-bottom: env(safe-area-inset-bottom);
 }
-/* .btn sets display, which would beat the hidden attribute. Touch screens get
-   the share sheet instead, so the copy button is left off there. */
-.cal-share__copy[hidden] {
-  display: none;
-}
-@media (pointer: coarse) {
-  .cal-share__copy {
-    display: none;
-  }
+/* What the share button just did (copied / downloaded). Empty until then,
+   but the line is always reserved so the image does not jump when it fills. */
+.cal-share__info {
+  min-height: 1.3em;
+  font-size: 0.9rem;
+  color: var(--amber2);
+  text-align: center;
 }
 .cal-share__close {
   position: absolute;
