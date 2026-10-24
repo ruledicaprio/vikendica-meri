@@ -4,6 +4,7 @@
 // day starts the selection in the full calendar at #dostupnost.
 import { t } from './i18n/ui.js';
 import { dayStatus, toYMD } from './calendar.js';
+import { teleport } from './teleport.js';
 
 const label = (ymd) => t.formatDate(new Date(`${ymd}T12:00:00`), t.months);
 
@@ -71,6 +72,6 @@ export async function initMiniCal(mount, cal) {
     const day = e.target.closest('.mini-cal__day--available');
     if (!day) return;
     cal.setStart(day.dataset.ymd);
-    document.getElementById('dostupnost')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    teleport(document.getElementById('dostupnost'));
   });
 }
