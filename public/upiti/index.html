@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="bs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- The link to share with the family instead of /manager.
+         /manager sits behind Cloudflare Access, so Viber/Messenger/WhatsApp
+         preview robots only ever see the Access login page and show a bare
+         domain. This page is public, carries the preview card, holds nothing
+         private, and sends a person on to /manager/ at once (robots do not run
+         JavaScript, so they stay here and read the tags). -->
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Vikendica Meri — Manager</title>
+    <meta name="description" content="Upiti, rezervacije i dolasci gostiju. Za vlasnike — potrebna je prijava." />
+    <meta name="theme-color" content="#e3ded3" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Vikendica Meri" />
+    <meta property="og:locale" content="bs_BA" />
+    <!-- This page, not /manager: crawlers re-fetch og:url and would hit the login. -->
+    <meta property="og:url" content="https://vikendica-meri.iot-pages.workers.dev/upiti/" />
+    <meta property="og:title" content="Vikendica Meri — Manager" />
+    <meta property="og:description" content="Upiti, rezervacije i dolasci gostiju. Za vlasnike — potrebna je prijava." />
+    <meta property="og:image" content="https://vikendica-meri.iot-pages.workers.dev/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Vikendica Meri zimi, pod snijegom, Babanovac, Vlašić" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Vikendica Meri — Manager" />
+    <meta name="twitter:description" content="Upiti, rezervacije i dolasci gostiju. Za vlasnike — potrebna je prijava." />
+    <meta name="twitter:image" content="https://vikendica-meri.iot-pages.workers.dev/og-image.jpg" />
+
+    <script>
+      // A person goes straight on; the hash survives so a deep link still works.
+      location.replace('/manager/' + location.hash);
+    </script>
+    <style>
+      :root { color-scheme: light; }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        background: #e3ded3;
+        color: #221f1a;
+        font: 18px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif;
+        text-align: center;
+        padding: 1.5rem;
+      }
+      h1 { font-size: 1.6rem; margin: 0 0 0.3rem; }
+      p { margin: 0 0 1.2rem; color: rgba(34, 31, 26, 0.74); }
+      a {
+        display: inline-block;
+        padding: 0.9rem 1.6rem;
+        border-radius: 12px;
+        background: #35657f;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Vikendica Meri — Manager</h1>
+      <p>Otvaram Manager…</p>
+      <a href="/manager/">Otvori Manager</a>
+    </main>
+  </body>
+</html>
