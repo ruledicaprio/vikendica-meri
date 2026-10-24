@@ -171,7 +171,7 @@ const bs = {
   fieldDate: (ymd) => ymd.split('-').reverse().join('.') + '.',
   fieldDatePlaceholder: 'dd.mm.gggg.',
   // Message prefilled when dates are picked in the calendar.
-  calAutoMsg: (from, to, n) => `Dolazak: ${from}\nOdlazak: ${to}\nBroj noći: ${n}`,
+  calAutoMsg: (from, to, n) => `Dolazak: ${from}\nOdlazak: ${to}\nBroj noći: ${n}\n\nDodatne informacije:\n`,
 };
 
 const en = {
@@ -325,7 +325,7 @@ const en = {
   formatDate: (d, months) => `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
   // English keeps the dates exactly as before.
   fieldDate: (ymd) => ymd,
-  calAutoMsg: (from, to, n) => `Check-in: ${from}\nCheck-out: ${to}\nNights: ${n}`,
+  calAutoMsg: (from, to, n) => `Check-in: ${from}\nCheck-out: ${to}\nNights: ${n}\n\nAdditional info:\n`,
 };
 
 // Exported because the build imports these too: plugins/gallery-manifest.js

@@ -145,7 +145,7 @@ export const bs = {
     'Tri noći.',
   faqQ6: 'Kako se plaća i treba li avans?',
   faqA6:
-    'Gotovinom, bankovnim transferom ili PayPalom. Rezervacija se potvrđuje uplatom avansa od 30% ukupnog iznosa.',
+    'Gotovinom ili bankovnim transferom. Rezervacija se potvrđuje uplatom avansa od 30% ukupnog iznosa.',
   faqQ7: 'Šta je uključeno u cijenu?',
   faqA7: 'Posteljina i pelet za grijanje.',
   faqQ8: 'Koliko je do Travnika i do sarajevskog aerodroma?',
@@ -164,7 +164,8 @@ export const bs = {
   // Also stated as checkinTime/checkoutTime in the JSON-LD; the two must agree.
   contactCheckin: '🕓 Prijava od 15:00 · Odjava do 10:00',
   mapTitle: 'Lokacija — Vikendica Meri',
-  mapButton: 'Otvori u Google Maps',
+  // Map tabs: "Otvori u" + Google Maps / OpenStreetMap (the names stay as they are).
+  mapOpen: 'Otvori u',
 
   formTitle: 'Pošaljite upit',
   formName: 'Ime i prezime',
@@ -316,7 +317,7 @@ export const en = {
     'Three nights.',
   faqQ6: 'How do I pay, and is a deposit required?',
   faqA6:
-    'Cash, bank transfer or PayPal. A 30% deposit, paid in advance, confirms the booking.',
+    'Cash or bank transfer. A 30% deposit, paid in advance, confirms the booking.',
   faqQ7: 'What is included in the price?',
   faqA7: 'Bedding and heating pellets.',
   faqQ8: 'How far is Travnik, and Sarajevo airport?',
@@ -334,7 +335,7 @@ export const en = {
   contactDeposit: '💳 30% deposit to confirm the booking',
   contactCheckin: '🕓 Check-in from 15:00 · Check-out by 10:00',
   mapTitle: 'Location — Vikendica Meri',
-  mapButton: 'Open in Google Maps',
+  mapOpen: 'Open in',
 
   formTitle: 'Send an enquiry',
   formName: 'Full name',

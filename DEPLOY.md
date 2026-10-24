@@ -82,6 +82,13 @@ Traps, each of which cost a real deploy cycle:
   The rest: HTTP Only **on**, Binding Cookie **on**, Eager redirect **off**,
   SameSite **Lax** (`Strict` on an Access app causes `ERR_TOO_MANY_REDIRECTS`).
 
+**Share `/upiti/`, not `/manager`.** Link-preview robots (Viber, Messenger,
+WhatsApp) cannot pass Access, so a shared `/manager` link shows a bare domain.
+[`public/upiti/index.html`](public/upiti/index.html) is a public page with the
+preview card (title, description, `og-image.jpg`) and nothing private; a person
+is sent straight on to `/manager/` by script, which robots do not run. It must
+stay outside the `/manager*` prefix the Access application covers.
+
 Diagnose authorization from **Zero Trust → Insights & Logs → Access**. It names
 the email, the verdict and the matching policy — far faster than reading config
 screens.

@@ -149,6 +149,9 @@ async function turnstileOk(env, token, ip) {
  * Never throws. The caller runs it through waitUntil and must not have a
  * delivery problem turn into a failed submission for the guest.
  */
+/** 2026-11-02 → 02.11.2026. — the format the owner reads, whatever the guest's language. */
+const ownerDate = (ymd) => (ymd ? `${ymd.slice(8, 10)}.${ymd.slice(5, 7)}.${ymd.slice(0, 4)}.` : '—');
+
 async function notifyOwner(env, data) {
   if (!env.WEB3FORMS_KEY) return;
   const L = data.lang === 'en' ? EN_LABELS : BS_LABELS;
@@ -165,8 +168,8 @@ async function notifyOwner(env, data) {
         [L.name]: data.name,
         [L.email]: data.email,
         [L.phone]: data.phone || '—',
-        [L.checkin]: data.checkin || '—',
-        [L.checkout]: data.checkout || '—',
+        [L.checkin]: ownerDate(data.checkin),
+        [L.checkout]: ownerDate(data.checkout),
         [L.guests]: data.guests || '—',
         [L.message]: data.message || '—',
         Jezik: data.lang,
