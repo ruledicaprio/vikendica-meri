@@ -16,6 +16,17 @@ const MONTHS = [
   'januar', 'februar', 'mart', 'april', 'maj', 'juni',
   'juli', 'august', 'septembar', 'oktobar', 'novembar', 'decembar',
 ];
+/** "6. novembra" — the form a date takes in a sentence. */
+const MONTHS_GEN = [
+  'januara', 'februara', 'marta', 'aprila', 'maja', 'juna',
+  'jula', 'augusta', 'septembra', 'oktobra', 'novembra', 'decembra',
+];
+/** Accusative, for "u petak" / "u subotu". */
+const WEEKDAYS_ACC = ['nedjelju', 'ponedjeljak', 'utorak', 'srijedu', 'četvrtak', 'petak', 'subotu'];
+
+/** House times, as the site states them to guests. */
+const CHECKIN_TIME = '15:00';
+const CHECKOUT_TIME = '10:00';
 
 /** A pending request older than this is called out as waiting too long. */
 const STALE_DAYS = 2;
@@ -42,7 +53,12 @@ const els = {
 const esc = (s) =>
   String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
-const todayYmd = () => new Date().toISOString().slice(0, 10);
+// Local, not toISOString(): that is UTC, so between midnight and 02:00 in
+// Sarajevo it returned yesterday and the "in the house now" status was a day old.
+const todayYmd = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 // Every date here is a plain YYYY-MM-DD with no time zone. Anchoring at 12:00
 // local keeps a DST transition from turning a whole-day difference into 23 or
@@ -60,6 +76,12 @@ function fmtShort(ymd) {
   if (!ymd) return '';
   const d = at(ymd);
   return `${d.getDate()}. ${MONTHS[d.getMonth()]}`;
+}
+
+/** "u petak, 6. novembra" */
+function fmtDay(ymd) {
+  const d = at(ymd);
+  return `u ${WEEKDAYS_ACC[d.getDay()]}, ${d.getDate()}. ${MONTHS_GEN[d.getMonth()]}`;
 }
 
 function daysBetween(from, to) {
@@ -88,6 +110,9 @@ const plural = (n, one, few, many) =>
 
 const nightsLabel = (n) => `${n} ${plural(n, 'noć', 'noći', 'noći')}`;
 const daysLabel = (n) => `${n} ${plural(n, 'dan', 'dana', 'dana')}`;
+const guestsLabel = (n) => `${n} ${plural(n, 'gost', 'gosta', 'gostiju')}`;
+/** "danas" / "sutra" / "prekosutra" / "za 13 dana" */
+const whenLabel = (n) => (n === 0 ? 'danas' : n === 1 ? 'sutra' : n === 2 ? 'prekosutra' : `za ${daysLabel(n)}`);
 
 function say(text, kind = '') {
   els.status.textContent = text;
@@ -143,6 +168,13 @@ async function load() {
 const overlaps = (a, b) =>
   Boolean(a.checkin && b.checkin && a.checkin <= b.checkout && a.checkout >= b.checkin);
 
+/**
+ * Still waiting for the owner: a pending request, or a general enquiry (no
+ * dates) that was "confirmed" before enquiries had their own answer — there is
+ * no booking behind it, so it belongs back in the queue, not under Potvrđeno.
+ */
+const isOpen = (r) => r.status === 'pending' || (r.status === 'confirmed' && !r.checkin);
+
 /** Confirmed ranges a pending request would collide with. */
 function conflictsFor(req) {
   if (!req.checkin) return [];
@@ -156,17 +188,22 @@ function conflictsFor(req) {
  * it can be exercised against a fixture array from the console.
  */
 export function summarise(list, today) {
-  const pendingRows = list.filter((r) => r.status === 'pending');
+  const pendingRows = list.filter(isOpen);
   const confirmed = list.filter((r) => r.status === 'confirmed' && r.checkin);
 
   const conflictRows = pendingRows.filter((r) =>
     confirmed.some((o) => o.id !== r.id && overlaps(r, o))
   );
 
+  // Who sleeps in the house tonight (arrived on or before today, leaves after
+  // it), who leaves today, and the next guests after today. Manual blocks are
+  // included throughout: the owner enters phone and Viber bookings that way,
+  // with the guest's name as the label.
+  const inHouse = confirmed.find((r) => r.checkin <= today && r.checkout > today) || null;
+  const leavingToday = confirmed.find((r) => r.checkout === today) || null;
   const upcoming = confirmed
-    .filter((r) => r.checkin >= today)
+    .filter((r) => r.checkin > today)
     .sort((a, b) => a.checkin.localeCompare(b.checkin));
-  const inHouse = confirmed.find((r) => r.checkin <= today && r.checkout >= today) || null;
 
   // Nights occupied in the next 30 days, each stay clipped to the window so a
   // long booking that starts inside it does not overstate the total.
@@ -187,57 +224,130 @@ export function summarise(list, today) {
     nextArrival: upcoming[0] || null,
     daysToArrival: upcoming[0] ? daysBetween(today, upcoming[0].checkin) : null,
     inHouse,
+    leavingToday,
     nights30,
     oldestPendingDays: ages.length ? Math.max(...ages) : null,
   };
 }
 
-function statHtml({ value, label, sub, tone }) {
-  return `<div class="mgr-stat${tone ? ` is-${tone}` : ''}">
-      <span class="mgr-stat__value">${esc(value)}</span>
-      <span class="mgr-stat__label">${esc(label)}</span>
-      <span class="mgr-stat__sub">${esc(sub || '')}</span>
-    </div>`;
+/**
+ * A typed phone number as +<country><number>, for tel:, Viber and WhatsApp.
+ *   "+387 61 833 834" → +38761833834
+ *   "00385 98 …"      → +38598…
+ *   "061 833 834"     → +38761833834   (short 0… is a local BiH number)
+ *   "0385912345678"   → +385912345678  (long 0… is 00<country> missing a zero)
+ */
+function intlPhone(phone) {
+  const raw = String(phone || '').trim();
+  const d = raw.replace(/\D/g, '');
+  if (!d) return '';
+  if (raw.startsWith('+')) return `+${d}`;
+  if (d.startsWith('00')) return `+${d.slice(2)}`;
+  if (d.startsWith('0')) return d.length >= 11 ? `+${d.slice(1)}` : `+387${d.slice(1)}`;
+  return `+${d}`;
+}
+const viberHref = (phone) => `viber://chat?number=${encodeURIComponent(intlPhone(phone))}`;
+const waHref = (phone) => `https://wa.me/${intlPhone(phone).slice(1)}`;
+
+/** Viber (the owner's app, so first) and call buttons for a guest, or mail when there is no phone. */
+function contactHtml(r) {
+  if (r.phone) {
+    return `<div class="mgr-today__actions">
+        <a class="mgr-btn mgr-btn--viber" href="${esc(viberHref(r.phone))}">💬 Viber</a>
+        <a class="mgr-btn mgr-btn--call" href="tel:${esc(intlPhone(r.phone))}">📞 Nazovi</a>
+      </div>`;
+  }
+  if (r.email) {
+    return `<div class="mgr-today__actions">
+        <a class="mgr-btn mgr-btn--call" href="mailto:${esc(r.email)}">✉️ Pošalji mail</a>
+      </div>`;
+  }
+  return '';
 }
 
-function renderSummary(s) {
-  const arrival = s.nextArrival
-    ? s.daysToArrival === 0
-      ? 'danas'
-      : `za ${daysLabel(s.daysToArrival)}`
-    : '—';
+function stayLine(r) {
+  return [nightsLabel(nights(r.checkin, r.checkout)), r.guests ? guestsLabel(Number(r.guests)) : '']
+    .filter(Boolean)
+    .join(' · ');
+}
 
-  els.summary.innerHTML = [
-    statHtml({
-      value: String(s.pending),
-      label: 'Na čekanju',
-      sub:
-        s.oldestPendingDays === null
-          ? 'sve riješeno'
-          : `najstariji čeka ${daysLabel(s.oldestPendingDays)}`,
-      tone: s.conflicts ? 'red' : s.pending ? 'brown' : '',
-    }),
-    statHtml({
-      value: arrival,
-      label: 'Sljedeći dolazak',
-      sub: s.nextArrival
-        ? `${s.nextArrival.name} · ${fmtShort(s.nextArrival.checkin)}`
-        : 'nema potvrđenih termina',
-      tone: s.nextArrival ? 'green' : '',
-    }),
-    statHtml({
-      value: String(s.nights30),
-      label: `Noći / ${HORIZON_DAYS} dana`,
-      sub: `od mogućih ${HORIZON_DAYS}`,
-      tone: s.nights30 ? 'blue' : '',
-    }),
-    statHtml({
-      value: s.inHouse ? s.inHouse.name : 'prazno',
-      label: 'Trenutno u kući',
-      sub: s.inHouse ? `do ${fmtShort(s.inHouse.checkout)}` : '—',
-      tone: s.inHouse ? 'green' : '',
-    }),
-  ].join('');
+/**
+ * The top of the panel, written to be read at a glance on a phone: who is in
+ * the house now, who comes next, and whether anything is waiting for an answer.
+ */
+function renderSummary(s, today) {
+  // ── now ──
+  let now;
+  const h = s.inHouse;
+  // On checkout morning the departing guests are still in the house until
+  // CHECKOUT_TIME; only after that is it free (or the next guests' turn).
+  const clock = new Date();
+  const hhmm = `${String(clock.getHours()).padStart(2, '0')}:${String(clock.getMinutes()).padStart(2, '0')}`;
+  const stillLeaving = !h && s.leavingToday && hhmm < CHECKOUT_TIME ? s.leavingToday : null;
+  if (stillLeaving) {
+    const title = stillLeaving.name;
+    now = `<article class="mgr-card is-busy">
+        <p class="mgr-card__kicker">Trenutno · kuća je zauzeta</p>
+        <p class="mgr-card__title">${esc(title)}</p>
+        <p class="mgr-card__line"><strong>Odlaze danas</strong> do ${CHECKOUT_TIME}</p>
+        <p class="mgr-card__line">Večeras je kuća slobodna.</p>
+        ${contactHtml(stillLeaving)}
+      </article>`;
+  } else if (h) {
+    const left = daysBetween(today, h.checkout);
+    const title = h.name;
+    const lines = [
+      h.checkin === today
+        ? `<strong>Dolaze danas</strong> od ${CHECKIN_TIME}`
+        : `Stigli su ${esc(fmtDay(h.checkin))}`,
+      `Odlaze <strong>${esc(fmtDay(h.checkout))}</strong> do ${CHECKOUT_TIME}`,
+      `Još ${esc(nightsLabel(left))}${h.guests ? ` · ${esc(guestsLabel(Number(h.guests)))}` : ''}`,
+    ];
+    now = `<article class="mgr-card is-busy">
+        <p class="mgr-card__kicker">Trenutno · kuća je zauzeta</p>
+        <p class="mgr-card__title">${esc(title)}</p>
+        ${lines.map((l) => `<p class="mgr-card__line">${l}</p>`).join('')}
+        ${contactHtml(h)}
+      </article>`;
+  } else {
+    now = `<article class="mgr-card is-free">
+        <p class="mgr-card__kicker">Trenutno</p>
+        <p class="mgr-card__title">Kuća je slobodna</p>
+        <p class="mgr-card__line">Večeras nema gostiju.</p>
+      </article>`;
+  }
+  // Same-day turnover: the guests leaving this morning are worth a line of
+  // their own, whatever else is going on.
+  const leaving =
+    s.leavingToday && s.leavingToday !== h && !stillLeaving
+      ? `<p class="mgr-card__note">${hhmm < CHECKOUT_TIME ? `Danas odlaze do ${CHECKOUT_TIME}` : 'Danas su otišli'}: <strong>${esc(s.leavingToday.name)}</strong></p>`
+      : '';
+
+  // ── next ──
+  const n = s.nextArrival;
+  const next = n
+    ? `<article class="mgr-card is-next">
+        <p class="mgr-card__kicker">Sljedeći dolazak · ${esc(whenLabel(s.daysToArrival))}</p>
+        <p class="mgr-card__title">${esc(n.name)}</p>
+        <p class="mgr-card__line">Dolaze <strong>${esc(fmtDay(n.checkin))}</strong> od ${CHECKIN_TIME}</p>
+        <p class="mgr-card__line">Odlaze ${esc(fmtDay(n.checkout))} · ${esc(stayLine(n))}</p>
+        ${contactHtml(n)}
+      </article>`
+    : `<article class="mgr-card">
+        <p class="mgr-card__kicker">Sljedeći dolazak</p>
+        <p class="mgr-card__title">Nema potvrđenih gostiju</p>
+      </article>`;
+
+  // ── the rest, one line each ──
+  const waiting = s.pending
+    ? `<a class="mgr-line ${s.conflicts ? 'is-red' : 'is-brown'}" href="#pending">
+        <span><strong>${s.pending}</strong> ${s.pending === 1 ? 'zahtjev čeka' : s.pending <= 4 ? 'zahtjeva čekaju' : 'zahtjeva čeka'} odgovor${
+          s.oldestPendingDays ? ` · najstariji ${esc(daysLabel(s.oldestPendingDays))}` : ''
+        }</span> <span class="mgr-line__go" aria-hidden="true">›</span></a>`
+    : `<p class="mgr-line">Svi zahtjevi su odgovoreni.</p>`;
+  const busy = `<p class="mgr-line"><span>Zauzeto <strong>${s.nights30}</strong> od ${HORIZON_DAYS} noći u narednih ${HORIZON_DAYS} dana</span></p>`;
+
+  els.summary.innerHTML = `${now}${leaving}${next}${waiting}${busy}`;
 }
 
 function renderAlert(s) {
@@ -285,11 +395,16 @@ function replyHtml(req) {
     links.push(`<a class="mgr-btn mgr-btn--reply" href="${esc(href)}">✉️ Odgovori mailom</a>`);
   }
   if (req.phone) {
-    const digits = req.phone.replace(/\D/g, '');
+    // Viber cannot open a chat with the text already typed, so this copies the
+    // reply and opens the chat; the owner pastes it (see the click handler).
+    links.unshift(
+      `<button class="mgr-btn mgr-btn--reply mgr-btn--viber-reply" type="button"
+          data-viber="${esc(viberHref(req.phone))}" data-text="${esc(body)}">💬 Odgovori na Viberu</button>`
+    );
     // WhatsApp has no subject line, so the greeting has to carry it.
     links.push(
       `<a class="mgr-btn mgr-btn--reply" target="_blank" rel="noopener"
-          href="https://wa.me/${esc(digits)}?text=${encodeURIComponent(body)}">💬 Odgovori na WhatsApp</a>`
+          href="${esc(waHref(req.phone))}?text=${encodeURIComponent(body)}">💬 Odgovori na WhatsApp</a>`
     );
   }
   if (!links.length) return '';
@@ -305,7 +420,21 @@ const STATUS_LABEL = {
   confirmed: 'potvrđeno',
   declined: 'odbijeno',
   cancelled: 'otkazano',
+  answered: 'odgovoreno',
 };
+
+/** Reply straight from the card: Viber first (the owner's app), then call and mail. */
+function enquiryContactHtml(req) {
+  const b = [];
+  if (req.phone) {
+    b.push(`<a class="mgr-btn mgr-btn--viber" href="${esc(viberHref(req.phone))}">💬 Viber</a>`);
+    b.push(`<a class="mgr-btn mgr-btn--call" href="tel:${esc(intlPhone(req.phone))}">📞 Nazovi</a>`);
+  }
+  if (req.email) {
+    b.push(`<a class="mgr-btn mgr-btn--call" href="mailto:${esc(req.email)}?subject=${encodeURIComponent('Vikendica Meri — vaš upit')}">✉️ Mail</a>`);
+  }
+  return b.length ? `<div class="mgr-today__actions req__contact">${b.join('')}</div>` : '';
+}
 
 function noteHtml(req) {
   return `<div class="req__note-row">
@@ -367,7 +496,9 @@ function blockCardHtml(req) {
 function bookingCardHtml(req) {
   const conflicts = req.status === 'pending' ? conflictsFor(req) : [];
   const n = nights(req.checkin, req.checkout);
-  const age = req.status === 'pending' ? ageDays(req.created_at) : null;
+  // A question with no dates: there is nothing to confirm, only to answer.
+  const enquiry = !req.checkin && isOpen(req);
+  const age = isOpen(req) ? ageDays(req.created_at) : null;
   const stale = age !== null && age >= STALE_DAYS;
   const dates = req.checkin
     ? `${fmtDate(req.checkin)} → ${fmtDate(req.checkout)}`
@@ -376,25 +507,27 @@ function bookingCardHtml(req) {
   const who = [];
   if (req.email) who.push(`<a href="mailto:${esc(req.email)}">${esc(req.email)}</a>`);
   if (req.phone) {
-    const digits = req.phone.replace(/[^\d+]/g, '');
     who.push(
-      `<a href="tel:${esc(digits)}">${esc(req.phone)}</a> · ` +
-        `<a href="https://wa.me/${esc(digits.replace(/\D/g, ''))}" target="_blank" rel="noopener">WhatsApp</a>`
+      `<a href="tel:${esc(intlPhone(req.phone))}">${esc(req.phone)}</a> · ` +
+        `<a href="${esc(viberHref(req.phone))}">Viber</a> · ` +
+        `<a href="${esc(waHref(req.phone))}" target="_blank" rel="noopener">WhatsApp</a>`
     );
   }
   if (req.guests) who.push(`${esc(req.guests)} gostiju`);
 
   // One button carries the decision; everything else is a step back from it and
   // lives behind the disclosure, so the card reads as a question with an answer.
-  const primary =
-    req.status === 'pending'
+  const primary = enquiry
+    ? `<button class="mgr-btn mgr-btn--ok" data-act="answered" data-id="${esc(req.id)}">✓ Odgovoreno</button>`
+    : req.status === 'pending'
       ? `<button class="mgr-btn mgr-btn--ok" data-act="confirmed" data-id="${esc(req.id)}">Potvrdi</button>`
       : req.status === 'confirmed'
         ? `<button class="mgr-btn mgr-btn--no" data-act="cancelled" data-id="${esc(req.id)}">Otkaži</button>`
         : `<button class="mgr-btn" data-act="pending" data-id="${esc(req.id)}">Vrati na čekanje</button>`;
 
-  const secondary =
-    req.status === 'pending'
+  const secondary = enquiry
+    ? ''
+    : req.status === 'pending'
       ? `<button class="mgr-btn mgr-btn--no" data-act="declined" data-id="${esc(req.id)}">Odbij</button>`
       : req.status === 'confirmed'
         ? `<button class="mgr-btn mgr-btn--ghost" data-act="pending" data-id="${esc(req.id)}">Vrati na čekanje</button>`
@@ -404,7 +537,7 @@ function bookingCardHtml(req) {
     esc(req.name),
     `primljeno ${esc((req.created_at || '').slice(0, 10))}`,
     age !== null ? `čeka ${esc(daysLabel(age))}` : '',
-    req.updated_at && req.status !== 'pending'
+    req.updated_at && !isOpen(req)
       ? `odlučeno ${esc(fmtShort(req.updated_at.slice(0, 10)))}`
       : '',
   ].filter(Boolean);
@@ -415,12 +548,17 @@ function bookingCardHtml(req) {
         <span class="req__dates">${esc(dates)}</span>
         ${n ? `<span class="req__nights">${esc(nightsLabel(n))}</span>` : ''}
         <span class="req__badge">${esc(req.source)}</span>
-        <span class="req__status is-${esc(req.status)}">${esc(STATUS_LABEL[req.status] || req.status)}</span>
+        ${
+          enquiry
+            ? '<span class="req__status is-pending">čeka odgovor</span>'
+            : `<span class="req__status is-${esc(req.status)}">${esc(STATUS_LABEL[req.status] || req.status)}</span>`
+        }
       </div>
       <p class="req__meta">${meta.join(' · ')}</p>
       ${conflicts.length ? `<p class="req__warn">Preklapa se sa ${conflicts.length} potvrđenim terminom. Potvrda bi napravila dvostruku rezervaciju.</p>` : ''}
       ${who.length ? `<p class="req__who">${who.join('')}</p>` : ''}
       ${req.message ? `<p class="req__msg">${esc(req.message)}</p>` : ''}
+      ${enquiry ? `<p class="req__hint">Opći upit bez datuma — odgovorite gostu, pa označite „Odgovoreno“. Ako gost javi datume, upišite ih pod „Detalji“.</p>${enquiryContactHtml(req)}` : ''}
       <div class="req__foot">
         ${primary}
         <details class="req__more">
@@ -486,7 +624,7 @@ function renderConfirmed(rows) {
 
 /** Which archive chip a row belongs to. */
 const archiveKind = (r) =>
-  r.status === 'declined' ? 'declined' : r.status === 'cancelled' ? 'cancelled' : 'past';
+  r.status === 'declined' || r.status === 'cancelled' || r.status === 'answered' ? r.status : 'past';
 
 function renderArchive(rows) {
   const q = view.q.trim().toLowerCase();
@@ -510,19 +648,20 @@ function renderArchive(rows) {
 function render() {
   const today = todayYmd();
   const s = summarise(all, today);
-  renderSummary(s);
+  renderSummary(s, today);
   renderAlert(s);
 
   // Longest wait first. The API orders by check-in, which is the wrong axis for
   // a queue: someone who asked about November nine days ago is the one being
   // kept waiting, not whoever happens to arrive soonest.
   const pending = all
-    .filter((r) => r.status === 'pending')
+    .filter(isOpen)
     .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
 
   // A confirmed booking whose checkout has passed belongs in the archive, not in
   // the working list — otherwise the panel silts up over a season.
-  const confirmed = all.filter((r) => r.status === 'confirmed' && (!r.checkout || r.checkout >= today));
+  // Only real bookings: an undated "confirmed" row is an enquiry (see isOpen).
+  const confirmed = all.filter((r) => r.status === 'confirmed' && r.checkin && r.checkout >= today);
   const archive = all.filter((r) => !pending.includes(r) && !confirmed.includes(r));
 
   fill(els.pending, pending, els.countPending, 'Nema novih zahtjeva — sve je odgovoreno.');
@@ -592,6 +731,18 @@ document.addEventListener('focusout', (e) => {
 });
 
 document.addEventListener('click', (e) => {
+  const viber = e.target.closest('[data-viber]');
+  if (viber) {
+    // The clipboard write is started inside the tap (iOS requires that); the
+    // chat opens once it has gone through, or failed — either way she gets Viber.
+    const open = () => (window.location.href = viber.dataset.viber);
+    (navigator.clipboard?.writeText(viber.dataset.text) ?? Promise.reject())
+      .then(() => say('Poruka je kopirana — u Viberu je zalijepite (dugi pritisak → Zalijepi).', 'ok'))
+      .catch(() => say('Poruku nije moguće kopirati — otvaram Viber.', 'err'))
+      .finally(open);
+    return;
+  }
+
   const act = e.target.closest('[data-act]');
   if (act) {
     const status = act.dataset.act;
@@ -635,6 +786,10 @@ els.archiveQ.addEventListener('input', () => {
 });
 
 document.getElementById('refresh').addEventListener('click', load);
+
+// The block form sits folded on a phone (rare job, long form); a desktop has
+// the room to show it in the side column.
+if (matchMedia('(min-width: 900px)').matches) document.getElementById('blockbox').open = true;
 
 document.getElementById('block-form').addEventListener('submit', async (e) => {
   e.preventDefault();
