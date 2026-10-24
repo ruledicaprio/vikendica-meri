@@ -321,9 +321,13 @@ export function initCalendar(container) {
     // The input events let the Bosnian page's formatted date text follow.
     if (fromEl) { fromEl.value = selStart; fromEl.dispatchEvent(new Event('input')); }
     if (toEl)   { toEl.value   = selEnd;   toEl.dispatchEvent(new Event('input')); }
-    if (msgEl && (!msgEl.value || msgEl.value === autoMsg)) {
+    // Our block (dates, nights, "Dodatne informacije:") sits at the top; the
+    // guest writes under it. Re-picking dates swaps only that block, so what
+    // they typed below stays. A message they rewrote from scratch is left alone.
+    if (msgEl && (!msgEl.value || (autoMsg && msgEl.value.startsWith(autoMsg)))) {
+      const typed = autoMsg ? msgEl.value.slice(autoMsg.length) : '';
       autoMsg = t.calAutoMsg(t.fieldDate(selStart), t.fieldDate(selEnd), diffDays(selStart, selEnd));
-      msgEl.value = autoMsg;
+      msgEl.value = autoMsg + typed;
     }
     document.getElementById('reserve-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
