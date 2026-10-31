@@ -2,6 +2,7 @@ import './style.css';
 import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews } from './gallery.js';
 import { initCalendar } from './calendar.js';
 import { initMiniCal } from './mini-cal.js';
+import { initAframeFloors } from './aframe-floors.js';
 import { t, lang } from './i18n/ui.js';
 import { teleport } from './teleport.js';
 
@@ -114,6 +115,10 @@ const navbar = document.getElementById('navbar');
 const onScrollNav = () => navbar.classList.toggle('is-solid', window.scrollY > 100);
 onScrollNav();
 window.addEventListener('scroll', onScrollNav, { passive: true });
+
+/* ---------- Floors: A-frame cross-section (aframe-floors.js) ----------
+   Scroll-driven, so motion-sensitive visitors keep the static diagram. */
+if (!reducedMotion) initAframeFloors(document.querySelector('[data-aframe]'), navbar);
 
 /* ---------- Mobile menu ---------- */
 const burger = document.getElementById('burger');

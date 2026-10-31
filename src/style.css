@@ -854,6 +854,155 @@ picture {
 .floor li:first-child {
   border-top: none;
 }
+/* ---------- Floors: A-frame cross-section (aframe-floors.js) ----------
+   Static (no JS, reduced motion): the drawing above the three cards, all floors
+   softly lit. Scene (.is-scene): the wrapper gets extra height to scroll
+   through, the stage sticks under the navbar, one floor is lit (data-active)
+   and only its card shows. --enter (0→1) draws and grows the house as it
+   arrives; unset, it counts as 1, i.e. fully drawn. */
+.aframe__house {
+  display: block;
+  width: min(100%, 340px);
+  height: auto;
+  margin: 0 auto 1.4rem;
+  overflow: visible;
+}
+.aframe__band {
+  fill: rgba(229, 168, 77, 0.1);
+  transition: fill 0.45s ease;
+}
+.aframe__slab {
+  stroke: rgba(143, 59, 46, 0.85);
+  stroke-width: 1.8;
+}
+.aframe__window {
+  fill: var(--amber2);
+  opacity: 0.85;
+}
+.aframe__door {
+  fill: #6b2c24;
+}
+.aframe__outline {
+  /* Bordeaux-brown, like the cabin's own beams; amber stays for the light. */
+  fill: none;
+  stroke: #8f3b2e;
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--enter, 1));
+}
+.aframe__label {
+  fill: var(--cream);
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+  pointer-events: none;
+  transition: fill 0.45s ease;
+}
+
+/* The apex band is the narrowest: a size down so "Second floor" clears the roof. */
+.aframe__label[data-floor='2'] {
+  font-size: 13px;
+}
+
+.aframe.is-scene {
+  /* One stage height, plus a stretch of scroll for the trip through the house. */
+  height: calc(100svh - var(--nav, 64px) + 150svh);
+}
+.aframe.is-scene .aframe__stage {
+  position: sticky;
+  top: var(--nav, 64px);
+  height: calc(100svh - var(--nav, 64px));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  /* Edge to edge on phones, where .wrap is the screen. */
+  margin-inline: calc(-1 * var(--pad));
+}
+/* The window the house slides through. The house is larger than it on purpose
+   and is clipped here, so it never widens the page (a wider-than-screen layer
+   lets Android Chrome zoom out). The cut edges fade into the page. */
+.aframe.is-scene .aframe__view {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: clip;
+  -webkit-mask-image: linear-gradient(transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(transparent, #000 7%, #000 93%, transparent);
+}
+/* Size and position come from aframe-floors.js. */
+.aframe.is-scene .aframe__house {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  max-width: none;
+  margin: 0;
+  transform-origin: 50% 0;
+  opacity: calc(0.25 + 0.75 * var(--enter, 1));
+  will-change: transform;
+}
+.aframe.is-scene .aframe__band {
+  fill: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+}
+/* The drawing is zoomed about 2–3×; labels shrink to match. */
+.aframe.is-scene .aframe__label {
+  fill: var(--muted);
+  font-size: 9px;
+}
+.aframe.is-scene .aframe__label[data-floor='2'] {
+  font-size: 8px;
+}
+.aframe[data-active='0'] .aframe__band[data-floor='0'],
+.aframe[data-active='1'] .aframe__band[data-floor='1'],
+.aframe[data-active='2'] .aframe__band[data-floor='2'] {
+  fill: rgba(229, 168, 77, 0.32);
+}
+.aframe[data-active='0'] .aframe__label[data-floor='0'],
+.aframe[data-active='1'] .aframe__label[data-floor='1'],
+.aframe[data-active='2'] .aframe__label[data-floor='2'] {
+  fill: var(--cream);
+}
+/* The three cards share one cell; the lit floor's card fades in. */
+.aframe.is-scene .floors {
+  flex: none;
+  grid-template-columns: minmax(0, 1fr);
+  width: min(calc(100% - 2 * var(--pad)), 30rem);
+  margin: 0 auto;
+}
+.aframe.is-scene .floor {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.aframe[data-active='0'] .floor[data-floor='0'],
+.aframe[data-active='1'] .floor[data-floor='1'],
+.aframe[data-active='2'] .floor[data-floor='2'] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+/* Wide screens: the window on the left, the card on the right. */
+@media (min-width: 901px) {
+  .aframe.is-scene .aframe__stage {
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4rem);
+    padding-block: 1.5rem;
+    margin-inline: 0;
+  }
+  .aframe.is-scene .aframe__view {
+    align-self: stretch;
+  }
+  .aframe.is-scene .floors {
+    flex: 0 1 26rem;
+    width: auto;
+  }
+}
 .amenities {
   list-style: none;
   display: grid;
