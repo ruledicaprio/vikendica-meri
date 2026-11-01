@@ -48,6 +48,35 @@ initRooms(document, openLightbox);
 /* ---------- Sadržaji: photo preview on hover ---------- */
 initHoverPreviews(document, openLightbox);
 
+/* ---------- Sadržaji: chips pop up as they scroll in, drop away as they leave ----------
+   The hidden start state comes with the class added here, so without the
+   script (or with reduced motion) the chips simply show. */
+const amenities = document.querySelector('.amenities');
+if (amenities && !reducedMotion && 'IntersectionObserver' in window) {
+  amenities.classList.add('amenities--pop');
+  const pop = new IntersectionObserver(
+    (entries) => {
+      let k = 0; // chips arriving together pop one after another
+      for (const e of entries) {
+        const li = e.target;
+        if (e.isIntersecting) {
+          li.style.setProperty('--d', `${Math.min(k++, 8) * 50}ms`); // capped: a phone screen takes them all at once
+          li.classList.remove('is-above');
+          li.classList.add('is-in');
+        } else {
+          li.style.setProperty('--d', '0ms');
+          // Over the top edge it drops upwards, under the bottom one downwards.
+          li.classList.toggle('is-above', e.boundingClientRect.top < (e.rootBounds?.top ?? 0));
+          li.classList.remove('is-in');
+        }
+      }
+    },
+    // In from under the fixed navbar at the top, a little short of the bottom.
+    { rootMargin: '-12% 0px -6% 0px' }
+  );
+  for (const li of amenities.children) pop.observe(li);
+}
+
 /* ---------- Availability calendar ---------- */
 const calMount = document.getElementById('cal-mount');
 if (calMount) {
