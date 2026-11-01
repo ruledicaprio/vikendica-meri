@@ -166,8 +166,7 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
 
 /* ---------- Tab cards: etaže and "Vlašić kroz godinu" ---------- */
 for (const box of document.querySelectorAll('[data-tabs]')) {
-  // Own tabs only: the floor card sits inside the Unutra panel of another card.
-  const tabs = [...box.querySelectorAll(':scope > [role="tablist"] > [role="tab"]')];
+  const tabs = [...box.querySelectorAll('[role="tab"]')];
   const select = (tab, focus = false) => {
     for (const t2 of tabs) {
       const on = t2 === tab;

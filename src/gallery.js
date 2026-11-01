@@ -134,9 +134,9 @@ export function locatePhoto(path) {
 }
 
 /**
- * "<cat>/<stem>[,<stem>…]" → that room's photos, in gallery order. Files are
- * named "NN-<stem>…", so "kupatila/kupatilo-sprat" is the upstairs bathroom
- * and never the ground-floor one.
+ * "<cat>[/<stem>,…]" → that room's photos, in gallery order; no stem means the
+ * whole category. Files are named "NN-<stem>…", so "kupatila/kupatilo-sprat"
+ * is the upstairs bathroom and never the ground-floor one.
  */
 export function roomPhotos(spec) {
   const [cat, stems = ''] = String(spec).split('/');
@@ -154,7 +154,7 @@ export function initRooms(root, openLightbox) {
     const spec = el.dataset.room;
     const photos = roomPhotos(spec);
     if (!photos.length) continue;
-    const floor = el.closest('[role="tabpanel"]')?.querySelector(':scope > :is(h4, h5)')?.textContent.trim();
+    const floor = el.closest('[role="tabpanel"]')?.querySelector('h4')?.textContent.trim();
     const room = el.textContent.trim();
     const label = floor ? `${floor} · ${room}` : room;
     el.addEventListener('click', () => openLightbox(spec.split('/')[0], 0, { id: spec, label, photos }));

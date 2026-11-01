@@ -570,8 +570,7 @@ picture {
   gap: clamp(1.5rem, 3vw, 2.6rem);
 }
 .seasons__item h3,
-.seasons__item h4,
-.seasons__item h5 {
+.seasons__item h4 {
   font-size: 1.22rem;
   color: var(--amber2);
   margin-bottom: 0.6rem;
@@ -598,11 +597,9 @@ picture {
   display: block;
   --panel: #151b2c; /* --bg2 with 3% white, opaque so the tab can cover the seam */
 }
-/* One column per tab: two for Unutra/Vani, three for the floors and seasons. */
 .seasons.is-tabs .seasons__tabs {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-template-columns: repeat(3, 1fr);
 }
 .seasons__tab {
   min-height: 3.3rem;
@@ -656,14 +653,52 @@ picture {
   display: none;
 }
 .seasons.is-tabs .seasons__item h3,
-.seasons.is-tabs .seasons__item h4,
-.seasons.is-tabs .seasons__item h5 {
+.seasons.is-tabs .seasons__item h4 {
   display: none;
 }
-/* The floor card nested in the Unutra panel: one step lighter, so it reads as
-   a card within the card. Opaque for the same reason as the outer --panel. */
-.seasons__item .seasons.is-tabs {
-  --panel: #1c2336;
+/* "Vani" hangs off the floor card's top edge, styled like the map's Google /
+   OpenStreetMap tabs (.map-tab), mirrored. Not a tab of the card: it opens
+   every exterior photo straight away, hence the chevron. */
+.floors-out {
+  display: flex;
+  width: fit-content; /* flex, not inline-flex: no line-box gap above the card */
+  grid-column: 1 / -1; /* own row in the no-JS grid too */
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  margin-left: 0.8rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--cream);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.floors-out:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--amber);
+}
+.floors-out:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+.floors-out::after {
+  content: '›';
+  content: '›' / '';
+  color: var(--muted);
+  font-size: 1.2em;
+  line-height: 1;
+}
+/* Nearly square where the tab hangs, as the map is. */
+.floors-out + .seasons__tabs .seasons__tab:first-child {
+  border-top-left-radius: 4px;
+}
+.floors-out + .seasons__tabs .seasons__tab:last-child {
+  border-top-right-radius: 4px;
 }
 .seasons.is-tabs .seasons__item p {
   max-width: 68ch;
@@ -1263,6 +1298,7 @@ summary:focus-visible {
 .chat-link,
 .amenity__btn,
 .room,
+.floors-out,
 .cal__nav-btn,
 .cal__day,
 .navbar__lang,
