@@ -1,5 +1,5 @@
 import './style.css';
-import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews } from './gallery.js';
+import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews, initRooms } from './gallery.js';
 import { initCalendar } from './calendar.js';
 import { initMiniCal } from './mini-cal.js';
 import { t, lang } from './i18n/ui.js';
@@ -42,7 +42,10 @@ document.querySelectorAll('.dest-card__media[data-cat]').forEach((el) => {
   attachHoverSwap(el, el.dataset.cat, openLightbox);
 });
 
-/* ---------- Etaže + sadržaji: photo preview on hover ---------- */
+/* ---------- Etaže: each room opens its own photos ---------- */
+initRooms(document, openLightbox);
+
+/* ---------- Sadržaji: photo preview on hover ---------- */
 initHoverPreviews(document, openLightbox);
 
 /* ---------- Availability calendar ---------- */
@@ -161,9 +164,10 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
   });
 });
 
-/* ---------- "Vlašić kroz godinu" tab cards ---------- */
+/* ---------- Tab cards: etaže and "Vlašić kroz godinu" ---------- */
 for (const box of document.querySelectorAll('[data-tabs]')) {
-  const tabs = [...box.querySelectorAll('[role="tab"]')];
+  // Own tabs only: the floor card sits inside the Unutra panel of another card.
+  const tabs = [...box.querySelectorAll(':scope > [role="tablist"] > [role="tab"]')];
   const select = (tab, focus = false) => {
     for (const t2 of tabs) {
       const on = t2 === tab;

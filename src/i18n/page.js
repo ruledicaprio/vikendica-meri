@@ -62,6 +62,13 @@ export const bs = {
   roomKids: 'Dječija soba: 2× single',
   roomTwoSingle: 'Soba: 2× single',
   roomThreeSingle: 'Soba: 3× single + balkon',
+  houseInside: 'Unutra',
+  houseOutside: 'Vani',
+  outHouse: 'Kuća spolja',
+  outEntrance: 'Ulaz',
+  outTerrace: 'Terasa i roštilj',
+  outDriveway: 'Prilaz',
+  outSurroundings: 'Okolina',
 
   amenitiesSubhead: 'Sadržaji',
   amParking: 'Besplatan parking',
@@ -151,7 +158,6 @@ export const bs = {
   faqQ8: 'Koliko je do Travnika i do sarajevskog aerodroma?',
   faqA8:
     'Do Travnika je 30 kilometara, oko pola sata vožnje. Do aerodroma u Sarajevu oko 130 kilometara, dva sata: sat autoputem do Lašve, pola sata do Travnika i pola sata do Babanovca. Usput vrijedi stati na ćevape kod Harija u Travniku.',
-  floorViewPhoto: 'pogledaj fotografiju',
   contactKicker: 'Kontakt',
   contactTitle: 'Rezervišite svoj boravak',
   contactLead:
@@ -241,6 +247,13 @@ export const en = {
   roomKids: 'Children’s room: 2× single',
   roomTwoSingle: 'Bedroom: 2× single',
   roomThreeSingle: 'Bedroom: 3× single + balcony',
+  houseInside: 'Inside',
+  houseOutside: 'Outside',
+  outHouse: 'The house',
+  outEntrance: 'Entrance',
+  outTerrace: 'Terrace and grill',
+  outDriveway: 'Driveway',
+  outSurroundings: 'Surroundings',
 
   amenitiesSubhead: 'Amenities',
   amParking: 'Free parking',
@@ -323,7 +336,6 @@ export const en = {
   faqQ8: 'How far is Travnik, and Sarajevo airport?',
   faqA8:
     'Travnik is 30 kilometres away, about half an hour by car. Sarajevo airport is roughly 130 kilometres, about two hours: an hour on the motorway to Lasva, half an hour to Travnik and half an hour up to Babanovac. On the way, stop for cevapi at Hari in Travnik.',
-  floorViewPhoto: 'view photo',
   contactKicker: 'Contact',
   contactTitle: 'Book your stay',
   contactLead:

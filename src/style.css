@@ -569,7 +569,9 @@ picture {
   grid-template-columns: repeat(3, 1fr);
   gap: clamp(1.5rem, 3vw, 2.6rem);
 }
-.seasons__item h3 {
+.seasons__item h3,
+.seasons__item h4,
+.seasons__item h5 {
   font-size: 1.22rem;
   color: var(--amber2);
   margin-bottom: 0.6rem;
@@ -596,9 +598,11 @@ picture {
   display: block;
   --panel: #151b2c; /* --bg2 with 3% white, opaque so the tab can cover the seam */
 }
+/* One column per tab: two for Unutra/Vani, three for the floors and seasons. */
 .seasons.is-tabs .seasons__tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
 }
 .seasons__tab {
   min-height: 3.3rem;
@@ -651,8 +655,15 @@ picture {
 .seasons.is-tabs .seasons__item[hidden] {
   display: none;
 }
-.seasons.is-tabs .seasons__item h3 {
+.seasons.is-tabs .seasons__item h3,
+.seasons.is-tabs .seasons__item h4,
+.seasons.is-tabs .seasons__item h5 {
   display: none;
+}
+/* The floor card nested in the Unutra panel: one step lighter, so it reads as
+   a card within the card. Opaque for the same reason as the outer --panel. */
+.seasons__item .seasons.is-tabs {
+  --panel: #1c2336;
 }
 .seasons.is-tabs .seasons__item p {
   max-width: 68ch;
@@ -823,53 +834,43 @@ picture {
   padding-bottom: 0.7rem;
   border-bottom: 1px solid var(--line);
 }
-.floors {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.4rem;
-}
-.floor {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 1.6rem;
-  transition: transform 0.3s ease, border-color 0.3s ease;
-}
-.floor {
-  position: relative;
-}
-.floor:hover {
-  transform: translateY(-4px);
-  border-color: rgba(212, 148, 58, 0.45);
-}
-/* Stretched overlay control: the card contains a heading and a list, which a
-   <button> may not, so the button sits over it instead of wrapping it. */
-.floor__view {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  border: none;
-  background: none;
-  border-radius: 14px;
-  cursor: pointer;
-  padding: 0;
-}
-.floor h4 {
-  font-size: 1.2rem;
-  margin-bottom: 0.8rem;
-  color: var(--amber2);
-}
-.floor ul {
+/* Rooms in the floor tabs (.seasons card): one row per room, each a button
+   that opens only that room's photos. */
+.rooms {
   list-style: none;
 }
-.floor li {
-  padding: 0.35rem 0;
+.rooms li + li {
   border-top: 1px solid var(--line);
-  font-size: 0.92rem;
-  color: rgba(245, 240, 232, 0.8);
 }
-.floor li:first-child {
-  border-top: none;
+.room {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.85rem 0.1rem;
+  border: none;
+  background: none;
+  color: rgba(245, 240, 232, 0.85);
+  font: inherit;
+  font-size: 0.98rem;
+  text-align: left;
+  cursor: pointer;
+}
+.room::after {
+  content: '›';
+  content: '›' / '';
+  color: var(--amber);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.room:hover {
+  color: var(--cream);
+}
+.room:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 .amenities {
   list-style: none;
@@ -1261,7 +1262,7 @@ summary:focus-visible {
 .lightbox__thumb,
 .chat-link,
 .amenity__btn,
-.floor__view,
+.room,
 .cal__nav-btn,
 .cal__day,
 .navbar__lang,
@@ -1284,6 +1285,7 @@ summary:focus-visible {
 .thumb:active,
 .lightbox__thumb:active,
 .amenity__btn:active,
+.room:active,
 .video-feature__play:active {
   opacity: 0.82;
 }
@@ -1308,7 +1310,7 @@ summary:focus-visible {
   outline-offset: -3px;
 }
 
-/* Shared floating photo preview for [data-photo] floor cards and amenity chips.
+/* Shared floating photo preview for [data-photo] amenity chips.
    Fixed + transform-positioned so showing it never reflows the section. */
 .hover-preview {
   position: fixed;
@@ -2230,7 +2232,6 @@ summary:focus-visible {
     display: flex;
     z-index: 60;
   }
-  .floors,
   .dest-grid,
   .contact-grid {
     /* minmax(0, …): a bare 1fr track grows to its content's min-content width,

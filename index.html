@@ -388,33 +388,68 @@
           </div>
 
           <h3 class="subhead">{{floorsSubhead}}</h3>
-          <div class="floors">
-            <!-- The card holds a heading and a list, which a <button> may not
-                 contain, so the control is a stretched overlay instead. -->
-            <article class="floor">
-              <h4>{{floorGround}}</h4>
-              <ul>
-                <li>{{roomHallway}}</li><li>{{roomBathroom}}</li><li>{{roomLiving}}</li><li>{{roomKitchen}}</li>
-              </ul>
-              <button class="floor__view" type="button" data-photo="dnevni/00-dnevni-boravak.jpg"
-                      aria-label="{{floorGround}} — {{floorViewPhoto}}"></button>
+          <!-- Two tab cards, the same as "Vlašić kroz godinu" below (data-tabs in
+               main.js): Unutra / Vani outside, and the floors nested in Unutra.
+               Each room is its own button and opens only that room's photos:
+               data-room is "<category>/<file stem>[,<stem>…]" (initRooms). -->
+          <div class="seasons reveal" data-tabs>
+            <div class="seasons__tabs" role="tablist" aria-label="{{floorsSubhead}}">
+              <button class="seasons__tab" type="button" role="tab" id="tab-house-in" aria-controls="panel-house-in" aria-selected="true">
+                {{houseInside}}
+              </button>
+              <button class="seasons__tab" type="button" role="tab" id="tab-house-out" aria-controls="panel-house-out" aria-selected="false" tabindex="-1">
+                {{houseOutside}}
+              </button>
+            </div>
+            <article class="seasons__item" role="tabpanel" id="panel-house-in" aria-labelledby="tab-house-in">
+              <h4>{{houseInside}}</h4>
+              <div class="seasons" data-tabs>
+                <div class="seasons__tabs" role="tablist" aria-label="{{houseInside}}">
+                  <button class="seasons__tab" type="button" role="tab" id="tab-floor-0" aria-controls="panel-floor-0" aria-selected="true">
+                    {{floorGround}}
+                  </button>
+                  <button class="seasons__tab" type="button" role="tab" id="tab-floor-1" aria-controls="panel-floor-1" aria-selected="false" tabindex="-1">
+                    {{floorFirst}}
+                  </button>
+                  <button class="seasons__tab" type="button" role="tab" id="tab-floor-2" aria-controls="panel-floor-2" aria-selected="false" tabindex="-1">
+                    {{floorSecond}}
+                  </button>
+                </div>
+                <article class="seasons__item" role="tabpanel" id="panel-floor-0" aria-labelledby="tab-floor-0">
+                  <h5>{{floorGround}}</h5>
+                  <ul class="rooms">
+                    <li><button class="room" type="button" data-room="dnevni/hodnik">{{roomHallway}}</button></li>
+                    <li><button class="room" type="button" data-room="kupatila/kupatilo-prizemlje">{{roomBathroom}}</button></li>
+                    <li><button class="room" type="button" data-room="dnevni/dnevni-boravak,trpezarija">{{roomLiving}}</button></li>
+                    <li><button class="room" type="button" data-room="kuhinja/kuhinja">{{roomKitchen}}</button></li>
+                  </ul>
+                </article>
+                <article class="seasons__item" role="tabpanel" id="panel-floor-1" aria-labelledby="tab-floor-1">
+                  <h5>{{floorFirst}}</h5>
+                  <ul class="rooms">
+                    <li><button class="room" type="button" data-room="sobe/soba-bracna-sprat-1">{{roomMaster}}</button></li>
+                    <li><button class="room" type="button" data-room="sobe/soba-djecija-sprat-1">{{roomKids}}</button></li>
+                    <li><button class="room" type="button" data-room="kupatila/kupatilo-sprat">{{roomBathroom}}</button></li>
+                  </ul>
+                </article>
+                <article class="seasons__item" role="tabpanel" id="panel-floor-2" aria-labelledby="tab-floor-2">
+                  <h5>{{floorSecond}}</h5>
+                  <ul class="rooms">
+                    <li><button class="room" type="button" data-room="sobe/soba-sprat-2-druga">{{roomTwoSingle}}</button></li>
+                    <li><button class="room" type="button" data-room="sobe/soba-sprat-2-prva">{{roomThreeSingle}}</button></li>
+                  </ul>
+                </article>
+              </div>
             </article>
-            <article class="floor">
-              <h4>{{floorFirst}}</h4>
-              <ul>
-                <li>{{roomMaster}}</li>
-                <li>{{roomKids}}</li><li>{{roomBathroom}}</li>
+            <article class="seasons__item" role="tabpanel" id="panel-house-out" aria-labelledby="tab-house-out">
+              <h4>{{houseOutside}}</h4>
+              <ul class="rooms">
+                <li><button class="room" type="button" data-room="eksterijer/vikendica-prednja,vikendica-a-frame,vikendica-bocna,vikendica-vece,vikendica-zimski">{{outHouse}}</button></li>
+                <li><button class="room" type="button" data-room="eksterijer/ulaz">{{outEntrance}}</button></li>
+                <li><button class="room" type="button" data-room="eksterijer/terasa">{{outTerrace}}</button></li>
+                <li><button class="room" type="button" data-room="eksterijer/vikendica-prilaz">{{outDriveway}}</button></li>
+                <li><button class="room" type="button" data-room="eksterijer/okolina">{{outSurroundings}}</button></li>
               </ul>
-              <button class="floor__view" type="button" data-photo="sobe/00-soba-bracna-sprat-1.jpg"
-                      aria-label="{{floorFirst}} — {{floorViewPhoto}}"></button>
-            </article>
-            <article class="floor">
-              <h4>{{floorSecond}}</h4>
-              <ul>
-                <li>{{roomTwoSingle}}</li><li>{{roomThreeSingle}}</li>
-              </ul>
-              <button class="floor__view" type="button" data-photo="sobe/04-soba-sprat-2-prva.jpg"
-                      aria-label="{{floorSecond}} — {{floorViewPhoto}}"></button>
             </article>
           </div>
 
