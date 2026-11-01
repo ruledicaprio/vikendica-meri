@@ -749,7 +749,7 @@ picture {
   color: var(--cream);
 }
 .floor-map__row[aria-selected='true'] .floor-map__pin {
-  background: var(--amber);
+  background: #feb246; /* --amber at 120% brightness */
   color: #14100a;
 }
 .floor-map__row--out .floor-map__pin::after {
