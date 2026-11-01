@@ -187,7 +187,9 @@ for (const box of document.querySelectorAll('[data-tabs]')) {
     });
   });
   box.classList.add('is-tabs');
-  select(tabs[0]);
+  // The tab the markup marks as open: the floor card's default, Prizemlje,
+  // sits in the bottom row, after the upper floors.
+  select(tabs.find((tab) => tab.getAttribute('aria-selected') === 'true') ?? tabs[0]);
 }
 
 /* ---------- Reveal on scroll (lazy) ----------

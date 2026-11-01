@@ -389,20 +389,13 @@
 
           <h3 class="subhead">{{floorsSubhead}}</h3>
           <!-- Same tab card as "Vlašić kroz godinu" below (data-tabs in main.js),
-               with "Vani" hanging off its top edge like the map's tabs: it is not
-               a tab, it opens every exterior photo straight away. Each room is its own button and
-               opens only that room's photos: data-room is
+               laid out like the house: the upper floors as tabs on top, Prizemlje
+               and Vani hanging off the bottom edge like the map's tabs. Vani is
+               not a tab, it opens every exterior photo straight away. Each room
+               is its own button and opens only that room's photos: data-room is
                "<category>[/<file stem>,…]", no stem meaning the whole category. -->
-          <div class="seasons reveal" data-tabs>
-            <button class="floors-out" type="button" data-room="eksterijer">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-              <span>{{houseOutside}}</span>
-            </button>
+          <div class="seasons floors reveal" data-tabs>
             <div class="seasons__tabs" role="tablist" aria-label="{{floorsSubhead}}">
-              <button class="seasons__tab" type="button" role="tab" id="tab-floor-0" aria-controls="panel-floor-0" aria-selected="true">
-                {{floorGround}}
-              </button>
               <button class="seasons__tab" type="button" role="tab" id="tab-floor-1" aria-controls="panel-floor-1" aria-selected="false" tabindex="-1">
                 {{floorFirst}}
               </button>
@@ -434,6 +427,18 @@
                 <li><button class="room" type="button" data-room="sobe/soba-sprat-2-prva">{{roomThreeSingle}}</button></li>
               </ul>
             </article>
+            <div class="floors__down">
+              <div role="tablist" aria-label="{{floorsSubhead}}">
+                <button class="floors__tab" type="button" role="tab" id="tab-floor-0" aria-controls="panel-floor-0" aria-selected="true">
+                  {{floorGround}}
+                </button>
+              </div>
+              <button class="floors__tab floors__tab--out" type="button" data-room="eksterijer">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                <span>{{houseOutside}}</span>
+              </button>
+            </div>
           </div>
 
           <h3 class="subhead">{{amenitiesSubhead}}</h3>

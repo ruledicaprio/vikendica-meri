@@ -597,9 +597,11 @@ picture {
   display: block;
   --panel: #151b2c; /* --bg2 with 3% white, opaque so the tab can cover the seam */
 }
+/* One column per tab: three for the seasons, two for the upper floors. */
 .seasons.is-tabs .seasons__tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
 }
 .seasons__tab {
   min-height: 3.3rem;
@@ -656,49 +658,71 @@ picture {
 .seasons.is-tabs .seasons__item h4 {
   display: none;
 }
-/* "Vani" hangs off the floor card's top edge, styled like the map's Google /
-   OpenStreetMap tabs (.map-tab), mirrored. Not a tab of the card: it opens
-   every exterior photo straight away, hence the chevron. */
-.floors-out {
+/* Floor card, laid out like the house: 1. and 2. sprat as tabs on top,
+   Prizemlje and Vani hanging off the bottom edge in the style of the map's
+   Google / OpenStreetMap tabs (.map-tab). Vani is not a tab: it opens every
+   exterior photo straight away, hence the chevron. */
+.floors__down {
+  display: none; /* tabs without the script would do nothing */
+}
+.floors.is-tabs .floors__down {
   display: flex;
-  width: fit-content; /* flex, not inline-flex: no line-box gap above the card */
-  grid-column: 1 / -1; /* own row in the no-JS grid too */
+  gap: 0.4rem;
+  padding: 0 0.8rem;
+}
+.floors__down [role='tablist'] {
+  display: flex;
+}
+/* Nearly square where the tabs hang, as the map is. */
+.floors.is-tabs .seasons__item {
+  border-radius: 0 0 4px 4px;
+}
+.floors__tab {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   min-height: 44px;
-  margin-left: 0.8rem;
+  margin-top: -1px; /* over the panel's bottom border, hidden by the open tab */
   padding: 0.5rem 1rem;
   border: 1px solid var(--line);
-  border-bottom: 0;
-  border-radius: 12px 12px 0 0;
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
   background: rgba(255, 255, 255, 0.06);
-  color: var(--cream);
+  color: var(--muted);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
-.floors-out:hover {
+.floors__tab:not([aria-selected='true']):hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: var(--amber);
+  color: var(--cream);
 }
-.floors-out:focus-visible {
+.floors__tab[aria-selected='true'] {
+  position: relative;
+  z-index: 1;
+  background: var(--panel);
+  color: var(--cream);
+  box-shadow: inset 0 -2px 0 var(--amber);
+}
+.floors__tab:focus-visible {
+  position: relative;
+  z-index: 2;
   outline: 2px solid var(--amber);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
-.floors-out::after {
+.floors__tab--out {
+  color: var(--cream);
+}
+.floors__tab--out::after {
   content: '›';
   content: '›' / '';
   color: var(--muted);
   font-size: 1.2em;
   line-height: 1;
-}
-/* Nearly square where the tab hangs, as the map is. */
-.floors-out + .seasons__tabs .seasons__tab:first-child {
-  border-top-left-radius: 4px;
-}
-.floors-out + .seasons__tabs .seasons__tab:last-child {
-  border-top-right-radius: 4px;
 }
 .seasons.is-tabs .seasons__item p {
   max-width: 68ch;
@@ -1298,7 +1322,7 @@ summary:focus-visible {
 .chat-link,
 .amenity__btn,
 .room,
-.floors-out,
+.floors__tab,
 .cal__nav-btn,
 .cal__day,
 .navbar__lang,
