@@ -476,19 +476,33 @@
           </div>
 
           <h3 class="subhead">{{amenitiesSubhead}}</h3>
-          <ul class="amenities">
-            <li>{{amParking}}</li>
-            <li><button class="amenity__btn" type="button" data-photo="eksterijer/08-terasa-rostilj.jpg">{{amGrill}}</button></li>
-            <li>{{amKettle}}</li>
-            <li><button class="amenity__btn" type="button" data-photo="kuhinja/03-kuhinja-stednjak.jpg">{{amOven}}</button></li>
-            <li><button class="amenity__btn" type="button" data-photo="kuhinja/03-kuhinja-stednjak.jpg">{{amStove}}</button></li>
-            <li><button class="amenity__btn" type="button" data-photo="kuhinja/05-kuhinja-mikrovalna.jpg">{{amMicrowave}}</button></li>
-            <li><button class="amenity__btn" type="button" data-photo="kuhinja/04-kuhinja-frizider.jpg">{{amFridge}}</button></li>
-            <li><button class="amenity__btn" type="button" data-photo="dnevni/00-dnevni-boravak.jpg">{{amTv}}</button></li>
-            <li>{{amSatTv}}</li><li>{{amWifi}}</li>
-            <li><button class="amenity__btn" type="button" data-photo="kupatila/06-kupatilo-sprat-ves-masina.jpg">{{amWasher}}</button></li>
-            <li>{{amHeating}}</li><li>{{amHairdryer}}</li><li>{{amIron}}</li><li>{{amHighChair}}</li><li>{{amVacuum}}</li>
-          </ul>
+          <!-- Sadržaji. With the script (and motion allowed) this becomes a walk
+               through the house, Vani → Prizemlje → 1. sprat → Cijela kuća, in a
+               frame pinned under the navbar (amenity-guide.js): data-zone puts
+               each chip in its group, data-label-* name the groups. Otherwise
+               it is this plain list. -->
+          <div class="amenity-guide" data-label-out="{{houseOutside}}" data-label-ground="{{floorGround}}"
+               data-label-first="{{floorFirst}}" data-label-all="{{amZoneAll}}">
+            <ul class="amenities">
+              <li data-zone="out">{{amParking}}</li>
+              <li data-zone="out"><button class="amenity__btn" type="button" data-photo="eksterijer/08-terasa-rostilj.jpg">{{amGrill}}</button></li>
+              <li data-zone="out">{{amTable}}</li>
+              <li data-zone="ground">{{amKettle}}</li>
+              <li data-zone="ground"><button class="amenity__btn" type="button" data-photo="kuhinja/03-kuhinja-stednjak.jpg">{{amOven}}</button></li>
+              <li data-zone="ground"><button class="amenity__btn" type="button" data-photo="kuhinja/03-kuhinja-stednjak.jpg">{{amStove}}</button></li>
+              <li data-zone="ground"><button class="amenity__btn" type="button" data-photo="kuhinja/05-kuhinja-mikrovalna.jpg">{{amMicrowave}}</button></li>
+              <li data-zone="ground"><button class="amenity__btn" type="button" data-photo="kuhinja/04-kuhinja-frizider.jpg">{{amFridge}}</button></li>
+              <li data-zone="ground"><button class="amenity__btn" type="button" data-photo="dnevni/00-dnevni-boravak.jpg">{{amTv}}</button></li>
+              <li data-zone="ground">{{amSatTv}}</li>
+              <li data-zone="all">{{amWifi}}</li>
+              <li data-zone="first"><button class="amenity__btn" type="button" data-photo="kupatila/06-kupatilo-sprat-ves-masina.jpg">{{amWasher}}</button></li>
+              <li data-zone="all">{{amHeating}}</li>
+              <li data-zone="first">{{amHairdryer}}</li>
+              <li data-zone="all">{{amIron}}</li>
+              <li data-zone="all">{{amHighChair}}</li>
+              <li data-zone="all">{{amVacuum}}</li>
+            </ul>
+          </div>
         </div>
       </section>
 

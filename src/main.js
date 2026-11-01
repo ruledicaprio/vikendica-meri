@@ -2,6 +2,7 @@ import './style.css';
 import { initGallery, createLightbox, attachHoverSwap, initHoverPreviews, initRooms } from './gallery.js';
 import { initCalendar } from './calendar.js';
 import { initMiniCal } from './mini-cal.js';
+import { initAmenityGuide } from './amenity-guide.js';
 import { t, lang } from './i18n/ui.js';
 import { teleport } from './teleport.js';
 
@@ -47,6 +48,15 @@ initRooms(document, openLightbox);
 
 /* ---------- Sadržaji: photo preview on hover ---------- */
 initHoverPreviews(document, openLightbox);
+
+/* ---------- Sadržaji: a walk through the house on scroll (amenity-guide.js) ----------
+   Uses a copy of the floor picker's sketch. With reduced motion, or without
+   the script, the chips stay the plain list. */
+const amenityGuide = document.querySelector('.amenity-guide');
+const floorArt = document.querySelector('.floor-map__art');
+if (amenityGuide && floorArt && !reducedMotion && 'IntersectionObserver' in window) {
+  initAmenityGuide(amenityGuide, floorArt);
+}
 
 /* ---------- Availability calendar ---------- */
 const calMount = document.getElementById('cal-mount');

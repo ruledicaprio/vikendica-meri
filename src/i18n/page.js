@@ -80,6 +80,8 @@ export const bs = {
   amIron: 'Pegla',
   amHighChair: 'Hranilica za bebu',
   amVacuum: 'Usisavač',
+  amTable: 'Drveni sto u dvorištu',
+  amZoneAll: 'Cijela kuća',
 
   videoKicker: 'Babanovac',
   videoTitle: 'Osjetite planinu iz vikendice',
@@ -258,6 +260,8 @@ export const en = {
   amIron: 'Iron',
   amHighChair: 'Baby high chair',
   amVacuum: 'Vacuum cleaner',
+  amTable: 'Wooden table in the yard',
+  amZoneAll: 'Whole house',
 
   videoKicker: 'Babanovac',
   videoTitle: 'Feel the mountain from the chalet',
