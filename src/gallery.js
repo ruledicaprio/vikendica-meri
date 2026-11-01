@@ -113,7 +113,7 @@ export function attachHoverSwap(el, key, openLightbox = null) {
 }
 
 /* ----------------------------------------------------------------------------
-   Hover previews for the floor cards and amenity chips
+   Hover previews for the amenity chips
    Each [data-photo] element names one photo as "<cat>/<file>". A single shared
    panel is repointed on hover rather than one panel per element: 17 targets
    would otherwise put 17 more <picture> trees in the DOM for a decoration.
@@ -131,6 +131,34 @@ export function locatePhoto(path) {
   const [cat, file] = String(path).split('/');
   const index = (categories[cat]?.photos || []).findIndex((p) => base(p.src) === file);
   return index < 0 ? null : { cat, index };
+}
+
+/**
+ * "<cat>[/<stem>,…]" → that room's photos, in gallery order; no stem means the
+ * whole category. Files are named "NN-<stem>…", so "kupatila/kupatilo-sprat"
+ * is the upstairs bathroom and never the ground-floor one.
+ */
+export function roomPhotos(spec) {
+  const [cat, stems = ''] = String(spec).split('/');
+  const wanted = stems.split(',');
+  return (categories[cat]?.photos || []).filter((p) => {
+    const name = base(p.src).replace(/^\d+-/, '');
+    return wanted.some((s) => name.startsWith(s));
+  });
+}
+
+/* Room buttons in the floor tabs: each opens only its own photos, labelled
+   "<floor> · <room>", instead of the whole category. */
+export function initRooms(root, openLightbox) {
+  for (const el of root.querySelectorAll('[data-room]')) {
+    const spec = el.dataset.room;
+    const photos = roomPhotos(spec);
+    if (!photos.length) continue;
+    const floor = el.closest('[role="tabpanel"]')?.querySelector('h4')?.textContent.trim();
+    const room = el.textContent.trim();
+    const label = floor ? `${floor} · ${room}` : room;
+    el.addEventListener('click', () => openLightbox(spec.split('/')[0], 0, { id: spec, label, photos }));
+  }
 }
 
 export function initHoverPreviews(root = document, openLightbox = null) {
@@ -353,14 +381,16 @@ export function createLightbox(root) {
   let opener = null;
   const focusables = () => [...el.querySelectorAll('button')];
 
-  const open = (key, index) => {
+  // `room` ({ id, label, photos }, from initRooms) narrows the category to one
+  // room's photos; without it the whole category opens.
+  const open = (key, index, room = null) => {
     const c = categories[key];
     if (!c || !c.photos.length) return;
-    list = c.photos;
+    list = room?.photos || c.photos;
     currentKey = key;
     i = Math.max(0, Math.min(index, list.length - 1));
-    label.textContent = c.label;
-    buildStrip(key, list);
+    label.textContent = room?.label || c.label;
+    buildStrip(room ? `${key}|${room.id}` : key, list);
     render();
     opener = document.activeElement;
     el.classList.add('is-open');

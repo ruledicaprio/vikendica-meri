@@ -388,33 +388,90 @@
           </div>
 
           <h3 class="subhead">{{floorsSubhead}}</h3>
-          <div class="floors">
-            <!-- The card holds a heading and a list, which a <button> may not
-                 contain, so the control is a stretched overlay instead. -->
-            <article class="floor">
+          <!-- Floor picker: a line sketch of the cabin's front, each floor a
+               band that is a tab of this card (data-tabs in main.js, as for
+               "Vlašić kroz godinu" below), --y0/--y1 being its top and bottom in
+               the sketch's 252-unit viewBox. Vani is not a tab: it opens every
+               exterior photo straight away. Each room is its own button and
+               opens only that room's photos: data-room is
+               "<category>[/<file stem>,…]", no stem meaning the whole category. -->
+          <div class="seasons floors reveal" data-tabs>
+            <div class="floor-map">
+              <svg class="floor-map__art" viewBox="0 0 360 252" aria-hidden="true" focusable="false"
+                   fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <!-- roof: the A-frame's two slopes, chimney on the right -->
+                <path d="M18 204L120 10L222 204H211.5L120 30L28.5 204Z" fill="currentColor" fill-opacity=".14" stroke="none"/>
+                <path d="M18 204L120 10L222 204M28.5 204L120 30L211.5 204" stroke-width="2.2"/>
+                <path d="M158 70H166V97.5L158 82.3ZM156 70H168"/>
+                <!-- floor lines carried from the roof edge into the label column -->
+                <path d="M163.1 92H252M193.6 150H252" stroke-dasharray="2 3" stroke-opacity=".45"/>
+                <g data-floor="2">
+                  <path d="M115 44h10v8h-10zM115 47h10M115 50h10"/>
+                  <rect x="114" y="62" width="12" height="18" fill="currentColor" fill-opacity=".12"/>
+                  <path d="M94 80H146M90 92H150 M98 80V92 M102 80V92 M106 80V92 M110 80V92 M114 80V92 M118 80V92 M122 80V92 M126 80V92 M130 80V92 M134 80V92 M138 80V92 M142 80V92"/>
+                </g>
+                <g data-floor="1">
+                  <rect x="100" y="100" width="12" height="26" fill="currentColor" fill-opacity=".12"/>
+                  <path d="M122 104h18v16h-18zM131 104v16"/>
+                  <path d="M72 126H168M68 142H172 M76 126V142 M80 126V142 M84 126V142 M88 126V142 M92 126V142 M96 126V142 M100 126V142 M104 126V142 M108 126V142 M112 126V142 M116 126V142 M120 126V142 M124 126V142 M128 126V142 M132 126V142 M136 126V142 M140 126V142 M144 126V142 M148 126V142 M152 126V142 M156 126V142 M160 126V142 M164 126V142"/>
+                  <rect x="58" y="142" width="124" height="8" fill="currentColor" fill-opacity=".22"/>
+                </g>
+                <g data-floor="0">
+                  <path d="M60 168h14v34H60zM64.7 168v34M69.3 168v34"/>
+                  <rect x="110" y="160" width="22" height="38" fill="currentColor" fill-opacity=".12"/>
+                  <path d="M121 160v38M101 160h8v38h-8zM133 160h8v38h-8zM101 172h8M101 184h8M133 172h8M133 184h8"/>
+                  <path d="M88 184H206M88 200H206 M92 184V200 M96 184V200 M100 184V200 M104 184V200 M108 184V200 M112 184V200 M116 184V200 M120 184V200 M124 184V200 M128 184V200 M132 184V200 M136 184V200 M140 184V200 M144 184V200 M148 184V200 M152 184V200 M156 184V200 M160 184V200 M164 184V200 M168 184V200 M172 184V200 M176 184V200 M180 184V200 M184 184V200 M188 184V200 M192 184V200 M196 184V200 M200 184V200 M204 184V200"/>
+                  <path d="M88 200h118v12H88z M88 200l12 12 M96 200l12 12 M104 200l12 12 M112 200l12 12 M120 200l12 12 M128 200l12 12 M136 200l12 12 M144 200l12 12 M152 200l12 12 M160 200l12 12 M168 200l12 12 M176 200l12 12 M184 200l12 12 M192 200l12 12" stroke-width="1"/>
+                </g>
+                <g data-out>
+                  <path d="M0 214H252"/>
+                  <path d="M237 150l10 26h-6l8 22h-24l8-22h-6zM237 198v16"/>
+                  <path d="M0 240h246v8H0z" fill="currentColor" fill-opacity=".12"/>
+                  <path d="M2 220h10v20H2zM82 220h10v20H82zM162 220h10v20h-10zM234 220h10v20h-10zM0 220h14M80 220h14M160 220h14M232 220h14"/>
+                  <path d="M12 227H82M12 234H82M92 227H162M92 234H162M172 227H234M172 234H234"/>
+                </g>
+              </svg>
+              <div class="floor-map__tabs" role="tablist" aria-label="{{floorsSubhead}}">
+                <button class="floor-map__row" type="button" role="tab" id="tab-floor-2" aria-controls="panel-floor-2" aria-selected="false" tabindex="-1" style="--y0: 30; --y1: 92">
+                  <span class="floor-map__pin">{{floorSecond}}</span>
+                </button>
+                <button class="floor-map__row" type="button" role="tab" id="tab-floor-1" aria-controls="panel-floor-1" aria-selected="false" tabindex="-1" style="--y0: 92; --y1: 150">
+                  <span class="floor-map__pin">{{floorFirst}}</span>
+                </button>
+                <button class="floor-map__row" type="button" role="tab" id="tab-floor-0" aria-controls="panel-floor-0" aria-selected="true" style="--y0: 150; --y1: 214">
+                  <span class="floor-map__pin">{{floorGround}}</span>
+                </button>
+              </div>
+              <button class="floor-map__row floor-map__row--out" type="button" data-room="eksterijer" style="--y0: 214; --y1: 252">
+                <span class="floor-map__pin">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                  <span>{{houseOutside}}</span>
+                </span>
+              </button>
+            </div>
+            <article class="seasons__item" role="tabpanel" id="panel-floor-0" aria-labelledby="tab-floor-0">
               <h4>{{floorGround}}</h4>
-              <ul>
-                <li>{{roomHallway}}</li><li>{{roomBathroom}}</li><li>{{roomLiving}}</li><li>{{roomKitchen}}</li>
+              <ul class="rooms">
+                <li><button class="room" type="button" data-room="kupatila/kupatilo-prizemlje">{{roomBathroom}}</button></li>
+                <li><button class="room" type="button" data-room="dnevni/dnevni-boravak,trpezarija">{{roomLiving}}</button></li>
+                <li><button class="room" type="button" data-room="kuhinja/kuhinja">{{roomKitchen}}</button></li>
               </ul>
-              <button class="floor__view" type="button" data-photo="dnevni/00-dnevni-boravak.jpg"
-                      aria-label="{{floorGround}} — {{floorViewPhoto}}"></button>
             </article>
-            <article class="floor">
+            <article class="seasons__item" role="tabpanel" id="panel-floor-1" aria-labelledby="tab-floor-1">
               <h4>{{floorFirst}}</h4>
-              <ul>
-                <li>{{roomMaster}}</li>
-                <li>{{roomKids}}</li><li>{{roomBathroom}}</li>
+              <ul class="rooms">
+                <li><button class="room" type="button" data-room="sobe/soba-bracna-sprat-1">{{roomMaster}}</button></li>
+                <li><button class="room" type="button" data-room="sobe/soba-djecija-sprat-1">{{roomKids}}</button></li>
+                <li><button class="room" type="button" data-room="kupatila/kupatilo-sprat">{{roomBathroom}}</button></li>
               </ul>
-              <button class="floor__view" type="button" data-photo="sobe/00-soba-bracna-sprat-1.jpg"
-                      aria-label="{{floorFirst}} — {{floorViewPhoto}}"></button>
             </article>
-            <article class="floor">
+            <article class="seasons__item" role="tabpanel" id="panel-floor-2" aria-labelledby="tab-floor-2">
               <h4>{{floorSecond}}</h4>
-              <ul>
-                <li>{{roomTwoSingle}}</li><li>{{roomThreeSingle}}</li>
+              <ul class="rooms">
+                <li><button class="room" type="button" data-room="sobe/soba-sprat-2-druga">{{roomTwoSingle}}</button></li>
+                <li><button class="room" type="button" data-room="sobe/soba-sprat-2-prva">{{roomThreeSingle}}</button></li>
               </ul>
-              <button class="floor__view" type="button" data-photo="sobe/04-soba-sprat-2-prva.jpg"
-                      aria-label="{{floorSecond}} — {{floorViewPhoto}}"></button>
             </article>
           </div>
 

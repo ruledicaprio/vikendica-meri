@@ -569,7 +569,8 @@ picture {
   grid-template-columns: repeat(3, 1fr);
   gap: clamp(1.5rem, 3vw, 2.6rem);
 }
-.seasons__item h3 {
+.seasons__item h3,
+.seasons__item h4 {
   font-size: 1.22rem;
   color: var(--amber2);
   margin-bottom: 0.6rem;
@@ -651,8 +652,116 @@ picture {
 .seasons.is-tabs .seasons__item[hidden] {
   display: none;
 }
-.seasons.is-tabs .seasons__item h3 {
+.seasons.is-tabs .seasons__item h3,
+.seasons.is-tabs .seasons__item h4 {
   display: none;
+}
+/* Floor picker: a line sketch of the cabin's front in one colour, each floor a
+   band (a tab of the card) running from the drawing to its label; the open
+   floor is drawn in amber. Vani, the fence band, opens the exterior photos. */
+.floor-map {
+  display: none; /* its bands are tabs: without the script they would do nothing */
+  position: relative;
+  margin-bottom: 0.9rem;
+}
+.floors.is-tabs .floor-map {
+  display: block;
+}
+.floor-map__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: rgba(245, 240, 232, 0.55);
+}
+.floor-map__art g {
+  transition: color 0.25s ease;
+}
+.floor-map:has(#tab-floor-0[aria-selected='true']) [data-floor='0'],
+.floor-map:has(#tab-floor-1[aria-selected='true']) [data-floor='1'],
+.floor-map:has(#tab-floor-2[aria-selected='true']) [data-floor='2'] {
+  color: var(--amber);
+}
+@media (hover: hover) {
+  .floor-map:has(#tab-floor-0[aria-selected='false']:hover) [data-floor='0'],
+  .floor-map:has(#tab-floor-1[aria-selected='false']:hover) [data-floor='1'],
+  .floor-map:has(#tab-floor-2[aria-selected='false']:hover) [data-floor='2'],
+  .floor-map:has(.floor-map__row--out:hover) [data-out] {
+    color: var(--cream);
+  }
+}
+.floor-map__tabs {
+  position: absolute;
+  inset: 0;
+}
+/* --y0 / --y1: the band's top and bottom in the sketch's 252-unit viewBox. */
+.floor-map__row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--y0) / 252 * 100%);
+  height: calc((var(--y1) - var(--y0)) / 252 * 100%);
+  display: flex;
+  justify-content: flex-end;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+.floor-map__row[aria-selected='true'] {
+  background: linear-gradient(90deg, transparent, rgba(229, 168, 77, 0.1));
+}
+.floor-map__row:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: -2px;
+}
+/* The labels are one column: a cell per band, as tall as its floor, the
+   cells touching. The sketch's dashed floor lines run into its left edge
+   (x 252 of 360, hence 30%). */
+.floor-map__pin {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 30%;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-top: 0;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+#tab-floor-2 .floor-map__pin {
+  border-top: 1px solid var(--line);
+  border-radius: 12px 12px 0 0;
+}
+.floor-map__row--out .floor-map__pin {
+  border-radius: 0 0 12px 12px;
+  color: var(--cream);
+}
+.floor-map__row:hover .floor-map__pin {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--cream);
+}
+.floor-map__row[aria-selected='true'] .floor-map__pin {
+  background: #feb246; /* --amber at 120% brightness */
+  color: #14100a;
+}
+.floor-map__row--out .floor-map__pin::after {
+  content: '›';
+  content: '›' / '';
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 1.2em;
+  line-height: 1;
+}
+.floors.is-tabs .seasons__item {
+  border-radius: 16px;
 }
 .seasons.is-tabs .seasons__item p {
   max-width: 68ch;
@@ -823,53 +932,43 @@ picture {
   padding-bottom: 0.7rem;
   border-bottom: 1px solid var(--line);
 }
-.floors {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.4rem;
-}
-.floor {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 1.6rem;
-  transition: transform 0.3s ease, border-color 0.3s ease;
-}
-.floor {
-  position: relative;
-}
-.floor:hover {
-  transform: translateY(-4px);
-  border-color: rgba(212, 148, 58, 0.45);
-}
-/* Stretched overlay control: the card contains a heading and a list, which a
-   <button> may not, so the button sits over it instead of wrapping it. */
-.floor__view {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  border: none;
-  background: none;
-  border-radius: 14px;
-  cursor: pointer;
-  padding: 0;
-}
-.floor h4 {
-  font-size: 1.2rem;
-  margin-bottom: 0.8rem;
-  color: var(--amber2);
-}
-.floor ul {
+/* Rooms in the floor tabs (.seasons card): one row per room, each a button
+   that opens only that room's photos. */
+.rooms {
   list-style: none;
 }
-.floor li {
-  padding: 0.35rem 0;
+.rooms li + li {
   border-top: 1px solid var(--line);
-  font-size: 0.92rem;
-  color: rgba(245, 240, 232, 0.8);
 }
-.floor li:first-child {
-  border-top: none;
+.room {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.85rem 0.1rem;
+  border: none;
+  background: none;
+  color: rgba(245, 240, 232, 0.85);
+  font: inherit;
+  font-size: 0.98rem;
+  text-align: left;
+  cursor: pointer;
+}
+.room::after {
+  content: '›';
+  content: '›' / '';
+  color: var(--amber);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.room:hover {
+  color: var(--cream);
+}
+.room:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 .amenities {
   list-style: none;
@@ -1261,7 +1360,8 @@ summary:focus-visible {
 .lightbox__thumb,
 .chat-link,
 .amenity__btn,
-.floor__view,
+.room,
+.floor-map__row,
 .cal__nav-btn,
 .cal__day,
 .navbar__lang,
@@ -1284,6 +1384,7 @@ summary:focus-visible {
 .thumb:active,
 .lightbox__thumb:active,
 .amenity__btn:active,
+.room:active,
 .video-feature__play:active {
   opacity: 0.82;
 }
@@ -1308,7 +1409,7 @@ summary:focus-visible {
   outline-offset: -3px;
 }
 
-/* Shared floating photo preview for [data-photo] floor cards and amenity chips.
+/* Shared floating photo preview for [data-photo] amenity chips.
    Fixed + transform-positioned so showing it never reflows the section. */
 .hover-preview {
   position: fixed;
@@ -2230,7 +2331,6 @@ summary:focus-visible {
     display: flex;
     z-index: 60;
   }
-  .floors,
   .dest-grid,
   .contact-grid {
     /* minmax(0, …): a bare 1fr track grows to its content's min-content width,
