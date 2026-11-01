@@ -701,11 +701,10 @@ picture {
   top: calc(var(--y0) / 252 * 100%);
   height: calc((var(--y1) - var(--y0)) / 252 * 100%);
   display: flex;
-  align-items: center;
   justify-content: flex-end;
   padding: 0;
   border: none;
-  border-radius: 10px;
+  border-radius: 0;
   background: none;
   font: inherit;
   cursor: pointer;
@@ -718,36 +717,45 @@ picture {
   outline: 2px solid var(--amber);
   outline-offset: -2px;
 }
+/* The labels are one column: a cell per band, as tall as its floor, the
+   cells touching. The sketch's dashed floor lines run into its left edge
+   (x 252 of 360, hence 30%). */
 .floor-map__pin {
-  display: inline-flex;
+  align-self: stretch;
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
-  min-height: 32px;
-  padding: 0.25rem 0.75rem;
+  gap: 0.4rem;
+  width: 30%;
+  padding: 0 0.75rem;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(14, 20, 38, 0.85);
+  border-top: 0;
+  background: rgba(255, 255, 255, 0.03);
   color: var(--muted);
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   font-weight: 600;
   white-space: nowrap;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+#tab-floor-2 .floor-map__pin {
+  border-top: 1px solid var(--line);
+  border-radius: 12px 12px 0 0;
+}
+.floor-map__row--out .floor-map__pin {
+  border-radius: 0 0 12px 12px;
+  color: var(--cream);
 }
 .floor-map__row:hover .floor-map__pin {
+  background: rgba(255, 255, 255, 0.07);
   color: var(--cream);
-  border-color: var(--amber);
 }
 .floor-map__row[aria-selected='true'] .floor-map__pin {
   background: var(--amber);
-  border-color: var(--amber);
   color: #14100a;
-}
-.floor-map__row--out .floor-map__pin {
-  color: var(--cream);
 }
 .floor-map__row--out .floor-map__pin::after {
   content: '›';
   content: '›' / '';
+  margin-left: auto;
   color: var(--muted);
   font-size: 1.2em;
   line-height: 1;
