@@ -992,19 +992,111 @@ picture {
     transform: translateY(-3px);
   }
 }
-/* Pop on scroll (main.js adds .amenities--pop): each chip pops up as it scrolls
-   in and drops away as it leaves, upwards over the top edge (.is-above),
-   downwards under the bottom one. --d staggers chips arriving together. */
+/* Sadržaji as a walk through the house (amenity-guide.js adds .is-guide): a
+   frame pinned under the navbar with the group buttons, a copy of the cabin
+   sketch and the current group's chips; one empty step per group below it
+   gives the scroll that moves it. */
+.amenity-guide.is-guide .amenity-guide__frame {
+  position: sticky;
+  top: 84px; /* under the fixed navbar */
+  display: grid;
+  grid-template-areas: 'nav' 'art' 'chips';
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #151b2c; /* the tab cards' --panel */
+}
+/* Wide screens: the sketch beside the chips. */
+@media (min-width: 700px) {
+  .amenity-guide.is-guide .amenity-guide__frame {
+    grid-template-columns: minmax(0, 28%) minmax(0, 1fr);
+    grid-template-areas: 'nav nav' 'art chips';
+  }
+}
+.amenity-guide__step {
+  height: 40vh;
+}
+.amenity-guide__nav {
+  grid-area: nav;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.amenity-guide__nav button {
+  min-height: 40px;
+  margin-left: -1px;
+  padding: 0.35rem 0.3rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.15;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.amenity-guide__nav button:first-child {
+  margin-left: 0;
+  border-radius: 10px 0 0 10px;
+}
+.amenity-guide__nav button:last-child {
+  border-radius: 0 10px 10px 0;
+}
+.amenity-guide__nav button:hover {
+  color: var(--cream);
+}
+.amenity-guide__nav button[aria-pressed='true'] {
+  background: #feb246; /* as the floor picker's open cell */
+  color: #14100a;
+}
+.amenity-guide__nav button:focus-visible {
+  position: relative;
+  outline: 2px solid var(--amber);
+  outline-offset: -2px;
+}
+.amenity-guide__art {
+  grid-area: art;
+  justify-self: center;
+  display: block;
+  width: auto;
+  height: 150px;
+  color: rgba(245, 240, 232, 0.55);
+}
+@media (min-width: 700px) {
+  .amenity-guide__art {
+    width: 100%;
+    height: auto;
+  }
+}
+.amenity-guide__art g {
+  transition: color 0.25s ease;
+}
+.amenity-guide[data-zone='out'] .amenity-guide__art [data-out],
+.amenity-guide[data-zone='ground'] .amenity-guide__art [data-floor='0'],
+.amenity-guide[data-zone='first'] .amenity-guide__art [data-floor='1'],
+.amenity-guide[data-zone='all'] .amenity-guide__art [data-floor] {
+  color: var(--amber);
+}
+.amenity-guide.is-guide .amenities {
+  grid-area: chips;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0.5rem;
+}
+.amenity-guide.is-guide .amenities li[hidden] {
+  display: none;
+}
+/* The chips pop in (a small overshoot), staggered by --d, and fade out. */
 .amenities--pop li {
   opacity: 0;
-  transform: translateY(24px) scale(0.85);
+  transform: translateY(16px) scale(0.85);
   transition:
-    opacity 0.4s ease var(--d, 0s),
-    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d, 0s),
+    opacity 0.3s ease var(--d, 0s),
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d, 0s),
     border-color 0.3s ease;
-}
-.amenities--pop li.is-above {
-  transform: translateY(-24px) scale(0.85);
 }
 .amenities--pop li.is-in {
   opacity: 1;
