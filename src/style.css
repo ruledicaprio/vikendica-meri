@@ -717,6 +717,69 @@ picture {
 .floors__tab--out {
   color: var(--cream);
 }
+/* 3D floor picker (floor-scene.js). Once it runs it replaces both tab rows;
+   the tabs stay in the page, driven by it, and are the fallback without it. */
+.floors__stage {
+  position: relative;
+  height: clamp(280px, 78vw, 380px);
+  margin-bottom: 0.9rem;
+}
+.floors__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y; /* a swipe over the house still scrolls the page */
+}
+.floors.has-3d .seasons__tabs,
+.floors.has-3d .floors__down {
+  display: none;
+}
+.floors.has-3d .seasons__item {
+  border-radius: 16px;
+}
+.floor-pin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(14, 20, 38, 0.8);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.floor-pin:hover {
+  color: var(--cream);
+  border-color: var(--amber);
+}
+.floor-pin[aria-pressed='true'] {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: #14100a;
+}
+.floor-pin:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+.floor-pin--out {
+  color: var(--cream);
+}
+.floor-pin--out::after {
+  content: '›';
+  content: '›' / '';
+  color: var(--muted);
+  font-size: 1.2em;
+  line-height: 1;
+}
 .floors__tab--out::after {
   content: '›';
   content: '›' / '';
@@ -1323,6 +1386,7 @@ summary:focus-visible {
 .amenity__btn,
 .room,
 .floors__tab,
+.floor-pin,
 .cal__nav-btn,
 .cal__day,
 .navbar__lang,

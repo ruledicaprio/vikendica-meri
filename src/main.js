@@ -45,6 +45,28 @@ document.querySelectorAll('.dest-card__media[data-cat]').forEach((el) => {
 /* ---------- Etaže: each room opens its own photos ---------- */
 initRooms(document, openLightbox);
 
+/* ---------- Etaže: 3D floor picker (lazy) ----------
+   Loaded as the card comes near, reusing the hero's Three.js chunk. It drives
+   the card's tabs and Vani button, which stay as they are on data saver or
+   where WebGL fails (initFloorScene throws before touching the page). */
+const floorsCard = document.querySelector('.floors');
+if (floorsCard && !saveData) {
+  const near = new IntersectionObserver(
+    async ([entry]) => {
+      if (!entry.isIntersecting) return;
+      near.disconnect();
+      try {
+        const { initFloorScene } = await import('./floor-scene.js');
+        initFloorScene(floorsCard);
+      } catch {
+        // No WebGL, or the chunk failed: the tabs keep working.
+      }
+    },
+    { rootMargin: '400px 0px' }
+  );
+  near.observe(floorsCard);
+}
+
 /* ---------- Sadržaji: photo preview on hover ---------- */
 initHoverPreviews(document, openLightbox);
 
