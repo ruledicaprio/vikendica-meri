@@ -395,6 +395,23 @@ picture {
   border-color: rgba(212, 148, 58, 0.55);
   color: rgba(255, 238, 210, 0.95);
 }
+/* Changeover day: morning top left, afternoon bottom right (see .cal__day--split). */
+.mini-cal__day--split {
+  background: linear-gradient(to bottom right, var(--am) 49.5%, var(--pm) 50.5%);
+  border-color: rgba(245, 240, 232, 0.2);
+}
+.mini-cal__day--split:enabled {
+  cursor: pointer;
+}
+.mini-cal__day--split:enabled:hover {
+  border-color: rgba(120, 200, 140, 0.9);
+}
+.mini-cal__day--am-available { --am: rgba(90, 170, 110, 0.2); }
+.mini-cal__day--pm-available { --pm: rgba(90, 170, 110, 0.2); }
+.mini-cal__day--am-booked    { --am: rgba(186, 62, 62, 0.4); }
+.mini-cal__day--pm-booked    { --pm: rgba(186, 62, 62, 0.4); }
+.mini-cal__day--am-pending   { --am: rgba(212, 148, 58, 0.35); }
+.mini-cal__day--pm-pending   { --pm: rgba(212, 148, 58, 0.35); }
 .mini-cal__day--past {
   color: rgba(245, 240, 232, 0.25);
 }
@@ -1012,6 +1029,26 @@ picture {
   border-color: rgba(212, 148, 58, 0.5);
   color: rgba(255, 238, 210, 0.95);
 }
+/* Changeover day, split corner to corner: the morning (top left) is the guest
+   leaving by 10:00, the afternoon (bottom right) the next one arriving from
+   15:00. Same colours as the whole-day states. */
+.cal__day--split {
+  background: linear-gradient(to bottom right, var(--am) 49.5%, var(--pm) 50.5%);
+  border-color: rgba(245, 240, 232, 0.2);
+}
+.cal__day--split:not(:disabled):hover {
+  border-color: rgba(120, 200, 140, 0.9);
+}
+.cal__day--split:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+.cal__day--am-available { --am: rgba(90, 170, 110, 0.16); }
+.cal__day--pm-available { --pm: rgba(90, 170, 110, 0.16); }
+.cal__day--am-booked    { --am: rgba(186, 62, 62, 0.34); }
+.cal__day--pm-booked    { --pm: rgba(186, 62, 62, 0.34); }
+.cal__day--am-pending   { --am: rgba(212, 148, 58, 0.3); }
+.cal__day--pm-pending   { --pm: rgba(212, 148, 58, 0.3); }
 .cal__day--today {
   border-color: rgba(245, 240, 232, 0.55);
 }
@@ -1021,6 +1058,12 @@ picture {
   border-color: var(--cream);
   color: #14100a;
   font-weight: 700;
+}
+/* A departure-only changeover day is disabled once the range is complete, but
+   it is still the guest's pick and must not look greyed out. */
+.cal__day--split.cal__day--sel-end {
+  opacity: 1;
+  cursor: default;
 }
 .cal__day--in-range {
   background: rgba(245, 240, 232, 0.4);
@@ -1087,6 +1130,9 @@ picture {
 }
 .cal__legend-dot--pending {
   background: rgba(212, 148, 58, 0.7);
+}
+.cal__legend-dot--split {
+  background: linear-gradient(to bottom right, rgba(186, 62, 62, 0.7) 49.5%, rgba(90, 170, 110, 0.55) 50.5%);
 }
 .cal__legend-dot--sel {
   background: var(--cream);

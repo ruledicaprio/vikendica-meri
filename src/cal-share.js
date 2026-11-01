@@ -7,7 +7,7 @@
  * the button is pressed.
  */
 import { t } from './i18n/ui.js';
-import { dayStatus, toYMD } from './calendar.js';
+import { dayHalves, dayStatus, toYMD } from './calendar.js';
 
 const W = 1080;
 const H = 1350;
@@ -210,8 +210,11 @@ function draw(canvas, year, month) {
     const idx = firstDow + d - 1;
     const x = x0 + (idx % 7) * (cw + gap);
     const y = top + Math.floor(idx / 7) * (ch + gap);
-    const status = dayStatus(toYMD(year, month, d));
-    seen.add(status);
+    const ymd = toYMD(year, month, d);
+    const status = dayStatus(ymd);
+    const [am, pm] = status === 'split' ? dayHalves(ymd) : [status, status];
+    seen.add(am);
+    seen.add(pm);
 
     if (status === 'past') {
       roundRect(ctx, x, y, cw, ch, 14);
@@ -219,27 +222,49 @@ function draw(canvas, year, month) {
       ctx.lineWidth = 2;
       ctx.stroke();
     } else {
-      const { fill, stroke, ink } = STATUS[status];
+      // A changeover day is filled as its morning, then its afternoon is laid
+      // over the bottom-right half, corner to corner, as on the site.
       roundRect(ctx, x, y, cw, ch, 14);
       ctx.save();
       ctx.shadowColor = 'rgba(0, 0, 0, 0.14)';
       ctx.shadowBlur = 10;
       ctx.shadowOffsetY = 3;
-      ctx.fillStyle = fill;
+      ctx.fillStyle = STATUS[am].fill;
       ctx.fill();
       ctx.restore();
-      ctx.strokeStyle = stroke;
+      if (pm !== am) {
+        ctx.save();
+        ctx.clip();
+        ctx.beginPath();
+        ctx.moveTo(x + cw, y);
+        ctx.lineTo(x + cw, y + ch);
+        ctx.lineTo(x, y + ch);
+        ctx.closePath();
+        // Page background first: the fills are translucent, and white laid
+        // straight over red would come out pink.
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.fillStyle = STATUS[pm].fill;
+        ctx.fill();
+        ctx.restore();
+        roundRect(ctx, x, y, cw, ch, 14);
+      }
+      // Green edge whenever any half is free, so a changeover reads as bookable.
+      ctx.strokeStyle = STATUS[am === 'available' || pm === 'available' ? 'available' : am].stroke;
       ctx.lineWidth = 3;
       ctx.stroke();
-      mark(ctx, status, x + cw * 0.58, y + ch * 0.66, 42, ink);
+      // The afternoon's mark, nudged clear of the diagonal on a split tile.
+      const [mx, my] = am === pm ? [0.58, 0.66] : [0.64, 0.7];
+      mark(ctx, pm, x + cw * mx, y + ch * my, 42, STATUS[pm].ink);
     }
     if (next && d >= turn) {
       // White on the solid booked/pending tiles, where the season colour vanishes.
-      const T = status === 'booked' || status === 'pending' ? { ...next, motifColor: '#ffffff' } : next;
+      const solid = [am, pm].every((h) => h === 'booked' || h === 'pending');
+      const T = solid ? { ...next, motifColor: '#ffffff' } : next;
       motifAt(ctx, T, x + cw - 24, y + 26, 13, 0, status === 'past' ? 0.4 : 1);
     }
     ctx.textAlign = 'left';
-    ctx.fillStyle = status === 'past' ? S.faint : status === 'available' ? S.ink : STATUS[status].ink;
+    ctx.fillStyle = status === 'past' ? S.faint : am === 'available' ? S.ink : STATUS[am].ink;
     ctx.font = `600 32px ${SANS}`;
     ctx.fillText(String(d), x + 14, y + 42);
     ctx.textAlign = 'center';
