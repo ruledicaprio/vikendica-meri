@@ -169,14 +169,14 @@ async function load() {
 /* -------------------------------------------------------------- summarise -- */
 
 /**
- * Do two rows occupy a common day?
+ * Do two rows occupy a common night?
  *
- * Inclusive on both ends, matching /api/availability: a checkout day counts as
- * occupied. Erring towards flagging one extra collision is the right direction
- * for a check whose whole job is to stop a double booking.
+ * Nights, as the public calendar counts them: one guest checking out by 10:00
+ * and the next checking in from 15:00 on the same day is a changeover, not a
+ * double booking, so touching ranges do not overlap.
  */
 const overlaps = (a, b) =>
-  Boolean(a.checkin && b.checkin && a.checkin <= b.checkout && a.checkout >= b.checkin);
+  Boolean(a.checkin && b.checkin && a.checkin < b.checkout && a.checkout > b.checkin);
 
 /**
  * Still waiting for the owner: a pending request, or a general enquiry (no

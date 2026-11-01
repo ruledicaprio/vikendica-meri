@@ -31,17 +31,40 @@ function fmtDate(s) {
 // both branches, so it never did anything.)
 function nightLabel(n) { return t.nights(n); }
 
+/**
+ * What the morning and the afternoon of `ymd` are taken by.
+ *
+ * The house is let by the night: a stay from→to holds the nights from … to−1.
+ * Its checkout day is free from the afternoon (check-out by 10:00) and its
+ * check-in day until then (check-in from 15:00), so each is half a day.
+ */
+export function dayHalves(ymd) {
+  let am = 'available';
+  let pm = 'available';
+  for (const b of BOOKED) {
+    if (ymd > b.from && ymd < b.to) return [b.status, b.status];
+    if (ymd === b.to) am = b.status;
+    if (ymd === b.from) pm = b.status;
+  }
+  return [am, pm];
+}
+
+/** 'past', a whole-day status, or 'split' for a changeover day (see dayHalves). */
 export function dayStatus(ymd) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   if (parseDate(ymd) < today) return 'past';
-  for (const b of BOOKED) {
-    if (ymd >= b.from && ymd <= b.to) return b.status;
-  }
-  return 'available';
+  const [am, pm] = dayHalves(ymd);
+  return am === pm ? am : 'split';
 }
 
+/** Screen-reader note for a changeover day: which half of it is free. */
+export function splitNote(am, pm) {
+  return pm === 'available' ? t.calFreeFrom : am === 'available' ? t.calFreeUntil : t.calBooked;
+}
+
+// Nights, not days: arriving on a checkout day or leaving on a check-in day is fine.
 function rangeConflicts(from, to) {
-  return BOOKED.some((b) => from <= b.to && to >= b.from);
+  return BOOKED.some((b) => from < b.to && to > b.from);
 }
 
 /* ── main export ───────────────────────────────────────────── */
@@ -100,11 +123,13 @@ export function initCalendar(container) {
     for (let d = 1; d <= daysInMonth; d++) {
       const ymd    = toYMD(year, month, d);
       const status = dayStatus(ymd);
+      const [am, pm] = status === 'split' ? dayHalves(ymd) : [status, status];
       // A button, not a div: these were click-only and unreachable by keyboard.
       const el     = document.createElement('button');
       el.type = 'button';
 
       el.className = `cal__day cal__day--${status}`;
+      if (status === 'split') el.classList.add(`cal__day--am-${am}`, `cal__day--pm-${pm}`);
       el.textContent = d;
       el.dataset.ymd = ymd;
 
@@ -118,10 +143,16 @@ export function initCalendar(container) {
       // and why an unavailable day cannot be chosen.
       const suffix = status === 'booked' ? ` — ${t.calBooked}`
         : status === 'pending' ? ` — ${t.calPending}`
-        : status === 'past' ? ` — ${t.calPast}` : '';
+        : status === 'past' ? ` — ${t.calPast}`
+        : status === 'split' ? ` — ${splitNote(am, pm)}` : '';
       el.setAttribute('aria-label', fmtDate(ymd) + suffix);
 
-      if (status === 'available') {
+      // A changeover day opens for the end of a stay it can be: an arrival when
+      // its afternoon is free, a departure when its morning is and it would
+      // close the range already started without crossing a booked night.
+      const open = pm === 'available'
+        || (am === 'available' && selStart && !selEnd && ymd > selStart && !rangeConflicts(selStart, ymd));
+      if (open) {
         el.setAttribute('aria-pressed', String(!!selected));
         el.addEventListener('click', () => handleClick(ymd));
       } else {
@@ -243,6 +274,9 @@ export function initCalendar(container) {
       </div>
       <div class="cal__legend-item">
         <span class="cal__legend-dot cal__legend-dot--pending"></span>${t.calLegendPending}
+      </div>
+      <div class="cal__legend-item">
+        <span class="cal__legend-dot cal__legend-dot--split"></span>${t.calLegendSplit}
       </div>
       <div class="cal__legend-item">
         <span class="cal__legend-dot cal__legend-dot--sel"></span>${t.calLegendSelected}

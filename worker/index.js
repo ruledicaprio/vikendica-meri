@@ -237,10 +237,9 @@ async function requireOwner(request, env) {
  * emails, phone numbers and messages. Nothing but the three columns below may
  * ever be selected here.
  *
- * `to` is the checkout date and is reported as blocked. That is one night more
- * conservative than the industry norm (where a checkout day can host the next
- * check-in), but it matches what the public calendar already renders and it can
- * only ever refuse a date, never double-book one.
+ * `to` is the checkout date. The public calendar counts nights, so it shows a
+ * checkout day as a changeover: taken in the morning, free from 15:00 for the
+ * next arrival (src/calendar.js, dayHalves).
  */
 async function getAvailability(env) {
   const { results } = await env.DB.prepare(

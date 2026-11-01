@@ -3,7 +3,7 @@
 // through its handle, so there is one fetch and one meaning of "free"; a free
 // day starts the selection in the full calendar at #dostupnost.
 import { t } from './i18n/ui.js';
-import { dayStatus, toYMD } from './calendar.js';
+import { dayHalves, dayStatus, splitNote, toYMD } from './calendar.js';
 import { teleport } from './teleport.js';
 
 const label = (ymd) => t.formatDate(new Date(`${ymd}T12:00:00`), t.months);
@@ -19,11 +19,15 @@ function month(year, m, extra = '') {
   for (let d = 1; d <= days; d++) {
     const ymd = toYMD(year, m, d);
     const status = dayStatus(ymd);
-    const cls = `mini-cal__day mini-cal__day--${status}${ymd === today ? ' mini-cal__day--today' : ''}`;
-    const why = status === 'booked' ? ` — ${t.calBooked}` : status === 'pending' ? ` — ${t.calPending}` : '';
+    const [am, pm] = status === 'split' ? dayHalves(ymd) : [status, status];
+    const half = status === 'split' ? ` mini-cal__day--am-${am} mini-cal__day--pm-${pm}` : '';
+    const cls = `mini-cal__day mini-cal__day--${status}${half}${ymd === today ? ' mini-cal__day--today' : ''}`;
+    const why = status === 'booked' ? ` — ${t.calBooked}` : status === 'pending' ? ` — ${t.calPending}`
+      : status === 'split' ? ` — ${splitNote(am, pm)}` : '';
+    // Only starts a stay, so a day opens when it can be an arrival.
     cells +=
-      status === 'available'
-        ? `<button type="button" class="${cls}" data-ymd="${ymd}" aria-label="${label(ymd)}">${d}</button>`
+      pm === 'available'
+        ? `<button type="button" class="${cls}" data-ymd="${ymd}" aria-label="${label(ymd)}${why}">${d}</button>`
         : `<button type="button" class="${cls}" disabled aria-label="${label(ymd)}${why}">${d}</button>`;
   }
   // Always six week rows, so a 5-row month and a 6-row month line up and the
@@ -69,7 +73,7 @@ export async function initMiniCal(mount, cal) {
   });
 
   mount.querySelector('.mini-cal__months').addEventListener('click', (e) => {
-    const day = e.target.closest('.mini-cal__day--available');
+    const day = e.target.closest('.mini-cal__day[data-ymd]');
     if (!day) return;
     cal.setStart(day.dataset.ymd);
     teleport(document.getElementById('dostupnost'));
