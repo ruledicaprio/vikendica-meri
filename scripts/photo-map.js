@@ -16,16 +16,12 @@ export const PHOTO_MAP = [
   // ---------------------------------------------------------------- eksterijer
   ['ext/front-2.jpg', 'eksterijer', '00-vikendica-prednja-strana.jpg'],
   ['ext/front-0-park.jpg', 'eksterijer', '01-vikendica-a-frame-ljeto.jpg'],
-  ['ext/front-4.jpg', 'eksterijer', '05-vikendica-prilaz.jpg'],
   ['ext/front-1.jpg', 'eksterijer', '06-vikendica-vece-snijeg.jpg'],
-  ['ext/front-3.jpg', 'eksterijer', '07-vikendica-zimski-pogled.jpg'],
   ['ext/back-0.jpg', 'eksterijer', '08-terasa-rostilj.jpg'],
   ['ext/back-1.jpg', 'eksterijer', '10-vikendica-bocna-strana.jpg'],
-  ['ext/entrance-0-view.jpg', 'eksterijer', '12-ulaz-kamena-staza.jpg'],
   ['ext/entrance-2.jpg', 'eksterijer', '13-ulaz-prolaz.jpg'],
   ['ext/entrance-1.jpg', 'eksterijer', '14-ulaz-balkoni.jpg'],
   ['ext/scene-1-view.jpg', 'eksterijer', '15-okolina-zimi.jpg'],
-  ['ext/scene-2-view.jpg', 'eksterijer', '16-okolina-borovi.jpg'],
   ['ext/scene-0-view.jpg', 'eksterijer', '17-okolina-naselje.jpg'],
 
   // --------------------------------------------------------------------- dnevni
@@ -56,7 +52,7 @@ export const PHOTO_MAP = [
   ['bed/floor-2-room-1-fig-4.JPG', 'sobe', '08-soba-sprat-2-prva-detalj.jpg'],
   ['bed/floor-2-room-2-fig-2.JPG', 'sobe', '09-soba-sprat-2-druga.jpg'],
   ['bed/floor-2-room-2-fig-1.JPG', 'sobe', '10-soba-sprat-2-druga-pogled.jpg'],
-  ['bed/floor-2-room-2-fig-3.JPG', 'sobe', '11-soba-sprat-2-druga-prozor.jpg'],
+  ['bed/floor-2-room-2-fig-3.JPG', 'sobe', '08-soba-sprat-2-prva-pogled.jpg'],
   ['bed/floor-2-room-2-fig-0.JPG', 'sobe', '12-soba-sprat-2-druga-detalj.jpg'],
 
   // ------------------------------------------------------------------- kupatila
