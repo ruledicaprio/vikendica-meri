@@ -110,7 +110,7 @@ export const bs = {
   locTitle: 'Vlašić kroz godinu',
   locWinterTitle: 'Zimi',
   locWinterBody:
-    'Ski-liftovi Babanovac I i II su par minuta pješke preko platoa, a hotel Blanca 200 metara od kuće. Nazad se može i na skijama: staza Markovac spušta se prema naselju, oko dva kilometra do kuće. Grijanje na pelet je uključeno u cijenu, pa se poslije snijega vraćate u toplu kuću.',
+    'Ski-liftovi Babanovac I i II su par minuta pješke preko platoa, a hotel Blanca 200 metara od kuće. Nazad se može i na skijama: staza Markovac spušta se do vikendice.',
   locSummerTitle: 'Ljeti',
   locSummerBody:
     'Dolina Panjeva je mirna strana Babanovca — borova šuma, pašnjaci i zrak zbog kojeg se na Vlašić i dolazi. Dvorište sa roštiljem gleda u šumu, a plato počinje nadomak kuće. Deset osoba na tri etaže: dovoljno za dvije porodice ili veće društvo.',
@@ -137,17 +137,15 @@ export const bs = {
     'Ispred kuće su garantovana tri parking mjesta, na otvorenom.',
   faqQ3: 'Jesu li kućni ljubimci dozvoljeni?',
   faqA3: 'Nažalost ne — vikendica ne prima kućne ljubimce.',
-  faqQ4: 'Kako se kuća grije i plaća li se grijanje posebno?',
+  faqQ4: 'Kako se kuća grije?',
   faqA4:
-    'Centralno grijanje na pelet, uključeno u cijenu. U kući vas čekaju kratke upute za potpalu i održavanje.',
+    'Centralno grijanje na pelet.',
   faqQ5: 'Koliko je najmanji boravak?',
   faqA5:
     'Tri noći.',
   faqQ6: 'Kako se plaća i treba li avans?',
   faqA6:
     'Gotovinom ili bankovnim transferom. Rezervacija se potvrđuje uplatom avansa od 30% ukupnog iznosa.',
-  faqQ7: 'Šta je uključeno u cijenu?',
-  faqA7: 'Posteljina i pelet za grijanje.',
   faqQ8: 'Koliko je do Travnika i do sarajevskog aerodroma?',
   faqA8:
     'Do Travnika je 30 kilometara, oko pola sata vožnje. Do aerodroma u Sarajevu oko 130 kilometara, dva sata: sat autoputem do Lašve, pola sata do Travnika i pola sata do Babanovca. Usput vrijedi stati na ćevape kod Harija u Travniku.',
@@ -285,7 +283,7 @@ export const en = {
   locTitle: 'Vlašić through the year',
   locWinterTitle: 'In winter',
   locWinterBody:
-    'The Babanovac I and II lifts are a few minutes on foot across the plateau, and Hotel Blanca is 200 metres from the house. You can ski back too: the Markovac piste runs down towards the village, about two kilometres to the house. Pellet heating is included, so after a day in the snow you come back to a warm house.',
+    'The Babanovac I and II lifts are a few minutes on foot across the plateau, and Hotel Blanca is 200 metres from the house. You can ski back too: the Markovac piste runs down to the chalet.',
   locSummerTitle: 'In summer',
   locSummerBody:
     'Dolina Panjeva is the quiet side of Babanovac — pine forest, pasture, and the air people come to Vlašić for. The yard and its grill look into the trees, and the plateau starts a short walk from the door. Room for ten across three floors: enough for two families or a large group.',
@@ -308,17 +306,15 @@ export const en = {
     'There are three guaranteed open-air parking spaces in front of the house.',
   faqQ3: 'Are pets allowed?',
   faqA3: 'Unfortunately not — the chalet does not accept pets.',
-  faqQ4: 'How is the house heated, and is heating charged separately?',
+  faqQ4: 'How is the house heated?',
   faqA4:
-    'Pellet central heating, included in the price. Short instructions for lighting and upkeep are waiting in the house.',
+    'Pellet central heating.',
   faqQ5: 'What is the minimum stay?',
   faqA5:
     'Three nights.',
   faqQ6: 'How do I pay, and is a deposit required?',
   faqA6:
     'Cash or bank transfer. A 30% deposit, paid in advance, confirms the booking.',
-  faqQ7: 'What is included in the price?',
-  faqA7: 'Bedding and heating pellets.',
   faqQ8: 'How far is Travnik, and Sarajevo airport?',
   faqA8:
     'Travnik is 30 kilometres away, about half an hour by car. Sarajevo airport is roughly 130 kilometres, about two hours: an hour on the motorway to Lasva, half an hour to Travnik and half an hour up to Babanovac. On the way, stop for cevapi at Hari in Travnik.',
